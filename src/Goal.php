@@ -48,14 +48,14 @@ class Goal
 
 	public function getChange()
 	{
-		return new Weight($this->getVector()->getChangePerWeek()->getInKg()->getAmount() * $this->getDuration()->getInWeeks()->getAmount());
+		return new Weight(new Amount($this->getVector()->getChangePerWeek()->getInKg()->getAmount()->getValue() * $this->getDuration()->getInWeeks()->getAmount()->getValue()));
 	}
 
 	public function getFinal(&$calculator)
 	{
 		$weight = $this->getWeight();
 		if (!($weight instanceof Weight)) {
-			throw (new CaloricCalculatorException("Missing weight."))
+			throw (new FattyException("Missing weight."))
 				->setAbbr('missingWeight')
 				;
 		}

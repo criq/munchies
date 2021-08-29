@@ -207,13 +207,18 @@ class Calculator
 			}
 		}
 
-		// if (trim($params['diet_approach'] ?? null)) {
-		// 	try {
-		// 		$this->setDietApproach($params['diet_approach']);
-		// 	} catch (\Throwable $e) {
-		// 		$exceptions->add($e);
-		// 	}
-		// }
+		if (trim($params['diet_approach'] ?? null)) {
+			try {
+				$value = Approach::createFromString($params['diet_approach']);
+				if (!$value) {
+					throw new \Katu\Exceptions\InputErrorException("invalid diet_approach");
+				}
+
+				$this->getDiet()->setApproach($value);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
 
 		// if (trim($params['diet_carbs'] ?? null)) {
 		// 	try {
@@ -403,40 +408,12 @@ class Calculator
 	}
 
 	/*****************************************************************************
-	 * Výživový trend.
+	 * Dieta.
 	 */
-	public function setDiet($diet, $dietCarbs)
+	public function getDiet() : Diet
 	{
-		if (is_string($diet)) {
-			$className = "Fatty\\Diets\\" . ucfirst($diet);
-			if (class_exists($className)) {
-				$diet = new $className;
-			}
-		}
+		$this->diet = $this->diet instanceof Diet ? $this->diet : new Diet;
 
-		if (!(($diet ?? null) instanceof Diet)) {
-			throw (new CaloricCalculatorException("Invalid diet."))
-				->setAbbr('invalidDiet')
-				;
-		}
-
-		try {
-			$carbs = new Nutrients\Carbs($dietCarbs, 'g');
-		} catch (\Throwable $e) {
-			$carbs = null;
-		}
-
-		if ($carbs) {
-			$diet->setCarbs($carbs);
-		}
-
-		$this->diet = $diet;
-
-		return $this;
-	}
-
-	public function getDiet()
-	{
 		return $this->diet;
 	}
 

@@ -2,7 +2,7 @@
 
 namespace Fatty\Approaches;
 
-class LowCarb extends \Fatty\Diet
+class LowCarb extends \Fatty\Approach
 {
 	const CARBS_DEFAULT = 80;
 	const CARBS_MAX = 120;

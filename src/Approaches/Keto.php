@@ -2,7 +2,7 @@
 
 namespace Fatty\Approaches;
 
-class Keto extends \Fatty\Diet
+class Keto extends \Fatty\Approach
 {
 	const CARBS_DEFAULT = 40;
 	const CARBS_MAX = 50;

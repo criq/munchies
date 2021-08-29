@@ -2,47 +2,74 @@
 
 namespace Fatty;
 
+use Fatty\Nutrients\Carbs;
+use Fatty\Nutrients\Fats;
+use Fatty\Nutrients\Proteins;
+
 abstract class Approach
 {
 	const CARBS_DEFAULT = null;
 	const CARBS_MAX = null;
 	const CARBS_MIN = null;
 	const CODE = null;
+	const ENERGY_DEFAULT = null;
+	const FATS_DEFAULT = null;
 	const LABEL_DECLINATED = null;
+	const PROTEINS_DEFAULT = null;
 
-	protected $approach;
-	protected $carbs;
-
-	public function __construct(Nutrients\Carbs $carbs = null)
+	public function __toString() : string
 	{
-		$this->carbs = $carbs;
+		return $this->getLabelDeclinated();
 	}
 
-	public function __toString()
+	public static function createFromString(string $value) : ?Approach
 	{
-		return static::LABEL_DECLINATED;
-	}
+		try {
+			$class = 'Fatty\\Approaches\\' . ucfirst($value);
 
-	public function setCarbs(Nutrients\Carbs $carbs)
-	{
-		if (defined('static::CARBS_MIN') && defined('static::CARBS_MAX') && static::CARBS_MIN && static::CARBS_MAX && ($carbs->getAmount() < static::CARBS_MIN || $carbs->getAmount() > static::CARBS_MAX)) {
-			throw (new Exceptions\CaloricCalculatorException("Invalid diet carbs."))
-				->setAbbr('invalidDietCarbs')
-				;
+			return new $class;
+		} catch (\Throwable $e) {
+			return null;
 		}
-
-		$this->carbs = $carbs;
-
-		return $this;
 	}
 
-	public function getCarbs()
+	public function getCode() : string
 	{
-		return ($this->carbs instanceof Nutrients\Carbs) ? $this->carbs : new Nutrients\Carbs(static::CARBS_DEFAULT, 'g');
+		return (string)static::CODE;
 	}
 
-	public function getArray()
+	public function getLabelDeclinated() : string
 	{
-		return static::CODE;
+		return (string)static::LABEL_DECLINATED;
+	}
+
+	public function getEnergyDefault() : ?Energy
+	{
+		return static::ENERGY_DEFAULT ? new Energy(new Amount((float)static::ENERGY_DEFAULT), 'kcal') : null;
+	}
+
+	public function getCarbsDefault() : ?Carbs
+	{
+		return static::CARBS_DEFAULT ? new Carbs(new Amount((float)static::CARBS_DEFAULT), 'g') : null;
+	}
+
+	public function getCarbsMin() : ?Carbs
+	{
+		return static::CARBS_MIN ? new Carbs(new Amount((float)static::CARBS_MIN), 'g') : null;
+	}
+
+	public function getCarbsMax() : ?Carbs
+	{
+		return static::CARBS_MAX ? new Carbs(new Amount((float)static::CARBS_MAX), 'g') : null;
+	}
+
+	public function getFatsDefault() : ?Fats
+	{
+		return static::FATS_DEFAULT ? new Carbs(new Amount((float)static::FATS_DEFAULT), 'g') : null;
+	}
+
+	public function getProteinsDefault() : ?Proteins
+	{
+		return static::PROTEINS_DEFAULT ? new Carbs(new Amount((float)static::PROTEINS_DEFAULT), 'g') : null;
 	}
 }

@@ -2,7 +2,7 @@
 
 namespace Fatty\Approaches;
 
-class Ned extends \Fatty\Diet
+class Ned extends \Fatty\Approach
 {
 	const CARBS_DEFAULT = 50;
 	const CARBS_MAX = 50;

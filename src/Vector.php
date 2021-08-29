@@ -38,7 +38,7 @@ abstract class Vector
 
 	public function getChangePerWeek()
 	{
-		return new Weight(static::WEIGHT_CHANGE_PER_WEEK, 'kg');
+		return new Weight(new Amount(static::WEIGHT_CHANGE_PER_WEEK), 'kg');
 	}
 
 	public function getGoalTdee(&$calculator)
