@@ -179,23 +179,33 @@ class Calculator
 			}
 		}
 
-		$this->setGoalDuration(new \App\Classes\Profile\Duration(12, 'weeks'));
+		$this->getGoal()->setDuration(new Duration(new Amount(12), 'weeks'));
 
-		// if (trim($params['goal_direction'] ?? null)) {
-		// 	try {
-		// 		$this->setGoalDirection($params['goal_direction']);
-		// 	} catch (\Throwable $e) {
-		// 		$exceptions->add($e);
-		// 	}
-		// }
+		if (trim($params['goal_vector'] ?? null)) {
+			try {
+				$value = Vector::createFromString($params['goal_vector']);
+				if (!$value) {
+					throw new \Katu\Exceptions\InputErrorException("invalid goal_vector");
+				}
 
-		// if (trim($params['goal_weight'] ?? null)) {
-		// 	try {
-		// 		$this->setGoalWeight($params['goal_weight']);
-		// 	} catch (\Throwable $e) {
-		// 		$exceptions->add($e);
-		// 	}
-		// }
+				$this->getGoal()->setVector($value);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
+
+		if (trim($params['goal_weight'] ?? null)) {
+			try {
+				$value = Weight::createFromString($params['goal_weight']);
+				if (!$value) {
+					throw new \Katu\Exceptions\InputErrorException("invalid goal_weight");
+				}
+
+				$this->getGoal()->setWeight($value);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
 
 		// if (trim($params['diet_approach'] ?? null)) {
 		// 	try {
@@ -308,46 +318,6 @@ class Calculator
 	}
 
 	/*****************************************************************************
-	 * Výška.
-	 */
-	// public function setHeight(?Length $value) : Calculator
-	// {
-	// 	$this->getProportions()->setHeight($value);
-
-	// 	return $this;
-	// }
-
-	/*****************************************************************************
-	 * Obvod pasu.
-	 */
-	// public function setWaist(?Length $value) : Calculator
-	// {
-	// 	$this->getProportions()->setWaist($value);
-
-	// 	return $this;
-	// }
-
-	/*****************************************************************************
-	 * Obvod boků.
-	 */
-	// public function setHips(?Length $value) : Calculator
-	// {
-	// 	$this->getProportions()->setHips($value);
-
-	// 	return $this;
-	// }
-
-	/*****************************************************************************
-	 * Obvod krku.
-	 */
-	// public function setNeck(?Length $value) : Calculator
-	// {
-	// 	$this->getProportions()->setNeck($value);
-
-	// 	return $this;
-	// }
-
-	/*****************************************************************************
 	 * Naměřené hodnoty.
 	 */
 	public function setMeasurementBodyFatPercentage(?Percentage $value) : Calculator
@@ -377,47 +347,12 @@ class Calculator
 		return $this->activity;
 	}
 
-	/*****************************************************************************
-	 * Sport.
-	 */
-	// public function setSportDurations(SportDuration $lowFrequency, SportDuration $aerobic, SportDuration $anaerobic) : Calculator
-	// {
-	// 	$this->getSportDurations()
-	// 		->setLowFrequency($lowFrequency)
-	// 		->setAerobic($aerobic)
-	// 		->setAnaerobic($anaerobic)
-	// 		;
-
-	// 	return $this;
-	// }
-
 	public function getSportDurations() : SportDurations
 	{
 		$this->sportDurations = $this->sportDurations instanceof SportDurations ? $this->sportDurations : new SportDurations;
 
 		return $this->sportDurations;
 	}
-
-	// public function setSportDurationLowFrequency(LowFrequency $sportDuration) : Calculator
-	// {
-	// 	$this->getSportDurations()->setLowFrequency($sportDuration);
-
-	// 	return $this;
-	// }
-
-	// public function setSportDurationAerobic(Aerobic $sportDuration) : Calculator
-	// {
-	// 	$this->getSportDurations()->setAerobic($sportDuration);
-
-	// 	return $this;
-	// }
-
-	// public function setSportDurationAnaerobic(SportDuration $sportDuration) : Calculator
-	// {
-	// 	$this->getSportDurations()->setAnaerobic($sportDuration);
-
-	// 	return $this;
-	// }
 
 	public function getSportActivityAmount()
 	{
@@ -460,84 +395,11 @@ class Calculator
 	/*****************************************************************************
 	 * Cíle.
 	 */
-	public function getGoal()
+	public function getGoal() : Goal
 	{
 		$this->goal = $this->goal instanceof Goal ? $this->goal : new Goal;
 
 		return $this->goal;
-	}
-
-	public function setGoalTrend($goalTrend)
-	{
-		$this->getGoal()->setTrend($goalTrend);
-
-		return $this;
-	}
-
-	public function getGoalTrend()
-	{
-		if (!($this->getGoal()->getTrend() instanceof WeightVector)) {
-			throw (new CaloricCalculatorException("Missing goal trend."))
-				->setAbbr('missingGoalTrend')
-				;
-		}
-
-		return $this->getGoal()->getTrend();
-	}
-
-	public function setGoalWeight($goalWeight)
-	{
-		$this->getGoal()->setWeight($goalWeight);
-
-		$weight = $this->getWeight();
-		$goalTrend = $this->getGoal()->getTrend();
-		$goalWeight = $this->getGoal()->getWeight();
-
-		if ($weight && $goalTrend && $goalWeight) {
-			if ($goalTrend instanceof WeightVectors\Loose && $goalWeight->getInKg()->getAmount() > $weight->getInKg()->getAmount()) {
-				throw (new CaloricCalculatorException("Target weight is higher than current weight."))
-					->setAbbr('goalWeightHigherThanCurrentWeight')
-					;
-			} elseif ($goalTrend instanceof WeightVectors\Loose && $goalWeight->getInKg()->getAmount() == $weight->getInKg()->getAmount()) {
-				throw (new CaloricCalculatorException("Target weight is the same as current weight."))
-					->setAbbr('goalWeightUnchanged')
-					;
-			}
-
-			if ($goalTrend instanceof WeightVectors\Gain && $goalWeight->getInKg()->getAmount() < $weight->getInKg()->getAmount()) {
-				throw (new CaloricCalculatorException("Target weight is lower than current weight."))
-					->setAbbr('goalWeightLowerThanCurrentWeight')
-					;
-			} elseif ($goalTrend instanceof WeightVectors\Gain && $goalWeight->getInKg()->getAmount() == $weight->getInKg()->getAmount()) {
-				throw (new CaloricCalculatorException("Target weight is the same as current weight."))
-					->setAbbr('goalWeightUnchanged')
-					;
-			}
-		}
-
-		return $this;
-	}
-
-	public function getGoalWeight()
-	{
-		if ($this->getGoalTrend() instanceof WeightVectors\Maintain) {
-			return $this->getWeight();
-		}
-
-		if (!($this->getGoal()->getWeight() instanceof Weight)) {
-			throw (new CaloricCalculatorException("Missing goal weight."))
-				->setAbbr('missingGoalWeight')
-				;
-		}
-
-		return $this->getGoal()->getWeight();
-	}
-
-	public function setGoalDuration($duration)
-	{
-		$this->getGoal()->setDuration($duration);
-
-		return $this;
 	}
 
 	/*****************************************************************************
@@ -978,7 +840,7 @@ class Calculator
 	 */
 	public function getTotalDailyEnergyExpenditure()
 	{
-		if (!($this->getGoal()->getTrend() instanceof WeightVector)) {
+		if (!($this->getGoal()->getTrend() instanceof Vector)) {
 			throw (new CaloricCalculatorException("Missing goal trend."))
 				->setAbbr('missingGoalTrend')
 				;
@@ -1389,7 +1251,7 @@ class Calculator
 		}
 
 		// Is loosing weight.
-		if ($this->getGoal()->getTrend() instanceof WeightVectors\Loose) {
+		if ($this->getGoal()->getTrend() instanceof Vectors\Loose) {
 			// Is loosing weight while pregnant.
 			if ($this->getGender() instanceof Genders\Female && $this->getGender()->isPregnant()) {
 				$messages[] = [
@@ -1442,8 +1304,8 @@ class Calculator
 							'fields' => ['goalWeight'],
 						];
 
-						$slowLooseTdee = (new WeightVectors\SlowLoose)->getGoalTdee($this);
-						$looseTdee = (new WeightVectors\Loose)->getGoalTdee($this);
+						$slowLooseTdee = (new Vectors\SlowLoose)->getGoalTdee($this);
+						$looseTdee = (new Vectors\Loose)->getGoalTdee($this);
 
 						$messages[] = [
 							'message' => strtr(\Katu\Config::get('caloricCalculator', 'messages', 'loosingWeightTdeeRecommendations'), [
@@ -1455,7 +1317,7 @@ class Calculator
 					}
 				}
 			}
-		} elseif ($this->getGoal()->getTrend() instanceof WeightVectors\Gain) {
+		} elseif ($this->getGoal()->getTrend() instanceof Vectors\Gain) {
 			if (!($this->getWeight() instanceof Weight)) {
 				$ec->add(
 					(new CaloricCalculatorException("Missing weight."))
@@ -1494,8 +1356,8 @@ class Calculator
 						'fields' => ['goalWeight'],
 					];
 
-					$slowGainTdee = (new WeightVectors\SlowGain)->getGoalTdee($this);
-					$gainTdee = (new WeightVectors\Gain)->getGoalTdee($this);
+					$slowGainTdee = (new Vectors\SlowGain)->getGoalTdee($this);
+					$gainTdee = (new Vectors\Gain)->getGoalTdee($this);
 
 					$messages[] = [
 						'message' => strtr(\Katu\Config::get('caloricCalculator', 'messages', 'gainingWeightTdeeRecommendations'), [

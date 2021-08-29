@@ -2,17 +2,28 @@
 
 namespace Fatty;
 
-abstract class WeightVector
+abstract class Vector
 {
 	const LABEL_INFINITIVE = null;
 	const TDEE_QUOTIENT = null;
-	const WEIGHT_CHANGE_PER_WEEK = null;
+	const WEIGHT_CHANGE_PER_WEEK = '';
 
 	abstract public function getTdeeChangePerDay(&$calculator);
 
 	public function __toString()
 	{
 		return $this->getLabelInfinitive();
+	}
+
+	public static function createFromString(string $value)
+	{
+		try {
+			$class = 'Fatty\\Vectors\\' . ucfirst($value);
+
+			return new $class;
+		} catch (\Throwable $e) {
+			return null;
+		}
 	}
 
 	public function getCode()

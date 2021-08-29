@@ -1,6 +1,6 @@
 <?php
 
-namespace Fatty\WeightVectors;
+namespace Fatty\Vectors;
 
 class SlowLoose extends Loose
 {

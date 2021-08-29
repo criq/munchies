@@ -1,6 +1,6 @@
 <?php
 
-namespace Fatty\Diets;
+namespace Fatty\Approaches;
 
 class Med extends Standard
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Fatty\Diets;
+namespace Fatty\Approaches;
 
 class Keto extends \Fatty\Diet
 {

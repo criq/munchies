@@ -1,8 +1,8 @@
 <?php
 
-namespace Fatty\WeightVectors;
+namespace Fatty\Vectors;
 
-class Loose extends \Fatty\WeightVector
+class Loose extends \Fatty\Vector
 {
 	const LABEL_INFINITIVE = "zhubnout";
 	const TDEE_QUOTIENT = 1;

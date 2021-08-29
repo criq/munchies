@@ -1,6 +1,6 @@
 <?php
 
-namespace Fatty\Diets;
+namespace Fatty\Approaches;
 
 class LowCarb extends \Fatty\Diet
 {

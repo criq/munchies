@@ -2,80 +2,53 @@
 
 namespace Fatty;
 
+use Fatty\Exceptions\FattyException;
+
 class Goal
 {
-	private $duration;
-	private $direction;
-	private $weight;
+	protected $duration;
+	protected $vector;
+	protected $weight;
 
-	public function setDirection($weightVector)
+	public function setDuration(?Duration $duration) : Goal
 	{
-		if (is_string($weightVector)) {
-			$className = "Fatty\\WeightVectors\\" . ucfirst($weightVector);
-			if (class_exists($className)) {
-				$weightVector = new $className;
-			}
-		}
-
-		if (!($weightVector instanceof WeightVector)) {
-			throw (new CaloricCalculatorException("Invalid goal direction."))
-				->setAbbr('invalidGoaldirection')
-				;
-		}
-
-		$this->direction = $weightVector;
-
-		return $this;
-	}
-
-	public function getDirection()
-	{
-		return $this->direction;
-	}
-
-	public function setWeight($weight)
-	{
-		if (!($weight instanceof Weight)) {
-			try {
-				$weight = new Weight($weight);
-			} catch (\Fatty\Exceptions\InvalidAmountException $e) {
-				throw (new CaloricCalculatorException("Invalid goal weight."))
-					->setAbbr('invalidGoalWeight')
-					;
-			}
-		}
-
-		$this->weight = $weight;
-
-		return $this;
-	}
-
-	public function getWeight()
-	{
-		return $this->weight;
-	}
-
-	public function setDuration($duration)
-	{
-		if (!($duration instanceof Duration)) {
-			throw (new CaloricCalculatorException("Invalid goal duration."))
-				->setAbbr('invalidGoalDuration')
-				;
-		}
-
 		$this->duration = $duration;
 
 		return $this;
 	}
 
-	public function getDuration()
+	public function getDuration() : ?Duration
 	{
 		return $this->duration;
 	}
 
+	public function setVector(?Vector $value) : Goal
+	{
+		$this->vector = $value;
+
+		return $this;
+	}
+
+	public function getVector() : ?Vector
+	{
+		return $this->vector;
+	}
+
+	public function setWeight(?Weight $weight) : Goal
+	{
+		$this->weight = $weight;
+
+		return $this;
+	}
+
+	public function getWeight() : ?Weight
+	{
+		return $this->weight;
+	}
+
 	public function getChange()
 	{
-		return new Weight($this->getDirection()->getChangePerWeek()->getInKg()->getAmount() * $this->getDuration()->getInWeeks()->getAmount());
+		return new Weight($this->getVector()->getChangePerWeek()->getInKg()->getAmount() * $this->getDuration()->getInWeeks()->getAmount());
 	}
 
 	public function getFinal(&$calculator)
@@ -92,22 +65,22 @@ class Goal
 
 	public function getDifference(&$calculator)
 	{
-		if ($this->getDirection() instanceof WeightVectors\Loose) {
+		if ($this->getVector() instanceof Vectors\Loose) {
 			return $this->getFinal($calculator)->getInKg()->getAmount() - $this->getWeight()->getInKg()->getAmount();
-		} elseif ($this->getDirection() instanceof WeightVectors\Gain) {
+		} elseif ($this->getVector() instanceof Vectors\Gain) {
 			return $this->getWeight()->getInKg()->getAmount() - $this->getFinal($calculator)->getInKg()->getAmount();
 		}
 	}
 
 	public function getGoalTdee($calculator)
 	{
-		$direction = $this->getDirection();
-		if (!($direction instanceof WeightVector)) {
-			throw (new CaloricCalculatorException("Missing goal direction."))
-				->setAbbr('missingGoaldirection')
+		$vector = $this->getVector();
+		if (!($vector instanceof Vector)) {
+			throw (new FattyException("Missing goal vector."))
+				->setAbbr('missingGoalvector')
 				;
 		}
 
-		return $direction->getGoalTdee($calculator);
+		return $vector->getGoalTdee($calculator);
 	}
 }

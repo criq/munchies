@@ -1,8 +1,8 @@
 <?php
 
-namespace Fatty\WeightVectors;
+namespace Fatty\Vectors;
 
-class Maintain extends \Fatty\WeightVector
+class Maintain extends \Fatty\Vector
 {
 	const LABEL_INFINITIVE = "udržovat hmotnost";
 	const TDEE_QUOTIENT = 1.05;

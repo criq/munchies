@@ -1,8 +1,8 @@
 <?php
 
-namespace Fatty\WeightVectors;
+namespace Fatty\Vectors;
 
-class Gain extends \Fatty\WeightVector
+class Gain extends \Fatty\Vector
 {
 	const LABEL_INFINITIVE = "přibrat";
 	const TDEE_QUOTIENT = 1.15;
