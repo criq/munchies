@@ -3,6 +3,9 @@
 namespace Fatty;
 
 use Fatty\Exceptions\FattyException;
+use Fatty\SportDurations\Aerobic;
+use Fatty\SportDurations\Anaerobic;
+use Fatty\SportDurations\LowFrequency;
 
 class Calculator
 {
@@ -66,7 +69,7 @@ class Calculator
 					throw new \Katu\Exceptions\InputErrorException("Neplatná výška.");
 				}
 
-				$this->setHeight($value);
+				$this->getProportions()->setHeight($value);
 			} catch (\Throwable $e) {
 				$exceptions->add($e);
 			}
@@ -79,7 +82,7 @@ class Calculator
 					throw new \Katu\Exceptions\InputErrorException("Neplatný obvod pasu.");
 				}
 
-				$this->setWaist($value);
+				$this->getProportions()->setWaist($value);
 			} catch (\Throwable $e) {
 				$exceptions->add($e);
 			}
@@ -92,7 +95,7 @@ class Calculator
 					throw new \Katu\Exceptions\InputErrorException("Neplatný obvod boků.");
 				}
 
-				$this->setHips($value);
+				$this->getProportions()->setHips($value);
 			} catch (\Throwable $e) {
 				$exceptions->add($e);
 			}
@@ -105,7 +108,7 @@ class Calculator
 					throw new \Katu\Exceptions\InputErrorException("Neplatný obvod boků.");
 				}
 
-				$this->setNeck($value);
+				$this->getProportions()->setNeck($value);
 			} catch (\Throwable $e) {
 				$exceptions->add($e);
 			}
@@ -124,8 +127,6 @@ class Calculator
 			}
 		}
 
-
-
 		if (trim($params['activity'] ?? null)) {
 			try {
 				$value = Activity::createFromString($params['activity']);
@@ -139,31 +140,46 @@ class Calculator
 			}
 		}
 
-		// if (trim($params['sportDurations_lowFrequency'] ?? null)) {
-		// 	try {
-		// 		$this->setSportDurationLowFrequency($params['sportDurations_lowFrequency']);
-		// 	} catch (\Throwable $e) {
-		// 		$exceptions->add($e);
-		// 	}
-		// }
+		if (trim($params['sportDurations_lowFrequency'] ?? null)) {
+			try {
+				$value = LowFrequency::createFromString($params['sportDurations_lowFrequency']);
+				if (!$value) {
+					throw new \Katu\Exceptions\InputErrorException("invalid sportDurations_lowFrequency");
+				}
 
-		// if (trim($params['sportDurations_aerobic'] ?? null)) {
-		// 	try {
-		// 		$this->setSportDurationAerobic($params['sportDurations_aerobic']);
-		// 	} catch (\Throwable $e) {
-		// 		$exceptions->add($e);
-		// 	}
-		// }
+				$this->getSportDurations()->setLowFrequency($value);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
 
-		// if (trim($params['sportDurations_anaerobic'] ?? null)) {
-		// 	try {
-		// 		$this->setSportDurationAnaerobic($params['sportDurations_anaerobic']);
-		// 	} catch (\Throwable $e) {
-		// 		$exceptions->add($e);
-		// 	}
-		// }
+		if (trim($params['sportDurations_aerobic'] ?? null)) {
+			try {
+				$value = Aerobic::createFromString($params['sportDurations_aerobic']);
+				if (!$value) {
+					throw new \Katu\Exceptions\InputErrorException("invalid sportDurations_aerobic");
+				}
 
-		// $this->setGoalDuration(new \App\Classes\Profile\Duration(12, 'weeks'));
+				$this->getSportDurations()->setAerobic($value);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
+
+		if (trim($params['sportDurations_anaerobic'] ?? null)) {
+			try {
+				$value = Anaerobic::createFromString($params['sportDurations_anaerobic']);
+				if (!$value) {
+					throw new \Katu\Exceptions\InputErrorException("invalid sportDurations_anaerobic");
+				}
+
+				$this->getSportDurations()->setAnaerobic($value);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
+
+		$this->setGoalDuration(new \App\Classes\Profile\Duration(12, 'weeks'));
 
 		// if (trim($params['goal_direction'] ?? null)) {
 		// 	try {
@@ -236,32 +252,6 @@ class Calculator
 		}
 	}
 
-
-
-
-
-
-
-	public static function getDeviation($value, $ideal, $extremes)
-	{
-		try {
-			$deviation = $value - $ideal;
-			$range = $deviation < 0 ? [$extremes[0], $ideal] : [$ideal, $extremes[1]];
-			$res = $deviation / ($range[1] - $range[0]);
-
-			if ($res < -1) {
-				$res = -1;
-			}
-			if ($res > 1) {
-				$res = 1;
-			}
-
-			return $res;
-		} catch (\Throwable $e) {
-			return 0;
-		}
-	}
-
 	/*****************************************************************************
 	 * Gender.
 	 */
@@ -320,42 +310,42 @@ class Calculator
 	/*****************************************************************************
 	 * Výška.
 	 */
-	public function setHeight(?Length $value) : Calculator
-	{
-		$this->getProportions()->setHeight($value);
+	// public function setHeight(?Length $value) : Calculator
+	// {
+	// 	$this->getProportions()->setHeight($value);
 
-		return $this;
-	}
+	// 	return $this;
+	// }
 
 	/*****************************************************************************
 	 * Obvod pasu.
 	 */
-	public function setWaist(?Length $value) : Calculator
-	{
-		$this->getProportions()->setWaist($value);
+	// public function setWaist(?Length $value) : Calculator
+	// {
+	// 	$this->getProportions()->setWaist($value);
 
-		return $this;
-	}
+	// 	return $this;
+	// }
 
 	/*****************************************************************************
 	 * Obvod boků.
 	 */
-	public function setHips(?Length $value) : Calculator
-	{
-		$this->getProportions()->setHips($value);
+	// public function setHips(?Length $value) : Calculator
+	// {
+	// 	$this->getProportions()->setHips($value);
 
-		return $this;
-	}
+	// 	return $this;
+	// }
 
 	/*****************************************************************************
 	 * Obvod krku.
 	 */
-	public function setNeck(?Length $value) : Calculator
-	{
-		$this->getProportions()->setNeck($value);
+	// public function setNeck(?Length $value) : Calculator
+	// {
+	// 	$this->getProportions()->setNeck($value);
 
-		return $this;
-	}
+	// 	return $this;
+	// }
 
 	/*****************************************************************************
 	 * Naměřené hodnoty.
@@ -390,48 +380,44 @@ class Calculator
 	/*****************************************************************************
 	 * Sport.
 	 */
-	public function setSportDurations($lowFrequency, $aerobic, $anaerobic)
-	{
-		if (!($this->getSportDurations() instanceof SportDurations)) {
-			$this->sport = new SportDurations;
-		}
+	// public function setSportDurations(SportDuration $lowFrequency, SportDuration $aerobic, SportDuration $anaerobic) : Calculator
+	// {
+	// 	$this->getSportDurations()
+	// 		->setLowFrequency($lowFrequency)
+	// 		->setAerobic($aerobic)
+	// 		->setAnaerobic($anaerobic)
+	// 		;
 
-		$this->getSportDurations()
-			->setLowFrequency(new SportDurations\LowFrequency($lowFrequency))
-			->setAerobic(new SportDurations\Aerobic($aerobic))
-			->setAnaerobic(new SportDurations\Anaerobic($anaerobic))
-			;
+	// 	return $this;
+	// }
 
-		return $this;
-	}
-
-	public function getSportDurations()
+	public function getSportDurations() : SportDurations
 	{
 		$this->sportDurations = $this->sportDurations instanceof SportDurations ? $this->sportDurations : new SportDurations;
 
 		return $this->sportDurations;
 	}
 
-	public function setSportDurationLowFrequency($sportDuration)
-	{
-		$this->getSportDurations()->setLowFrequency($sportDuration);
+	// public function setSportDurationLowFrequency(LowFrequency $sportDuration) : Calculator
+	// {
+	// 	$this->getSportDurations()->setLowFrequency($sportDuration);
 
-		return $this;
-	}
+	// 	return $this;
+	// }
 
-	public function setSportDurationAerobic($sportDuration)
-	{
-		$this->getSportDurations()->setAerobic($sportDuration);
+	// public function setSportDurationAerobic(Aerobic $sportDuration) : Calculator
+	// {
+	// 	$this->getSportDurations()->setAerobic($sportDuration);
 
-		return $this;
-	}
+	// 	return $this;
+	// }
 
-	public function setSportDurationAnaerobic($sportDuration)
-	{
-		$this->getSportDurations()->setAnaerobic($sportDuration);
+	// public function setSportDurationAnaerobic(SportDuration $sportDuration) : Calculator
+	// {
+	// 	$this->getSportDurations()->setAnaerobic($sportDuration);
 
-		return $this;
-	}
+	// 	return $this;
+	// }
 
 	public function getSportActivityAmount()
 	{
@@ -1610,5 +1596,25 @@ class Calculator
 		}
 
 		return $messages;
+	}
+
+	public static function getDeviation($value, $ideal, $extremes)
+	{
+		try {
+			$deviation = $value - $ideal;
+			$range = $deviation < 0 ? [$extremes[0], $ideal] : [$ideal, $extremes[1]];
+			$res = $deviation / ($range[1] - $range[0]);
+
+			if ($res < -1) {
+				$res = -1;
+			}
+			if ($res > 1) {
+				$res = 1;
+			}
+
+			return $res;
+		} catch (\Throwable $e) {
+			return 0;
+		}
 	}
 }

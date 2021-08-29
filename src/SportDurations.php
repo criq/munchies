@@ -2,7 +2,9 @@
 
 namespace Fatty;
 
-use Exception;
+use Fatty\SportDurations\Aerobic;
+use Fatty\SportDurations\Anaerobic;
+use Fatty\SportDurations\LowFrequency;
 
 class SportDurations
 {
@@ -12,68 +14,38 @@ class SportDurations
 	private $anaerobic;
 	private $lowFrequency;
 
-	public function setLowFrequency($sportDuration)
+	public function setLowFrequency(?LowFrequency $value) : SportDurations
 	{
-		if (!($sportDuration instanceof SportDurations\LowFrequency)) {
-			try {
-				$sportDuration = new SportDurations\LowFrequency($sportDuration);
-			} catch (\Exception $e) {
-				throw (new Exceptions\CaloricCalculatorException("Invalid low frequency sport duration."))
-					->setAbbr('invalidLowFrequencySportDuration')
-					;
-			}
-		}
-
-		$this->lowFrequency = $sportDuration;
+		$this->lowFrequency = $value;
 
 		return $this;
 	}
 
-	public function getLowFrequency()
+	public function getLowFrequency() : ?SportDuration
 	{
 		return $this->lowFrequency;
 	}
 
-	public function setAerobic($sportDuration)
+	public function setAerobic(?Aerobic $value) : SportDurations
 	{
-		if (!($sportDuration instanceof SportDurations\Aerobic)) {
-			try {
-				$sportDuration = new SportDurations\Aerobic($sportDuration);
-			} catch (\Exception $e) {
-				throw (new Exceptions\CaloricCalculatorException("Invalid aerobic sport duration."))
-					->setAbbr('invalidAerobicSportDuration')
-					;
-			}
-		}
-
-		$this->aerobic = $sportDuration;
+		$this->aerobic = $value;
 
 		return $this;
 	}
 
-	public function getAerobic()
+	public function getAerobic() : ?SportDuration
 	{
 		return $this->aerobic;
 	}
 
-	public function setAnaerobic($sportDuration)
+	public function setAnaerobic(?Anaerobic $value) : SportDurations
 	{
-		if (!($sportDuration instanceof SportDurations\Anaerobic)) {
-			try {
-				$sportDuration = new SportDurations\Anaerobic($sportDuration);
-			} catch (\Exception $e) {
-				throw (new Exceptions\CaloricCalculatorException("Invalid anaerobic sport duration."))
-					->setAbbr('invalidAnaerobicSportDuration')
-					;
-			}
-		}
-
-		$this->anaerobic = $sportDuration;
+		$this->anaerobic = $value;
 
 		return $this;
 	}
 
-	public function getAnaerobic()
+	public function getAnaerobic() : ?SportDuration
 	{
 		return $this->anaerobic;
 	}

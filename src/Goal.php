@@ -2,15 +2,13 @@
 
 namespace Fatty;
 
-use \Fatty\Exceptions\CaloricCalculatorException;
-
 class Goal
 {
 	private $duration;
-	private $trend;
+	private $direction;
 	private $weight;
 
-	public function setTrend($weightVector)
+	public function setDirection($weightVector)
 	{
 		if (is_string($weightVector)) {
 			$className = "Fatty\\WeightVectors\\" . ucfirst($weightVector);
@@ -20,19 +18,19 @@ class Goal
 		}
 
 		if (!($weightVector instanceof WeightVector)) {
-			throw (new CaloricCalculatorException("Invalid goal trend."))
-				->setAbbr('invalidGoalTrend')
+			throw (new CaloricCalculatorException("Invalid goal direction."))
+				->setAbbr('invalidGoaldirection')
 				;
 		}
 
-		$this->trend = $weightVector;
+		$this->direction = $weightVector;
 
 		return $this;
 	}
 
-	public function getTrend()
+	public function getDirection()
 	{
-		return $this->trend;
+		return $this->direction;
 	}
 
 	public function setWeight($weight)
@@ -77,7 +75,7 @@ class Goal
 
 	public function getChange()
 	{
-		return new Weight($this->getTrend()->getChangePerWeek()->getInKg()->getAmount() * $this->getDuration()->getInWeeks()->getAmount());
+		return new Weight($this->getDirection()->getChangePerWeek()->getInKg()->getAmount() * $this->getDuration()->getInWeeks()->getAmount());
 	}
 
 	public function getFinal(&$calculator)
@@ -94,22 +92,22 @@ class Goal
 
 	public function getDifference(&$calculator)
 	{
-		if ($this->getTrend() instanceof WeightVectors\Loose) {
+		if ($this->getDirection() instanceof WeightVectors\Loose) {
 			return $this->getFinal($calculator)->getInKg()->getAmount() - $this->getWeight()->getInKg()->getAmount();
-		} elseif ($this->getTrend() instanceof WeightVectors\Gain) {
+		} elseif ($this->getDirection() instanceof WeightVectors\Gain) {
 			return $this->getWeight()->getInKg()->getAmount() - $this->getFinal($calculator)->getInKg()->getAmount();
 		}
 	}
 
 	public function getGoalTdee($calculator)
 	{
-		$trend = $this->getTrend();
-		if (!($trend instanceof WeightVector)) {
-			throw (new CaloricCalculatorException("Missing goal trend."))
-				->setAbbr('missingGoalTrend')
+		$direction = $this->getDirection();
+		if (!($direction instanceof WeightVector)) {
+			throw (new CaloricCalculatorException("Missing goal direction."))
+				->setAbbr('missingGoaldirection')
 				;
 		}
 
-		return $trend->getGoalTdee($calculator);
+		return $direction->getGoalTdee($calculator);
 	}
 }
