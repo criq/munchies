@@ -6,7 +6,7 @@ use Fatty\Exceptions\FattyException;
 
 class Calculator
 {
-	protected $activityAmount;
+	protected $activity;
 	protected $birthday;
 	protected $diet;
 	protected $gender;
@@ -22,12 +22,12 @@ class Calculator
 
 		if (trim($params['gender'] ?? null)) {
 			try {
-				$gender = \Fatty\Gender::createFromString($params['gender']);
-				if (!$gender) {
+				$value = \Fatty\Gender::createFromString($params['gender']);
+				if (!$value) {
 					throw new \Katu\Exceptions\InputErrorException("Neplatné pohlaví.");
 				}
 
-				$this->setGender($gender);
+				$this->setGender($value);
 			} catch (\Throwable $e) {
 				$exceptions->add($e);
 			}
@@ -35,12 +35,12 @@ class Calculator
 
 		if (trim($params['birthday'] ?? null)) {
 			try {
-				$birthday = \Fatty\Birthday::createFromString($params['birthday']);
-				if (!$birthday) {
+				$value = \Fatty\Birthday::createFromString($params['birthday']);
+				if (!$value) {
 					throw new \Katu\Exceptions\InputErrorException("Neplatné datum narození.");
 				}
 
-				$this->setBirthday($birthday);
+				$this->setBirthday($value);
 			} catch (\Throwable $e) {
 				$exceptions->add($e);
 			}
@@ -48,12 +48,12 @@ class Calculator
 
 		if (trim($params['weight'] ?? null)) {
 			try {
-				$weight = Weight::createFromString($params['weight']);
-				if (!$weight) {
+				$value = Weight::createFromString($params['weight']);
+				if (!$value) {
 					throw new \Katu\Exceptions\InputErrorException("Neplatná hmotnost.");
 				}
 
-				$this->setWeight($weight);
+				$this->setWeight($value);
 			} catch (\Throwable $e) {
 				$exceptions->add($e);
 			}
@@ -61,12 +61,12 @@ class Calculator
 
 		if (trim($params['proportions_height'] ?? null)) {
 			try {
-				$height = Length::createFromString($params['proportions_height']);
-				if (!$height) {
+				$value = Length::createFromString($params['proportions_height']);
+				if (!$value) {
 					throw new \Katu\Exceptions\InputErrorException("Neplatná výška.");
 				}
 
-				$this->setHeight($height);
+				$this->setHeight($value);
 			} catch (\Throwable $e) {
 				$exceptions->add($e);
 			}
@@ -74,12 +74,12 @@ class Calculator
 
 		if (trim($params['proportions_waist'] ?? null)) {
 			try {
-				$waist = Length::createFromString($params['proportions_waist']);
-				if (!$waist) {
+				$value = Length::createFromString($params['proportions_waist']);
+				if (!$value) {
 					throw new \Katu\Exceptions\InputErrorException("Neplatný obvod pasu.");
 				}
 
-				$this->setWaist($waist);
+				$this->setWaist($value);
 			} catch (\Throwable $e) {
 				$exceptions->add($e);
 			}
@@ -87,12 +87,12 @@ class Calculator
 
 		if (trim($params['proportions_hips'] ?? null)) {
 			try {
-				$hips = Length::createFromString($params['proportions_hips']);
-				if (!$hips) {
+				$value = Length::createFromString($params['proportions_hips']);
+				if (!$value) {
 					throw new \Katu\Exceptions\InputErrorException("Neplatný obvod boků.");
 				}
 
-				$this->setHips($hips);
+				$this->setHips($value);
 			} catch (\Throwable $e) {
 				$exceptions->add($e);
 			}
@@ -100,12 +100,25 @@ class Calculator
 
 		if (trim($params['proportions_neck'] ?? null)) {
 			try {
-				$neck = Length::createFromString($params['proportions_neck']);
-				if (!$neck) {
+				$value = Length::createFromString($params['proportions_neck']);
+				if (!$value) {
 					throw new \Katu\Exceptions\InputErrorException("Neplatný obvod boků.");
 				}
 
-				$this->setNeck($neck);
+				$this->setNeck($value);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
+
+		if (trim($params['bodyFatPercentage'] ?? null)) {
+			try {
+				$value = Percentage::createFromString($params['bodyFatPercentage']);
+				if (!$value) {
+					throw new \Katu\Exceptions\InputErrorException("Neplatné procento tělesného tuku.");
+				}
+
+				$this->setMeasurementBodyFatPercentage($value);
 			} catch (\Throwable $e) {
 				$exceptions->add($e);
 			}
@@ -113,18 +126,18 @@ class Calculator
 
 
 
+		if (trim($params['activity'] ?? null)) {
+			try {
+				$value = Activity::createFromString($params['activity']);
+				if (!$value) {
+					throw new \Katu\Exceptions\InputErrorException("Neplatná uroveň aktivity.");
+				}
 
-		// if (trim($params['bodyFatPercentage'] ?? null)) {
-		// 	try {
-		// 		$this->setMeasurementBodyFatPercentage($params['bodyFatPercentage']);
-		// 	} catch (\Throwable $e) {
-		// 		$exceptions->add($e);
-		// 	}
-		// }
-
-		// if (trim($params['activity'] ?? null)) {
-		// 	$this->setActivityAmount($params['activity']);
-		// }
+				$this->setActivity($value);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
 
 		// if (trim($params['sportDurations_lowFrequency'] ?? null)) {
 		// 	try {
@@ -252,9 +265,9 @@ class Calculator
 	/*****************************************************************************
 	 * Gender.
 	 */
-	public function setGender(?Gender $gender) : Calculator
+	public function setGender(?Gender $value) : Calculator
 	{
-		$this->gender = $gender;
+		$this->gender = $value;
 
 		return $this;
 	}
@@ -267,25 +280,9 @@ class Calculator
 	/*****************************************************************************
 	 * Birthday.
 	 */
-	public function setBirthday(?Birthday $birthday) : Calculator
+	public function setBirthday(?Birthday $value) : Calculator
 	{
-		if ($birthday instanceof \DateTime) {
-			$birthday = new Birthday($birthday);
-		}
-
-		if (!($birthday instanceof Birthday)) {
-			throw (new CaloricCalculatorException("Invalid birthday."))
-				->setAbbr('invalidBirthday')
-				;
-		}
-
-		if ($birthday && $birthday->getAge() < 18) {
-			throw (new CaloricCalculatorException("Too low age."))
-				->setAbbr('lowAge')
-				;
-		}
-
-		$this->birthday = $birthday;
+		$this->birthday = $value;
 
 		return $this;
 	}
@@ -298,9 +295,9 @@ class Calculator
 	/*****************************************************************************
 	 * Hmotnost.
 	 */
-	public function setWeight(?Weight $weight) : Calculator
+	public function setWeight(?Weight $value) : Calculator
 	{
-		$this->weight = $weight;
+		$this->weight = $value;
 
 		return $this;
 	}
@@ -323,9 +320,9 @@ class Calculator
 	/*****************************************************************************
 	 * Výška.
 	 */
-	public function setHeight(?Length $length) : Calculator
+	public function setHeight(?Length $value) : Calculator
 	{
-		$this->getProportions()->setHeight($length);
+		$this->getProportions()->setHeight($value);
 
 		return $this;
 	}
@@ -333,9 +330,9 @@ class Calculator
 	/*****************************************************************************
 	 * Obvod pasu.
 	 */
-	public function setWaist(?Length $length) : Calculator
+	public function setWaist(?Length $value) : Calculator
 	{
-		$this->getProportions()->setWaist($length);
+		$this->getProportions()->setWaist($value);
 
 		return $this;
 	}
@@ -343,9 +340,9 @@ class Calculator
 	/*****************************************************************************
 	 * Obvod boků.
 	 */
-	public function setHips(?Length $length) : Calculator
+	public function setHips(?Length $value) : Calculator
 	{
-		$this->getProportions()->setHips($length);
+		$this->getProportions()->setHips($value);
 
 		return $this;
 	}
@@ -353,9 +350,9 @@ class Calculator
 	/*****************************************************************************
 	 * Obvod krku.
 	 */
-	public function setNeck(?Length $length) : Calculator
+	public function setNeck(?Length $value) : Calculator
 	{
-		$this->getProportions()->setNeck($length);
+		$this->getProportions()->setNeck($value);
 
 		return $this;
 	}
@@ -363,57 +360,31 @@ class Calculator
 	/*****************************************************************************
 	 * Naměřené hodnoty.
 	 */
-	public function setMeasurementBodyFatPercentage($measurement)
+	public function setMeasurementBodyFatPercentage(?Percentage $value) : Calculator
 	{
-		if (!($measurement instanceof Percentage)) {
-			try {
-				$measurement = Percentage::createFromWhole($measurement);
-			} catch (\Throwable $e) {
-				throw (new CaloricCalculatorException("Invalid body fat percentage measurement."))
-					->setAbbr('invalidMeasurementBodyFatPercentage')
-					;
-			}
-		}
-
-		$this->measurements['bodyFatPercentage'] = $measurement;
+		$this->measurements['bodyFatPercentage'] = $value;
 
 		return $this;
 	}
 
-	public function getMeasurementBodyFatPercentage()
+	public function getMeasurementBodyFatPercentage() : ?Percentage
 	{
-		if (!(isset($this->measurements['bodyFatPercentage']) && $this->measurements['bodyFatPercentage'] instanceof Percentage)) {
-			throw (new CaloricCalculatorException("Missing body fat percentage measurement."))
-				->setAbbr('missingMeasurementBodyFatPercentage')
-				;
-		}
-
 		return $this->measurements['bodyFatPercentage'];
 	}
 
 	/*****************************************************************************
 	 * Activity.
 	 */
-	public function setActivityAmount($activityAmount)
+	public function setActivity(?Activity $activity) : Calculator
 	{
-		if (!($activityAmount instanceof ActivityAmount)) {
-			$activityAmount = new ActivityAmount($activityAmount);
-		}
-
-		$this->activityAmount = $activityAmount;
+		$this->activity = $activity;
 
 		return $this;
 	}
 
-	public function getActivityAmount()
+	public function getActivity() : ?Activity
 	{
-		if (!($this->activityAmount instanceof ActivityAmount)) {
-			throw (new CaloricCalculatorException("Missing activity amount."))
-				->setAbbr('missingActivityAmount')
-				;
-		}
-
-		return $this->activityAmount;
+		return $this->activity;
 	}
 
 	/*****************************************************************************
@@ -970,14 +941,14 @@ class Calculator
 				;
 		}
 
-		return new Weight($this->getWeight()->getInKg()->getAmount() - ($this->getBodyFatPercentage()->getAsPercenatge() * $this->getWeight()->getInKg()->getAmount()));
+		return new Weight($this->getWeight()->getInKg()->getAmount() - ($this->getBodyFatPercentage()->getAsPercentage() * $this->getWeight()->getInKg()->getAmount()));
 	}
 
 	public function getFatFreeMassFormula()
 	{
 		$result = $this->getFatFreeMass()->getInKg()->getAmount();
 
-		return 'weight[' . $this->getWeight()->getInKg()->getAmount() . '] - (bodyFatPercentage[' . $this->getBodyFatPercentage()->getAsPercenatge() . '] * weight[' . $this->getWeight()->getInKg()->getAmount() . ']) = ' . $result;
+		return 'weight[' . $this->getWeight()->getInKg()->getAmount() . '] - (bodyFatPercentage[' . $this->getBodyFatPercentage()->getAsPercentage() . '] * weight[' . $this->getWeight()->getInKg()->getAmount() . ']) = ' . $result;
 	}
 
 	/*****************************************************************************

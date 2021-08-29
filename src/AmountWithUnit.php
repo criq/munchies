@@ -2,16 +2,18 @@
 
 namespace Fatty;
 
-class AmountWithUnit extends Amount
+class AmountWithUnit
 {
+	protected $amount;
 	protected $unit;
 
-	public function __construct($amount, $unit = null)
+	public function __construct(Amount $amount, string $unit = null)
 	{
-		return $this->setAmountWithUnit($amount, $unit);
+		$this->amount = $amount;
+		$this->unit = $unit;
 	}
 
-	public function __toString()
+	public function __toString() : string
 	{
 		return implode(' ', [
 			\Katu\Utils\Formatter::getLocalReadableNumber(\Katu\Utils\Formatter::getPreferredLocale(), $this->getAmount()),
@@ -19,16 +21,23 @@ class AmountWithUnit extends Amount
 		]);
 	}
 
-	public function setAmountWithUnit(float $amount, string $unit) : AmountWithUnit
+	public static function createFromString(string $value) : ?AmountWithUnit
 	{
-		if (!static::validateNumber($amount)) {
-			throw (new \App\Classes\Profile\Exceptions\InvalidAmountException("Invalid amount."));
+		try {
+			$amount = Amount::createFromString($value);
+			if ($amount) {
+				return new static($amount);
+			}
+
+			return null;
+		} catch (\Throwable $e) {
+			return null;
 		}
+	}
 
-		$this->amount = static::sanitizeNumber($amount);
-		$this->unit = $unit;
-
-		return $this;
+	public function getAmount() : ?Amount
+	{
+		return $this->amount;
 	}
 
 	public function getUnit() : ?string
@@ -39,7 +48,7 @@ class AmountWithUnit extends Amount
 	public function getArray() : array
 	{
 		return [
-			'amount' => $this->getAmount(),
+			'amount' => $this->getAmount()->getValue(),
 			'unit' => $this->getUnit(),
 		];
 	}

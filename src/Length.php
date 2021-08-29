@@ -4,23 +4,9 @@ namespace Fatty;
 
 class Length extends AmountWithUnit
 {
-	public function __construct($amount, $unit = 'cm')
+	public function __construct(Amount $amount, string $unit = 'cm')
 	{
 		return parent::__construct($amount, $unit);
-	}
-
-	public static function createFromString(string $value) : ?Length
-	{
-		try {
-			$amount = (new \Katu\Types\TString($value))->getAsFloat();
-			if ($amount) {
-				return new static($amount);
-			}
-
-			return null;
-		} catch (\Throwable $e) {
-			return null;
-		}
 	}
 
 	public function getInCm() : Length
@@ -30,7 +16,7 @@ class Length extends AmountWithUnit
 				return new static($this->getAmount(), 'cm');
 				break;
 			case 'm':
-				return new static($this->getAmount() * .01, 'cm');
+				return new static($this->getAmount()->getMultiplied(.01), 'cm');
 				break;
 		}
 	}
@@ -39,7 +25,7 @@ class Length extends AmountWithUnit
 	{
 		switch ($this->getUnit()) {
 			case 'cm':
-				return new static($this->getAmount() / 100, 'm');
+				return new static($this->getAmount()->getMultiplied(.01), 'm');
 				break;
 			case 'm':
 				return new static($this->getAmount(), 'm');

@@ -2,41 +2,45 @@
 
 namespace Fatty;
 
+use Fatty\Exceptions\FattyException;
+
 class Amount
 {
-	protected $amount;
+	protected $value;
 
-	public function __construct($amount)
+	public function __construct(float $value)
 	{
-		if (!static::validateNumber($amount)) {
-			throw (new \App\Classes\Profile\Exceptions\InvalidAmountException("Invalid amount."));
+		$this->value = $value;
+	}
+
+	public function __toString() : string
+	{
+		return \Katu\Utils\Formatter::getLocalReadableNumber(\Katu\Utils\Formatter::getPreferredLocale(), $this->getValue());
+	}
+
+	public static function createFromString(string $value) : ?Amount
+	{
+		try {
+			$value = trim($value);
+			if (!preg_match('/^\-?[0-9]+([\,\.][0-9]+)?$/', $value)) {
+				throw new FattyException("Invalid amount.");
+			}
+
+			return new static((new \Katu\Types\TString(trim($value)))->getAsFloat());
+		} catch (\Throwable $e) {
+			return null;
 		}
 
-		$this->amount = static::sanitizeNumber($amount);
+		return null;
 	}
 
-	public function __toString()
+	public function getValue() : ?float
 	{
-		return \Katu\Utils\Formatter::getLocalReadableNumber(\Katu\Utils\Formatter::getPreferredLocale(), $this->getAmount());
+		return (float)$this->value;
 	}
 
-	public static function validateNumber($amount)
+	public function getMultiplied(float $value) : Amount
 	{
-		$amount = trim($amount);
-		if (!preg_match('/^\-?[0-9]+([\,\.][0-9]+)?$/', $amount)) {
-			throw (new \App\Classes\Profile\Exceptions\InvalidAmountException("Invalid amount."));
-		}
-
-		return true;
-	}
-
-	public static function sanitizeNumber($amount)
-	{
-		return (new \Katu\Types\TString(trim($amount)))->getAsFloat();
-	}
-
-	public function getAmount()
-	{
-		return $this->amount;
+		return new static($this->getValue() * $value);
 	}
 }
