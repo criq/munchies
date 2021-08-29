@@ -6,7 +6,7 @@ abstract class Nutrient extends Weight
 {
 	const KJ_IN_G = null;
 
-	public function __construct(Amount $amount, string $unit)
+	public function __construct(Amount $amount, string $unit = 'g')
 	{
 		return parent::__construct(new Amount(max($amount->getValue(), 0)), $unit);
 	}

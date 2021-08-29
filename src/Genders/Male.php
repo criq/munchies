@@ -2,33 +2,42 @@
 
 namespace Fatty\Genders;
 
-use \Fatty\Birthday;
-use \Fatty\Energy;
-use \Fatty\Exceptions\CaloricCalculatorException;
-use \Fatty\Length;
-use \Fatty\Percentage;
-use \Fatty\Proportions;
-use \Fatty\Weight;
+use Fatty\Amount;
+use Fatty\Birthday;
+use Fatty\Calculator;
+use Fatty\Energy;
+use Fatty\Length;
+use Fatty\Percentage;
+use Fatty\Proportions;
+use Fatty\Weight;
 
 class Male extends \Fatty\Gender
 {
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
 	 */
-	protected function getBodyFatPercentageByProportions(&$calculator)
+	protected function getBodyFatPercentageByProportions(Calculator $calculator) : Percentage
 	{
-		return new Percentage(((495 / (1.0324 - (0.19077 * log10($calculator->getProportions()->getWaist()->getInCm()->getAmount() - $calculator->getProportions()->getNeck()->getInCm()->getAmount())) + (0.15456 * log10($calculator->getProportions()->getHeight()->getInCm()->getAmount())))) - 450) * .01);
+		$waist = $calculator->getProportions()->getWaist()->getInCm()->getAmount()->getValue();
+		$neck = $calculator->getProportions()->getNeck()->getInCm()->getAmount()->getValue();
+		$height = $calculator->getProportions()->getHeight()->getInCm()->getAmount()->getValue();
+
+		return new Percentage(new Amount(((495 / (1.0324 - (0.19077 * log10($waist - $neck)) + (0.15456 * log10($height)))) - 450) * .01));
 	}
 
-	public function getBodyFatPercentageByProportionsFormula(&$calculator)
+	public function getBodyFatPercentageByProportionsFormula(Calculator $calculator) : string
 	{
-		return '((495 / (1.0324 - (0.19077 * log10(waist[' . $calculator->getProportions()->getWaist()->getInCm()->getAmount() . '] - neck[' . $calculator->getProportions()->getNeck()->getInCm()->getAmount() . '])) + (0.15456 * log10(height[' . $calculator->getProportions()->getHeight()->getInCm()->getAmount() . '])))) - 450) * .01';
+		$waist = $calculator->getProportions()->getWaist()->getInCm()->getAmount()->getValue();
+		$neck = $calculator->getProportions()->getNeck()->getInCm()->getAmount()->getValue();
+		$height = $calculator->getProportions()->getHeight()->getInCm()->getAmount()->getValue();
+
+		return '((495 / (1.0324 - (0.19077 * log10(waist[' . $waist . '] - neck[' . $neck . '])) + (0.15456 * log10(height[' . $height . '])))) - 450) * .01';
 	}
 
 	/*****************************************************************************
 	 * Bazální metabolismus - BMR.
 	 */
-	public function getBasalMetabolicRate(&$calculator)
+	public function getBasalMetabolicRate(Calculator $calculator)
 	{
 		$ec = new \Katu\Exceptions\ExceptionCollection;
 
@@ -59,7 +68,7 @@ class Male extends \Fatty\Gender
 		return new Energy((10 * $calculator->getWeight()->getInKg()->getAmount()) + (6.25 * $calculator->getProportions()->getHeight()->getInCm()->getAmount()) - (5 * $calculator->getBirthday()->getAge()) + 5, 'kCal');
 	}
 
-	public function getBasalMetabolicRateFormula(&$calculator)
+	public function getBasalMetabolicRateFormula(Calculator $calculator)
 	{
 		return '(10 * weight[' . $calculator->getWeight()->getInKg()->getAmount() . ']) + (6.25 * height[' . $calculator->getProportions()->getHeight()->getInCm()->getAmount() . ']) - (5 * age[' . $calculator->getBirthday()->getAge() . ']) + 5';
 	}
@@ -67,7 +76,7 @@ class Male extends \Fatty\Gender
 	/*****************************************************************************
 	 * Typ postavy.
 	 */
-	public function getBodyType(&$calculator)
+	public function getBodyType(Calculator $calculator)
 	{
 		$waistHipRatioAmount = $calculator->getWaistHipRatio()->getAmount();
 

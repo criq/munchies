@@ -9,11 +9,11 @@ abstract class Gender
 	const BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT = 'measurement';
 	const BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS = 'proportions';
 
-	abstract protected function getBodyFatPercentageByProportions(&$calculator);
-	abstract public function getBasalMetabolicRate(&$calculator);
-	abstract public function getBasalMetabolicRateFormula(&$calculator);
-	abstract public function getBodyFatPercentageByProportionsFormula(&$calculator);
-	abstract public function getBodyType(&$calculator);
+	abstract protected function getBodyFatPercentageByProportions(Calculator $calculator) : Percentage;
+	abstract public function getBasalMetabolicRate(Calculator $calculator);
+	abstract public function getBasalMetabolicRateFormula(Calculator $calculator);
+	abstract public function getBodyFatPercentageByProportionsFormula(Calculator $calculator) : string;
+	abstract public function getBodyType(Calculator $calculator);
 
 	public static function createFromString(string $value) : ?Gender
 	{
@@ -87,12 +87,12 @@ abstract class Gender
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
 	 */
-	public function getBodyFatPercentageStrategy(&$calculator)
+	public function getBodyFatPercentageStrategy(Calculator $calculator)
 	{
 		try {
-			$measurementBodyFatPercentage = $calculator->getMeasurementBodyFatPercentage();
+			$bodyFatPercentage = $calculator->getBodyFatPercentage();
 		} catch (\Exception $e) {
-			$measurementBodyFatPercentage = false;
+			$bodyFatPercentage = false;
 		}
 
 		try {
@@ -113,7 +113,7 @@ abstract class Gender
 			$waist = false;
 		}
 
-		if ($measurementBodyFatPercentage) {
+		if ($bodyFatPercentage) {
 			return static::BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT;
 		} elseif ($height && $neck && $waist) {
 			return static::BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS;
@@ -122,7 +122,7 @@ abstract class Gender
 		}
 	}
 
-	public function getBodyFatPercentage(&$calculator)
+	public function getBodyFatPercentage(Calculator $calculator) : Percentage
 	{
 		$strategy = $this->getBodyFatPercentageStrategy($calculator);
 		if (!$strategy) {
@@ -140,12 +140,12 @@ abstract class Gender
 		}
 	}
 
-	protected function getBodyFatPercentageByMeasurement(&$calculator)
+	protected function getBodyFatPercentageByMeasurement(Calculator $calculator)
 	{
-		return $calculator->getMeasurementBodyFatPercentage();
+		return $calculator->getBodyFatPercentage();
 	}
 
-	public function getBodyFatPercentageFormula(&$calculator)
+	public function getBodyFatPercentageFormula(Calculator $calculator)
 	{
 		$result = $this->getBodyFatPercentage($calculator)->getAmount();
 

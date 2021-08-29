@@ -24,7 +24,7 @@ class Diet
 
 	public function setCarbs(Carbs $carbs) : Diet
 	{
-		if ($this->getApproach()->getCarbsMin() && $this->getApproach()->getCarbsMax() && ($carbs->getAmount() < $this->getApproach()->getCarbsMin() || $carbs->getAmount() > $this->getApproach()->getCarbsMax())) {
+		if ($this->getApproach() && $this->getApproach()->getCarbsMin() && $this->getApproach()->getCarbsMax() && ($carbs->getAmount() < $this->getApproach()->getCarbsMin() || $carbs->getAmount() > $this->getApproach()->getCarbsMax())) {
 			throw (new FattyException("Invalid diet carbs."))
 				->setAbbr('invalidDietCarbs')
 				;

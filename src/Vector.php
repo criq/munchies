@@ -8,7 +8,7 @@ abstract class Vector
 	const TDEE_QUOTIENT = null;
 	const WEIGHT_CHANGE_PER_WEEK = '';
 
-	abstract public function getTdeeChangePerDay(&$calculator);
+	abstract public function getTdeeChangePerDay(Calculator $calculator);
 
 	public function __toString()
 	{
@@ -31,7 +31,7 @@ abstract class Vector
 		return lcfirst(array_slice(explode('\\', get_called_class()), -1, 1)[0]);
 	}
 
-	public function getTdeeQuotient(&$calculator)
+	public function getTdeeQuotient(Calculator $calculator)
 	{
 		return static::TDEE_QUOTIENT;
 	}
@@ -41,7 +41,7 @@ abstract class Vector
 		return new Weight(new Amount(static::WEIGHT_CHANGE_PER_WEEK), 'kg');
 	}
 
-	public function getGoalTdee(&$calculator)
+	public function getGoalTdee(Calculator $calculator)
 	{
 		return new Energy($calculator->getTotalDailyEnergyExpenditure()->getAmount() + $this->getTdeeChangePerDay($calculator)->getAmount(), 'kCal');
 	}

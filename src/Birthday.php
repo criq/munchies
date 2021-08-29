@@ -4,11 +4,11 @@ namespace Fatty;
 
 class Birthday
 {
-	private $birthday;
+	private $datetime;
 
-	public function __construct(\DateTime $birthday)
+	public function __construct(\DateTime $datetime)
 	{
-		$this->birthday = $birthday;
+		$this->datetime = $datetime;
 	}
 
 	public static function createFromString(string $value) : ?Birthday
@@ -23,30 +23,30 @@ class Birthday
 		}
 	}
 
-	public function getBirthday() : \DateTime
+	public function getDatetime() : \DateTime
 	{
-		return $this->birthday;
+		return $this->datetime;
 	}
 
 	public function isInPast() : bool
 	{
-		return $this->getBirthday()->getTimestamp() <= (new \DateTime)->getTimestamp();
+		return $this->getDatetime()->getTimestamp() <= (new \DateTime)->getTimestamp();
 	}
 
 	public function isInFuture() : bool
 	{
-		return $this->getBirthday()->getTimestamp() > (new \DateTime)->getTimestamp();
+		return $this->getDatetime()->getTimestamp() > (new \DateTime)->getTimestamp();
 	}
 
 	public function getAge() : float
 	{
-		return $this->getBirthday()->diff(new \DateTime)->y;
+		return $this->getDatetime()->diff(new \DateTime)->y;
 	}
 
 	public function diff() : ?\DateInterval
 	{
 		try {
-			return $this->getBirthday()->diff(...func_get_args());
+			return $this->getDatetime()->diff(...func_get_args());
 		} catch (\Throwable $e) {
 			return null;
 		}

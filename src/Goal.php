@@ -51,7 +51,7 @@ class Goal
 		return new Weight(new Amount($this->getVector()->getChangePerWeek()->getInKg()->getAmount()->getValue() * $this->getDuration()->getInWeeks()->getAmount()->getValue()));
 	}
 
-	public function getFinal(&$calculator)
+	public function getFinal(Calculator $calculator)
 	{
 		$weight = $this->getWeight();
 		if (!($weight instanceof Weight)) {
@@ -63,7 +63,7 @@ class Goal
 		return new Weight($weight->getInKg()->getAmount() + $this->getChange()->getInKg()->getAmount(), 'kg');
 	}
 
-	public function getDifference(&$calculator)
+	public function getDifference(Calculator $calculator)
 	{
 		if ($this->getVector() instanceof Vectors\Loose) {
 			return $this->getFinal($calculator)->getInKg()->getAmount() - $this->getWeight()->getInKg()->getAmount();
@@ -72,7 +72,7 @@ class Goal
 		}
 	}
 
-	public function getGoalTdee($calculator)
+	public function getGoalTdee(Calculator $calculator)
 	{
 		$vector = $this->getVector();
 		if (!($vector instanceof Vector)) {

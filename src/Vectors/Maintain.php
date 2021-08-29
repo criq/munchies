@@ -2,6 +2,8 @@
 
 namespace Fatty\Vectors;
 
+use Fatty\Calculator;
+
 class Maintain extends \Fatty\Vector
 {
 	const LABEL_INFINITIVE = "udržovat hmotnost";
@@ -9,17 +11,17 @@ class Maintain extends \Fatty\Vector
 	const TDEE_QUOTIENT__LARGE = 1.07;
 	const WEIGHT_CHANGE_PER_WEEK = 0;
 
-	public function getTdeeQuotient(&$calculator)
+	public function getTdeeQuotient(Calculator $calculator)
 	{
 		return $calculator->getPhysicalActivityLevel()->getAmount() >= 2 ? static::TDEE_QUOTIENT__LARGE : static::TDEE_QUOTIENT;
 	}
 
-	public function getTdeeChangePerDay(&$calculator)
+	public function getTdeeChangePerDay(Calculator $calculator)
 	{
 		return new \Fatty\Energy(0, 'kCal');
 	}
 
-	public function getGoalTdee(&$calculator)
+	public function getGoalTdee(Calculator $calculator)
 	{
 		return $calculator->getTotalDailyEnergyExpenditure();
 	}

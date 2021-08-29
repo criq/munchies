@@ -11,7 +11,7 @@ class Percentage extends AmountWithUnit
 
 	public function __toString() : string
 	{
-		return \Katu\Utils\Formatter::getLocalPercent(\Katu\Utils\Formatter::getPreferredLocale(), $this->getAmount());
+		return \Katu\Utils\Formatter::getLocalPercent(\Katu\Utils\Formatter::getPreferredLocale(), $this->getAmount()->getValue());
 	}
 
 	public function getAsPercentage() : float

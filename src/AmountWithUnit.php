@@ -16,7 +16,7 @@ class AmountWithUnit
 	public function __toString() : string
 	{
 		return implode(' ', [
-			\Katu\Utils\Formatter::getLocalReadableNumber(\Katu\Utils\Formatter::getPreferredLocale(), $this->getAmount()),
+			\Katu\Utils\Formatter::getLocalReadableNumber(\Katu\Utils\Formatter::getPreferredLocale(), $this->getAmount()->getValue()),
 			$this->getUnit(),
 		]);
 	}
