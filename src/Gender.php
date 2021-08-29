@@ -2,7 +2,7 @@
 
 namespace Fatty;
 
-use \Fatty\Exceptions\CaloricCalculatorException;
+use Fatty\Exceptions\FattyException;
 
 abstract class Gender
 {
@@ -15,10 +15,10 @@ abstract class Gender
 	abstract public function getBodyFatPercentageByProportionsFormula(&$calculator);
 	abstract public function getBodyType(&$calculator);
 
-	public static function createFromString(string $code) : ?Gender
+	public static function createFromString(string $value) : ?Gender
 	{
 		try {
-			$class = 'App\\Classes\\Profile\\Genders\\' . ucfirst(strtolower($code));
+			$class = 'Fatty\\Genders\\' . ucfirst($value);
 
 			return new $class;
 		} catch (\Throwable $e) {
@@ -126,7 +126,7 @@ abstract class Gender
 	{
 		$strategy = $this->getBodyFatPercentageStrategy($calculator);
 		if (!$strategy) {
-			throw (new CaloricCalculatorException("Missing data to determine your body fat percentage."))
+			throw (new FattyException("Missing data to determine your body fat percentage."))
 				->setAbbr('missingBodyFatPercentageInput');
 		}
 

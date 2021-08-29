@@ -6,35 +6,49 @@ class Birthday
 {
 	private $birthday;
 
-	public function __construct($birthday)
+	public function __construct(\DateTime $birthday)
 	{
-		$this->birthday = $birthday->setHour(0)->setMinute(0)->setSecond(0);
+		$this->birthday = $birthday;
 	}
 
-	public function getBirthday()
+	public static function createFromString(string $value) : ?Birthday
+	{
+		try {
+			$datetime = \DateTime::createFromFormat('j.n.Y', $value);
+			$datetime->setTime(0, 0, 0);
+
+			return new static($datetime);
+		} catch (\Throwable $e) {
+			return null;
+		}
+	}
+
+	public function getBirthday() : \DateTime
 	{
 		return $this->birthday;
 	}
 
-	public function isInPast()
+	public function isInPast() : bool
 	{
-		return $this->birthday->isInPast();
+		return $this->getBirthday()->getTimestamp() <= (new \DateTime)->getTimestamp();
 	}
 
-	public function isInFuture()
+	public function isInFuture() : bool
 	{
-		return $this->birthday->isInFuture();
+		return $this->getBirthday()->getTimestamp() > (new \DateTime)->getTimestamp();
 	}
 
-	public function getAge()
+	public function getAge() : float
 	{
-		$diff = $this->birthday->diff(new \Katu\Utils\DateTime);
-
-		return $diff->y;
+		return $this->getBirthday()->diff(new \DateTime)->y;
 	}
 
-	public function diff()
+	public function diff() : ?\DateInterval
 	{
-		return call_user_func_array([$this->birthday, 'diff'], func_get_args());
+		try {
+			return $this->getBirthday()->diff(...func_get_args());
+		} catch (\Throwable $e) {
+			return null;
+		}
 	}
 }

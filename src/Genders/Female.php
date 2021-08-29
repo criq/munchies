@@ -168,7 +168,7 @@ class Female extends \Fatty\Gender
 	public function setBreastfeedingMode($breastfeedingMode)
 	{
 		if (is_string($breastfeedingMode)) {
-			$className = "\\App\\Classes\\Profile\\BreastfeedingModes\\" . ucfirst($breastfeedingMode);
+			$className = "Fatty\\BreastfeedingModes\\" . ucfirst($breastfeedingMode);
 			if (class_exists($className)) {
 				$breastfeedingMode = new $className;
 			}

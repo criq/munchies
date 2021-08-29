@@ -16,6 +16,219 @@ class Calculator
 	protected $sportDurations;
 	protected $weight;
 
+	public function __construct(?array $params = [])
+	{
+		$exceptions = new \Katu\Exceptions\ExceptionCollection;
+
+		if (trim($params['gender'] ?? null)) {
+			try {
+				$gender = \Fatty\Gender::createFromString($params['gender']);
+				if (!$gender) {
+					throw new \Katu\Exceptions\InputErrorException("Neplatné pohlaví.");
+				}
+
+				$this->setGender($gender);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
+
+		if (trim($params['birthday'] ?? null)) {
+			try {
+				$birthday = \Fatty\Birthday::createFromString($params['birthday']);
+				if (!$birthday) {
+					throw new \Katu\Exceptions\InputErrorException("Neplatné datum narození.");
+				}
+
+				$this->setBirthday($birthday);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
+
+		if (trim($params['weight'] ?? null)) {
+			try {
+				$weight = Weight::createFromString($params['weight']);
+				if (!$weight) {
+					throw new \Katu\Exceptions\InputErrorException("Neplatná hmotnost.");
+				}
+
+				$this->setWeight($weight);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
+
+		if (trim($params['proportions_height'] ?? null)) {
+			try {
+				$height = Length::createFromString($params['proportions_height']);
+				if (!$height) {
+					throw new \Katu\Exceptions\InputErrorException("Neplatná výška.");
+				}
+
+				$this->setHeight($height);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
+
+		if (trim($params['proportions_waist'] ?? null)) {
+			try {
+				$waist = Length::createFromString($params['proportions_waist']);
+				if (!$waist) {
+					throw new \Katu\Exceptions\InputErrorException("Neplatný obvod pasu.");
+				}
+
+				$this->setWaist($waist);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
+
+		if (trim($params['proportions_hips'] ?? null)) {
+			try {
+				$hips = Length::createFromString($params['proportions_hips']);
+				if (!$hips) {
+					throw new \Katu\Exceptions\InputErrorException("Neplatný obvod boků.");
+				}
+
+				$this->setHips($hips);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
+
+		if (trim($params['proportions_neck'] ?? null)) {
+			try {
+				$neck = Length::createFromString($params['proportions_neck']);
+				if (!$neck) {
+					throw new \Katu\Exceptions\InputErrorException("Neplatný obvod boků.");
+				}
+
+				$this->setNeck($neck);
+			} catch (\Throwable $e) {
+				$exceptions->add($e);
+			}
+		}
+
+
+
+
+		// if (trim($params['bodyFatPercentage'] ?? null)) {
+		// 	try {
+		// 		$this->setMeasurementBodyFatPercentage($params['bodyFatPercentage']);
+		// 	} catch (\Throwable $e) {
+		// 		$exceptions->add($e);
+		// 	}
+		// }
+
+		// if (trim($params['activity'] ?? null)) {
+		// 	$this->setActivityAmount($params['activity']);
+		// }
+
+		// if (trim($params['sportDurations_lowFrequency'] ?? null)) {
+		// 	try {
+		// 		$this->setSportDurationLowFrequency($params['sportDurations_lowFrequency']);
+		// 	} catch (\Throwable $e) {
+		// 		$exceptions->add($e);
+		// 	}
+		// }
+
+		// if (trim($params['sportDurations_aerobic'] ?? null)) {
+		// 	try {
+		// 		$this->setSportDurationAerobic($params['sportDurations_aerobic']);
+		// 	} catch (\Throwable $e) {
+		// 		$exceptions->add($e);
+		// 	}
+		// }
+
+		// if (trim($params['sportDurations_anaerobic'] ?? null)) {
+		// 	try {
+		// 		$this->setSportDurationAnaerobic($params['sportDurations_anaerobic']);
+		// 	} catch (\Throwable $e) {
+		// 		$exceptions->add($e);
+		// 	}
+		// }
+
+		// $this->setGoalDuration(new \App\Classes\Profile\Duration(12, 'weeks'));
+
+		// if (trim($params['goal_direction'] ?? null)) {
+		// 	try {
+		// 		$this->setGoalDirection($params['goal_direction']);
+		// 	} catch (\Throwable $e) {
+		// 		$exceptions->add($e);
+		// 	}
+		// }
+
+		// if (trim($params['goal_weight'] ?? null)) {
+		// 	try {
+		// 		$this->setGoalWeight($params['goal_weight']);
+		// 	} catch (\Throwable $e) {
+		// 		$exceptions->add($e);
+		// 	}
+		// }
+
+		// if (trim($params['diet_approach'] ?? null)) {
+		// 	try {
+		// 		$this->setDietApproach($params['diet_approach']);
+		// 	} catch (\Throwable $e) {
+		// 		$exceptions->add($e);
+		// 	}
+		// }
+
+		// if (trim($params['diet_carbs'] ?? null)) {
+		// 	try {
+		// 		$this->setDietCarbs($params['diet_carbs']);
+		// 	} catch (\Throwable $e) {
+		// 		$exceptions->add($e);
+		// 	}
+		// }
+
+		// if ($this->getGender() instanceof \App\Classes\Profile\Genders\Female) {
+		// 	if (isset($params['pregnancyIsPregnant']) && $params['pregnancyIsPregnant']) {
+		// 		$this->getGender()->setIsPregnant(true);
+
+		// 		if (isset($params['pregnancyChildbirthDate'])) {
+		// 			try {
+		// 				$this->getGender()->setPregnancyChildbirthDate($params['pregnancyChildbirthDate']);
+		// 			} catch (\Throwable $e) {
+		// 				$exceptions->add($e);
+		// 			}
+		// 		}
+		// 	}
+
+		// 	if (isset($params['breastfeedingIsBreastfeeding']) && $params['breastfeedingIsBreastfeeding']) {
+		// 		$this->getGender()->setIsBreastfeeding(true);
+
+		// 		if (isset($params['breastfeeding']['childbirthDate'])) {
+		// 			try {
+		// 				$this->getGender()->setBreastfeedingChildbirthDate($params['breastfeeding']['childbirthDate']);
+		// 			} catch (\Throwable $e) {
+		// 				$exceptions->add($e);
+		// 			}
+		// 		}
+
+		// 		if (isset($params['breastfeedingMode'])) {
+		// 			try {
+		// 				$this->getGender()->setBreastfeedingMode($params['breastfeedingMode']);
+		// 			} catch (\Throwable $e) {
+		// 				$exceptions->add($e);
+		// 			}
+		// 		}
+		// 	}
+		// }
+
+		if ($exceptions->has()) {
+			throw $exceptions;
+		}
+	}
+
+
+
+
+
+
+
 	public static function getDeviation($value, $ideal, $extremes)
 	{
 		try {
@@ -39,37 +252,22 @@ class Calculator
 	/*****************************************************************************
 	 * Gender.
 	 */
-	public function setGender(?Gender $gender = null)
+	public function setGender(?Gender $gender) : Calculator
 	{
-		if (is_string($gender)) {
-			$className = "\\App\\Classes\\Profile\\Genders\\" . ucfirst($gender);
-			if (class_exists($className)) {
-				$gender = new $className;
-			}
-		}
-
-		if (!($gender instanceof Gender)) {
-			throw (new CaloricCalculatorException("Invalid gender."))
-				->setAbbr('invalidGender')
-				;
-		}
-
 		$this->gender = $gender;
 
 		return $this;
 	}
 
-	public function getGender()
+	public function getGender() : ?Gender
 	{
-		$this->gender = $this->gender;
-
 		return $this->gender;
 	}
 
 	/*****************************************************************************
-	 * Datum narození.
+	 * Birthday.
 	 */
-	public function setBirthday($birthday)
+	public function setBirthday(?Birthday $birthday) : Calculator
 	{
 		if ($birthday instanceof \DateTime) {
 			$birthday = new Birthday($birthday);
@@ -92,7 +290,7 @@ class Calculator
 		return $this;
 	}
 
-	public function getBirthday()
+	public function getBirthday() : ?Birthday
 	{
 		return $this->birthday;
 	}
@@ -100,24 +298,14 @@ class Calculator
 	/*****************************************************************************
 	 * Hmotnost.
 	 */
-	public function setWeight($weight)
+	public function setWeight(?Weight $weight) : Calculator
 	{
-		if (!($weight instanceof Weight)) {
-			try {
-				$weight = new Weight($weight);
-			} catch (\Fatty\Exceptions\InvalidAmountException $e) {
-				throw (new \Fatty\Exceptions\CaloricCalculatorException("Invalid weight."))
-					->setAbbr('invalidWeightAmount')
-					;
-			}
-		}
-
 		$this->weight = $weight;
 
 		return $this;
 	}
 
-	public function getWeight()
+	public function getWeight() : ?Weight
 	{
 		return $this->weight;
 	}
@@ -125,7 +313,7 @@ class Calculator
 	/*****************************************************************************
 	 * Proporce.
 	 */
-	public function getProportions()
+	public function getProportions() : Proportions
 	{
 		$this->proportions = $this->proportions instanceof Proportions ? $this->proportions : new Proportions;
 
@@ -135,7 +323,7 @@ class Calculator
 	/*****************************************************************************
 	 * Výška.
 	 */
-	public function setHeight($length)
+	public function setHeight(?Length $length) : Calculator
 	{
 		$this->getProportions()->setHeight($length);
 
@@ -145,7 +333,7 @@ class Calculator
 	/*****************************************************************************
 	 * Obvod pasu.
 	 */
-	public function setWaist($length)
+	public function setWaist(?Length $length) : Calculator
 	{
 		$this->getProportions()->setWaist($length);
 
@@ -155,7 +343,7 @@ class Calculator
 	/*****************************************************************************
 	 * Obvod boků.
 	 */
-	public function setHips($length)
+	public function setHips(?Length $length) : Calculator
 	{
 		$this->getProportions()->setHips($length);
 
@@ -165,7 +353,7 @@ class Calculator
 	/*****************************************************************************
 	 * Obvod krku.
 	 */
-	public function setNeck($length)
+	public function setNeck(?Length $length) : Calculator
 	{
 		$this->getProportions()->setNeck($length);
 
@@ -401,7 +589,7 @@ class Calculator
 	public function setDiet($diet, $dietCarbs)
 	{
 		if (is_string($diet)) {
-			$className = "\\App\\Classes\\Profile\\Diets\\" . ucfirst($diet);
+			$className = "Fatty\\Diets\\" . ucfirst($diet);
 			if (class_exists($className)) {
 				$diet = new $className;
 			}

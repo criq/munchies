@@ -4,12 +4,26 @@ namespace Fatty;
 
 class Weight extends AmountWithUnit
 {
-	public function __construct($amount, $unit = 'kg')
+	public function __construct(float $amount, string $unit = 'kg')
 	{
 		return parent::__construct($amount, $unit);
 	}
 
-	public function getInKg()
+	public static function createFromString(string $value) : ?Weight
+	{
+		try {
+			$amount = (new \Katu\Types\TString($value))->getAsFloat();
+			if ($amount) {
+				return new static($amount);
+			}
+
+			return null;
+		} catch (\Throwable $e) {
+			return null;
+		}
+	}
+
+	public function getInKg() : Weight
 	{
 		switch ($this->getUnit()) {
 			case 'kg':
@@ -21,7 +35,7 @@ class Weight extends AmountWithUnit
 		}
 	}
 
-	public function getInG()
+	public function getInG() : Weight
 	{
 		switch ($this->getUnit()) {
 			case 'kg':

@@ -12,19 +12,11 @@ class Proportions
 	/*****************************************************************************
 	 * Výška
 	 */
-	public function setHeight($length)
+	public function setHeight(?Length $length) : Proportions
 	{
-		if (!($length instanceof Length)) {
-			try {
-				$length = new Length($length);
-			} catch (\Fatty\Exceptions\InvalidAmountException $e) {
-				throw (new \Fatty\Exceptions\CaloricCalculatorException("Invalid height."))
-					->setAbbr('invalidHeightAmount')
-					;
-			}
-		}
-
 		$this->height = $length;
+
+		return $this;
 	}
 
 	public function getHeight()

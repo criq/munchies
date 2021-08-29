@@ -13,7 +13,7 @@ class Goal
 	public function setTrend($weightVector)
 	{
 		if (is_string($weightVector)) {
-			$className = "\\App\\Classes\\Profile\\WeightVectors\\" . ucfirst($weightVector);
+			$className = "Fatty\\WeightVectors\\" . ucfirst($weightVector);
 			if (class_exists($className)) {
 				$weightVector = new $className;
 			}

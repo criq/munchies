@@ -9,7 +9,21 @@ class Length extends AmountWithUnit
 		return parent::__construct($amount, $unit);
 	}
 
-	public function getInCm()
+	public static function createFromString(string $value) : ?Length
+	{
+		try {
+			$amount = (new \Katu\Types\TString($value))->getAsFloat();
+			if ($amount) {
+				return new static($amount);
+			}
+
+			return null;
+		} catch (\Throwable $e) {
+			return null;
+		}
+	}
+
+	public function getInCm() : Length
 	{
 		switch ($this->getUnit()) {
 			case 'cm':
@@ -21,7 +35,7 @@ class Length extends AmountWithUnit
 		}
 	}
 
-	public function getInM()
+	public function getInM() : Length
 	{
 		switch ($this->getUnit()) {
 			case 'cm':
