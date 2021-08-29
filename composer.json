@@ -3,6 +3,9 @@
 	"description": "fatty caloric calculator",
 	"type": "library",
 	"minimum-stability": "dev",
+	"require" : {
+		"criq/katu": "v1.x-dev"
+	},
 	"autoload": {
 		"psr-4": {
 			"Fatty\\": "src/"
