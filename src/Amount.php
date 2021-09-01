@@ -23,7 +23,7 @@ class Amount
 		try {
 			$value = trim($value);
 			if (!preg_match('/^\-?[0-9]+([\,\.][0-9]+)?$/', $value)) {
-				throw new FattyException("Invalid amount.");
+				throw FattyException::createFromAbbr('invalidAmount');
 			}
 
 			return new static((new \Katu\Types\TString(trim($value)))->getAsFloat());

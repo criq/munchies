@@ -12,6 +12,6 @@ class Gain extends \Fatty\Vector
 
 	public function getTdeeChangePerDay(Calculator $calculator)
 	{
-		return new \Fatty\Energy($calculator->getTotalDailyEnergyExpenditure()->getAmount() * ($this->getTdeeQuotient($calculator) - 1), 'kCal');
+		return new \Fatty\Energy($calculator->calcTotalDailyEnergyExpenditure()->getAmount() * ($this->getTdeeQuotient($calculator)->getValue() - 1), 'kCal');
 	}
 }

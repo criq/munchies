@@ -31,9 +31,9 @@ abstract class Vector
 		return lcfirst(array_slice(explode('\\', get_called_class()), -1, 1)[0]);
 	}
 
-	public function getTdeeQuotient(Calculator $calculator)
+	public function getTdeeQuotient(Calculator $calculator) : Amount
 	{
-		return static::TDEE_QUOTIENT;
+		return new Amount((float)static::TDEE_QUOTIENT);
 	}
 
 	public function getChangePerWeek()
@@ -41,9 +41,9 @@ abstract class Vector
 		return new Weight(new Amount(static::WEIGHT_CHANGE_PER_WEEK), 'kg');
 	}
 
-	public function getGoalTdee(Calculator $calculator)
+	public function calcGoalTdee(Calculator $calculator)
 	{
-		return new Energy($calculator->getTotalDailyEnergyExpenditure()->getAmount() + $this->getTdeeChangePerDay($calculator)->getAmount(), 'kCal');
+		return new Energy($calculator->calcTotalDailyEnergyExpenditure()->getAmount() + $this->getTdeeChangePerDay($calculator)->getAmount(), 'kCal');
 	}
 
 	public function getLabelInfinitive()

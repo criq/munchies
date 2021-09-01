@@ -11,6 +11,6 @@ class SlowLoose extends Loose
 
 	public function getTdeeChangePerDay(Calculator $calculator)
 	{
-		return new \Fatty\Energy(($calculator->getTotalDailyEnergyExpenditure()->getAmount() - $calculator->getBasalMetabolicRate()->getAmount()) * -.35, 'kCal');
+		return new \Fatty\Energy(($calculator->calcTotalDailyEnergyExpenditure()->getAmount() - $calculator->calcBasalMetabolicRate()->getAmount()) * -.35, 'kCal');
 	}
 }

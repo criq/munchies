@@ -19,7 +19,7 @@ class Proportions
 		return $this;
 	}
 
-	public function getHeight()
+	public function getHeight() : ?Length
 	{
 		return $this->height;
 	}
@@ -27,22 +27,14 @@ class Proportions
 	/*****************************************************************************
 	 * Obvod pasu.
 	 */
-	public function setWaist($length)
+	public function setWaist(?Length $length) : Proportions
 	{
-		if (!($length instanceof Length)) {
-			try {
-				$length = new Length($length);
-			} catch (\Fatty\Exceptions\InvalidAmountException $e) {
-				throw (new \Fatty\Exceptions\CaloricCalculatorException("Invalid waist."))
-					->setAbbr('invalidWaistAmount')
-					;
-			}
-		}
-
 		$this->waist = $length;
+
+		return $this;
 	}
 
-	public function getWaist()
+	public function getWaist() : ?Length
 	{
 		return $this->waist;
 	}
@@ -50,22 +42,14 @@ class Proportions
 	/*****************************************************************************
 	 * Obvod boků.
 	 */
-	public function setHips($length)
+	public function setHips(?Length $length) : Proportions
 	{
-		if (!($length instanceof Length)) {
-			try {
-				$length = new Length($length);
-			} catch (\Fatty\Exceptions\InvalidAmountException $e) {
-				throw (new \Fatty\Exceptions\CaloricCalculatorException("Invalid hips."))
-					->setAbbr('invalidHipsAmount')
-					;
-			}
-		}
-
 		$this->hips = $length;
+
+		return $this;
 	}
 
-	public function getHips()
+	public function getHips() : ?Length
 	{
 		return $this->hips;
 	}
@@ -73,22 +57,14 @@ class Proportions
 	/*****************************************************************************
 	 * Obvod krku.
 	 */
-	public function setNeck($length)
+	public function setNeck(?Length $length) : Proportions
 	{
-		if (!($length instanceof Length)) {
-			try {
-				$length = new Length($length);
-			} catch (\Fatty\Exceptions\InvalidAmountException $e) {
-				throw (new \Fatty\Exceptions\CaloricCalculatorException("Invalid neck."))
-					->setAbbr('invalidNeckAmount')
-					;
-			}
-		}
-
 		$this->neck = $length;
+
+		return $this;
 	}
 
-	public function getNeck()
+	public function getNeck() : ?Length
 	{
 		return $this->neck;
 	}

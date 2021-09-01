@@ -3,33 +3,37 @@
 namespace Fatty\Genders;
 
 use Fatty\Birthday;
+use Fatty\BodyType;
 use Fatty\BreastfeedingMode;
 use Fatty\BreastfeedingModes\Full;
 use Fatty\BreastfeedingModes\Partial;
 use Fatty\Calculator;
 use Fatty\Energy;
-use Fatty\Length;
+use Fatty\Exceptions\FattyException;
+use Fatty\Exceptions\FattyExceptionList;
 use Fatty\Percentage;
-use Fatty\Proportions;
-use Fatty\Weight;
 
 class Female extends \Fatty\Gender
 {
+	const ESSENTIAL_FAT_PERCENTAGE = .13;
+
 	private $breastfeedingChildbirthDate;
 	private $breastfeedingMode;
 	private $isBreastfeeding;
 	private $isPregnant;
 	private $pregnancyChildbirthDate;
 
+
+
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
 	 */
-	protected function getBodyFatPercentageByProportions(Calculator $calculator) : Percentage
+	protected function calcBodyFatPercentageByProportions(Calculator $calculator) : Percentage
 	{
 		return new Percentage(((495 / (1.0324 - (0.19077 * log10($calculator->getProportions()->getWaist()->getInCm()->getAmount() - $calculator->getProportions()->getNeck()->getInCm()->getAmount())) + (0.15456 * log10($calculator->getProportions()->getHeight()->getInCm()->getAmount())))) - 450) * .01);
 	}
 
-	public function getBodyFatPercentageByProportionsFormula(Calculator $calculator) : string
+	public function calcBodyFatPercentageByProportionsFormula(Calculator $calculator) : string
 	{
 		return '((495 / (1.0324 - (0.19077 * log10(waist[' . $calculator->getProportions()->getWaist()->getInCm()->getAmount() . '] - neck[' . $calculator->getProportions()->getNeck()->getInCm()->getAmount() . '])) + (0.15456 * log10(height[' . $calculator->getProportions()->getHeight()->getInCm()->getAmount() . '])))) - 450) * .01';
 	}
@@ -37,38 +41,30 @@ class Female extends \Fatty\Gender
 	/*****************************************************************************
 	 * Bazální metabolismus - BMR.
 	 */
-	public function getBasalMetabolicRate(Calculator $calculator)
+	public function calcBasalMetabolicRate(Calculator $calculator) : Energy
 	{
-		$ec = new \Katu\Exceptions\ExceptionCollection;
+		$exceptionList = new FattyExceptionList;
 
-		if (!($calculator->getWeight() instanceof Weight)) {
-			$ec->add((new CaloricCalculatorException("Missing weight."))
-				->setAbbr('missingWeight'));
+		if (!$calculator->getWeight()) {
+			$exceptionList->append(FattyException::createFromAbbr('missingWeight'));
 		}
 
-		if (!($calculator->getProportions() instanceof Proportions)) {
-			$ec->add((new CaloricCalculatorException("Missing proportions."))
-				->setAbbr('missingProportions'));
+		if (!$calculator->getProportions()->getHeight()) {
+			$exceptionList->append(FattyException::createFromAbbr('missingHeight'));
 		}
 
-		if (!($calculator->getProportions()->getHeight() instanceof Length)) {
-			$ec->add((new CaloricCalculatorException("Missing height."))
-				->setAbbr('missingHeight'));
+		if (!$calculator->getBirthday()) {
+			$exceptionList->append(FattyException::createFromAbbr('missingBirthday'));
 		}
 
-		if (!($calculator->getBirthday() instanceof Birthday)) {
-			$ec->add((new CaloricCalculatorException("Missing birthday."))
-				->setAbbr('missingBirthday'));
-		}
-
-		if ($ec->has()) {
-			throw $ec;
+		if (count($exceptionList)) {
+			throw $exceptionList;
 		}
 
 		return new Energy((10 * $calculator->getWeight()->getInKg()->getAmount()) + (6.25 * $calculator->getProportions()->getHeight()->getInCm()->getAmount()) - (5 * $calculator->getBirthday()->getAge()) - 161, 'kCal');
 	}
 
-	public function getBasalMetabolicRateFormula(Calculator $calculator)
+	public function getBasalMetabolicRateFormula(Calculator $calculator) : string
 	{
 		return '(10 * weight[' . $calculator->getWeight()->getInKg()->getAmount() . ']) + (6.25 * height[' . $calculator->getProportions()->getHeight()->getInCm()->getAmount() . ']) - (5 * age[' . $calculator->getBirthday()->getAge() . ']) - 161';
 	}
@@ -89,9 +85,7 @@ class Female extends \Fatty\Gender
 	public function setPregnancyChildbirthDate($pregnancyChildbirthDate)
 	{
 		if (!$pregnancyChildbirthDate) {
-			throw (new CaloricCalculatorException("Missing pregnancy childbirth date."))
-				->setAbbr('missingPregnancyChildbirthDate')
-				;
+			throw FattyException::createFromAbbr('missingPregnancyChildbirthDate');
 		}
 
 		if (is_string($pregnancyChildbirthDate)) {
@@ -103,15 +97,11 @@ class Female extends \Fatty\Gender
 		}
 
 		if (!($pregnancyChildbirthDate instanceof Birthday)) {
-			throw (new CaloricCalculatorException("Invalid pregnancy childbirth date."))
-				->setAbbr('invalidPregnancyChildbirthDate')
-				;
+			throw FattyException::createFromAbbr('invalidPregnancyChildbirthDate');
 		}
 
 		if ($pregnancyChildbirthDate->getBirthday()->isInPast()) {
-			throw (new CaloricCalculatorException("Pregnancy childbirth date is in past."))
-				->setAbbr('pregnancyChildbirthDateInPast')
-				;
+			throw FattyException::createFromAbbr('pregnancyChildbirthDateInPast');
 		}
 
 		$this->pregnancyChildbirthDate = $pregnancyChildbirthDate;
@@ -135,9 +125,7 @@ class Female extends \Fatty\Gender
 	public function setBreastfeedingChildbirthDate($breastfeedingChildbirthDate)
 	{
 		if (!$breastfeedingChildbirthDate) {
-			throw (new CaloricCalculatorException("Missing breastfeeding childbirth date."))
-				->setAbbr('missingBreastfeedingChildbirthDate')
-				;
+			throw FattyException::createFromAbbr('missingBreastfeedingChildbirthDate');
 		}
 
 		if (is_string($breastfeedingChildbirthDate)) {
@@ -149,15 +137,11 @@ class Female extends \Fatty\Gender
 		}
 
 		if (!($breastfeedingChildbirthDate instanceof Birthday)) {
-			throw (new CaloricCalculatorException("Invalid breastfeeding childbirth date."))
-				->setAbbr('invalidBreastfeedingChildbirthDate')
-				;
+			throw FattyException::createFromAbbr('invalidBreastfeedingChildbirthDate');
 		}
 
 		if ($breastfeedingChildbirthDate->getBirthday()->isInFuture()) {
-			throw (new CaloricCalculatorException("Breastfeeding childbirth date is in future."))
-				->setAbbr('breastfeedingChildbirthDateInFuture')
-				;
+			throw FattyException::createFromAbbr('breastfeedingChildbirthDateInFuture');
 		}
 
 		$this->breastfeedingChildbirthDate = $breastfeedingChildbirthDate;
@@ -175,9 +159,7 @@ class Female extends \Fatty\Gender
 		}
 
 		if (!($breastfeedingMode instanceof BreastfeedingMode)) {
-			throw (new CaloricCalculatorException("Invalid breastfeeding mode."))
-				->setAbbr('invalidBreastfeedingMode')
-				;
+			throw FattyException::createFromAbbr('invalidBreastfeedingMode');
 		}
 
 		$this->breastfeedingMode = $breastfeedingMode;
@@ -188,24 +170,24 @@ class Female extends \Fatty\Gender
 	/*****************************************************************************
 	 * Doporučený denní příjem - bonusy.
 	 */
-	public function getReferenceDailyIntakeBonus()
+	public function calcReferenceDailyIntakeBonus()
 	{
-		$ec = new \Katu\Exceptions\ExceptionCollection;
+		$exceptionList = new FattyExceptionList;
 
 		try {
 			$referenceDailyIntakeBonusPregnancy = $this->getReferenceDailyIntakeBonusPregnancy();
-		} catch (\Exception $e) {
-			$ec->add($e);
+		} catch (\Throwable $e) {
+			$exceptionList->append($e);
 		}
 
 		try {
 			$referenceDailyIntakeBonusBreastfeeding = $this->getReferenceDailyIntakeBonusBreastfeeding();
-		} catch (\Exception $e) {
-			$ec->add($e);
+		} catch (\Throwable $e) {
+			$exceptionList->append($e);
 		}
 
-		if ($ec->has()) {
-			throw $ec;
+		if (count($exceptionList)) {
+			throw $exceptionList;
 		}
 
 		return new Energy($referenceDailyIntakeBonusPregnancy->getAmount() + $referenceDailyIntakeBonusBreastfeeding->getAmount(), 'kCal');
@@ -218,9 +200,7 @@ class Female extends \Fatty\Gender
 		}
 
 		if (!($this->getPregnancyChildbirthDate() instanceof \Fatty\Birthday)) {
-			throw (new CaloricCalculatorException("Missing pregnancy childbirth date."))
-				->setAbbr('missingPregnancyChildbirthDate')
-				;
+			throw FattyException::createFromAbbr('missingPregnancyChildbirthDate');
 		}
 
 		$diff = $this->getPregnancyChildbirthDate()->diff(new \Katu\Utils\DateTime);
@@ -237,24 +217,22 @@ class Female extends \Fatty\Gender
 
 	public function getReferenceDailyIntakeBonusBreastfeeding()
 	{
-		$ec = new \Katu\Exceptions\ExceptionCollection;
+		$exceptionList = new FattyExceptionList;
 
 		if (!$this->isBreastfeeding()) {
 			return new Energy(0);
 		}
 
 		if (!($this->getBreastfeedingChildbirthDate() instanceof \Fatty\Birthday)) {
-			$ec->add((new CaloricCalculatorException("Missing breastfeeding childbirth date."))
-				->setAbbr('missingBreastfeedingChildbirthDate'));
+			$exceptionList->append(FattyException::createFromAbbr('missingBreastfeedingChildbirthDate'));
 		}
 
 		if (!($this->getBreastfeedingMode() instanceof \Fatty\BreastfeedingMode)) {
-			$ec->add((new CaloricCalculatorException("Missing breastfeeding mode."))
-				->setAbbr('missingBreastfeedingMode'));
+			$exceptionList->append(FattyException::createFromAbbr('missingBreastfeedingMode'));
 		}
 
-		if ($ec->has()) {
-			throw $ec;
+		if (count($exceptionList)) {
+			throw $exceptionList;
 		}
 
 		$diff = $this->getBreastfeedingChildbirthDate()->diff(new \Katu\Utils\DateTime);
@@ -283,9 +261,9 @@ class Female extends \Fatty\Gender
 	 * Typ postavy.
 	 */
 
-	public function getBodyType(Calculator $calculator)
+	public function calcBodyType(Calculator $calculator) : BodyType
 	{
-		$waistHipRatioAmount = $calculator->getWaistHipRatio()->getAmount();
+		$waistHipRatioAmount = $calculator->calcWaistHipRatio()->getAmount();
 
 		if ($waistHipRatioAmount < .75) {
 			// @TODO - hruška nebo přesýpací hodiny - budu muset zahrnout prsa.

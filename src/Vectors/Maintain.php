@@ -2,6 +2,7 @@
 
 namespace Fatty\Vectors;
 
+use Fatty\Amount;
 use Fatty\Calculator;
 
 class Maintain extends \Fatty\Vector
@@ -11,18 +12,18 @@ class Maintain extends \Fatty\Vector
 	const TDEE_QUOTIENT__LARGE = 1.07;
 	const WEIGHT_CHANGE_PER_WEEK = 0;
 
-	public function getTdeeQuotient(Calculator $calculator)
+	public function getTdeeQuotient(Calculator $calculator) : Amount
 	{
-		return $calculator->getPhysicalActivityLevel()->getAmount() >= 2 ? static::TDEE_QUOTIENT__LARGE : static::TDEE_QUOTIENT;
+		return new Amount($calculator->calcPhysicalActivityLevel()->getValue() >= 2 ? static::TDEE_QUOTIENT__LARGE : static::TDEE_QUOTIENT);
 	}
 
 	public function getTdeeChangePerDay(Calculator $calculator)
 	{
-		return new \Fatty\Energy(0, 'kCal');
+		return new \Fatty\Energy(new Amount(0), 'kCal');
 	}
 
-	public function getGoalTdee(Calculator $calculator)
+	public function calcGoalTdee(Calculator $calculator)
 	{
-		return $calculator->getTotalDailyEnergyExpenditure();
+		return $calculator->calcTotalDailyEnergyExpenditure();
 	}
 }

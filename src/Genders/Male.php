@@ -3,20 +3,21 @@
 namespace Fatty\Genders;
 
 use Fatty\Amount;
-use Fatty\Birthday;
+use Fatty\BodyType;
 use Fatty\Calculator;
 use Fatty\Energy;
-use Fatty\Length;
+use Fatty\Exceptions\FattyException;
+use Fatty\Exceptions\FattyExceptionList;
 use Fatty\Percentage;
-use Fatty\Proportions;
-use Fatty\Weight;
 
 class Male extends \Fatty\Gender
 {
+	const ESSENTIAL_FAT_PERCENTAGE = .5;
+
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
 	 */
-	protected function getBodyFatPercentageByProportions(Calculator $calculator) : Percentage
+	protected function calcBodyFatPercentageByProportions(Calculator $calculator) : Percentage
 	{
 		$waist = $calculator->getProportions()->getWaist()->getInCm()->getAmount()->getValue();
 		$neck = $calculator->getProportions()->getNeck()->getInCm()->getAmount()->getValue();
@@ -25,7 +26,7 @@ class Male extends \Fatty\Gender
 		return new Percentage(new Amount(((495 / (1.0324 - (0.19077 * log10($waist - $neck)) + (0.15456 * log10($height)))) - 450) * .01));
 	}
 
-	public function getBodyFatPercentageByProportionsFormula(Calculator $calculator) : string
+	public function calcBodyFatPercentageByProportionsFormula(Calculator $calculator) : string
 	{
 		$waist = $calculator->getProportions()->getWaist()->getInCm()->getAmount()->getValue();
 		$neck = $calculator->getProportions()->getNeck()->getInCm()->getAmount()->getValue();
@@ -37,38 +38,32 @@ class Male extends \Fatty\Gender
 	/*****************************************************************************
 	 * Bazální metabolismus - BMR.
 	 */
-	public function getBasalMetabolicRate(Calculator $calculator)
+	public function calcBasalMetabolicRate(Calculator $calculator) : Energy
 	{
-		$ec = new \Katu\Exceptions\ExceptionCollection;
+		$exceptionList = new FattyExceptionList;
 
-		if (!($calculator->getWeight() instanceof Weight)) {
-			$ec->add((new CaloricCalculatorException("Missing weight."))
-				->setAbbr('missingWeight'));
+		if (!$calculator->getWeight()) {
+			$exceptionList->append(FattyException::createFromAbbr('missingWeight'));
 		}
 
-		if (!($calculator->getProportions() instanceof Proportions)) {
-			$ec->add((new CaloricCalculatorException("Missing proportions."))
-				->setAbbr('missingProportions'));
+		if (!$calculator->getProportions()->getHeight()) {
+			$exceptionList->append(FattyException::createFromAbbr('missingHeight'));
 		}
 
-		if (!($calculator->getProportions()->getHeight() instanceof Length)) {
-			$ec->add((new CaloricCalculatorException("Missing height."))
-				->setAbbr('missingHeight'));
+		if (!$calculator->getBirthday()) {
+			$exceptionList->append(FattyException::createFromAbbr('missingBirthday'));
 		}
 
-		if (!($calculator->getBirthday() instanceof Birthday)) {
-			$ec->add((new CaloricCalculatorException("Missing birthday."))
-				->setAbbr('missingBirthday'));
+		if (count($exceptionList)) {
+			throw $exceptionList;
 		}
 
-		if ($ec->has()) {
-			throw $ec;
-		}
+		$amount = new Amount((10 * $calculator->getWeight()->getInKg()->getAmount()->getValue()) + (6.25 * $calculator->getProportions()->getHeight()->getInCm()->getAmount()->getValue()) - (5 * $calculator->getBirthday()->getAge()) + 5);
 
-		return new Energy((10 * $calculator->getWeight()->getInKg()->getAmount()) + (6.25 * $calculator->getProportions()->getHeight()->getInCm()->getAmount()) - (5 * $calculator->getBirthday()->getAge()) + 5, 'kCal');
+		return new Energy($amount, 'kCal');
 	}
 
-	public function getBasalMetabolicRateFormula(Calculator $calculator)
+	public function getBasalMetabolicRateFormula(Calculator $calculator) : string
 	{
 		return '(10 * weight[' . $calculator->getWeight()->getInKg()->getAmount() . ']) + (6.25 * height[' . $calculator->getProportions()->getHeight()->getInCm()->getAmount() . ']) - (5 * age[' . $calculator->getBirthday()->getAge() . ']) + 5';
 	}
@@ -76,15 +71,15 @@ class Male extends \Fatty\Gender
 	/*****************************************************************************
 	 * Typ postavy.
 	 */
-	public function getBodyType(Calculator $calculator)
+	public function calcBodyType(Calculator $calculator) : BodyType
 	{
-		$waistHipRatioAmount = $calculator->getWaistHipRatio()->getAmount();
+		$waistHipRatio = $calculator->calcWaistHipRatio();
 
-		if ($waistHipRatioAmount < .85) {
+		if ($waistHipRatio->getValue() < .85) {
 			return new \Fatty\BodyTypes\PearOrHourglass;
-		} elseif ($waistHipRatioAmount >= .8 && $waistHipRatioAmount < .9) {
+		} elseif ($waistHipRatio->getValue() >= .8 && $waistHipRatio->getValue() < .9) {
 			return new \Fatty\BodyTypes\Balanced;
-		} elseif ($waistHipRatioAmount >= .9 && $waistHipRatioAmount < .95) {
+		} elseif ($waistHipRatio->getValue() >= .9 && $waistHipRatio->getValue() < .95) {
 			return new \Fatty\BodyTypes\Apple;
 		} else {
 			return new \Fatty\BodyTypes\AppleWithHigherRisk;

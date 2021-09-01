@@ -12,6 +12,6 @@ class Loose extends \Fatty\Vector
 
 	public function getTdeeChangePerDay(Calculator $calculator)
 	{
-		return new \Fatty\Energy(($calculator->getTotalDailyEnergyExpenditure()->getAmount() - ($calculator->getBasalMetabolicRate()->getAmount() + 50)) * -1, 'kCal');
+		return new \Fatty\Energy(($calculator->calcTotalDailyEnergyExpenditure()->getAmount() - ($calculator->calcBasalMetabolicRate()->getAmount() + 50)) * -1, 'kCal');
 	}
 }

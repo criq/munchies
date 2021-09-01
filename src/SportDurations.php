@@ -50,27 +50,27 @@ class SportDurations
 		return $this->anaerobic;
 	}
 
-	public function getActivityAmount()
+	public function calcSportActivity() : Activity
 	{
-		$pal = 0;
+		$amount = 0;
 
 		if ($this->lowFrequency || $this->aerobic || $this->anaerobic) {
 			if ($this->lowFrequency) {
-				$pal += $this->lowFrequency->getActivityAmount()->getAmount();
+				$amount += $this->lowFrequency->getActivityAmount()->getValue();
 			}
 
 			if ($this->aerobic) {
-				$pal += $this->aerobic->getActivityAmount()->getAmount();
+				$amount += $this->aerobic->getActivityAmount()->getValue();
 			}
 
 			if ($this->anaerobic) {
-				$pal += $this->anaerobic->getActivityAmount()->getAmount();
+				$amount += $this->anaerobic->getActivityAmount()->getValue();
 			}
 		} else {
-			$pal = static::DEFAULT_PAL;
+			$amount = static::DEFAULT_PAL;
 		}
 
-		return new ActivityAmount($pal);
+		return new Activity($amount);
 	}
 
 	public function getTotalDuration()

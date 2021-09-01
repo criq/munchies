@@ -54,10 +54,8 @@ class Goal
 	public function getFinal(Calculator $calculator)
 	{
 		$weight = $this->getWeight();
-		if (!($weight instanceof Weight)) {
-			throw (new FattyException("Missing weight."))
-				->setAbbr('missingWeight')
-				;
+		if (!$weight) {
+			throw FattyException::createFromAbbr('missingWeight');
 		}
 
 		return new Weight($weight->getInKg()->getAmount() + $this->getChange()->getInKg()->getAmount(), 'kg');
@@ -72,15 +70,13 @@ class Goal
 		}
 	}
 
-	public function getGoalTdee(Calculator $calculator)
+	public function calcGoalTdee(Calculator $calculator)
 	{
 		$vector = $this->getVector();
-		if (!($vector instanceof Vector)) {
-			throw (new FattyException("Missing goal vector."))
-				->setAbbr('missingGoalvector')
-				;
+		if (!$vector) {
+			throw FattyException::createFromAbbr('missingGoalvector');
 		}
 
-		return $vector->getGoalTdee($calculator);
+		return $vector->calcGoalTdee($calculator);
 	}
 }

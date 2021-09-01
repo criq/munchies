@@ -8,12 +8,13 @@ abstract class Gender
 {
 	const BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT = 'measurement';
 	const BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS = 'proportions';
+	const ESSENTIAL_FAT_PERCENTAGE = null;
 
-	abstract protected function getBodyFatPercentageByProportions(Calculator $calculator) : Percentage;
-	abstract public function getBasalMetabolicRate(Calculator $calculator);
-	abstract public function getBasalMetabolicRateFormula(Calculator $calculator);
-	abstract public function getBodyFatPercentageByProportionsFormula(Calculator $calculator) : string;
-	abstract public function getBodyType(Calculator $calculator);
+	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator) : Percentage;
+	abstract public function calcBasalMetabolicRate(Calculator $calculator) : Energy;
+	abstract public function getBasalMetabolicRateFormula(Calculator $calculator) : string;
+	abstract public function calcBodyFatPercentageByProportionsFormula(Calculator $calculator) : string;
+	abstract public function calcBodyType(Calculator $calculator) : BodyType;
 
 	public static function createFromString(string $value) : ?Gender
 	{
@@ -91,25 +92,25 @@ abstract class Gender
 	{
 		try {
 			$bodyFatPercentage = $calculator->getBodyFatPercentage();
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 			$bodyFatPercentage = false;
 		}
 
 		try {
 			$height = $calculator->getProportions()->getHeight();
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 			$height = false;
 		}
 
 		try {
 			$neck = $calculator->getProportions()->getNeck();
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 			$neck = false;
 		}
 
 		try {
 			$waist = $calculator->getProportions()->getWaist();
-		} catch (\Exception $e) {
+		} catch (\Throwable $e) {
 			$waist = false;
 		}
 
@@ -122,48 +123,52 @@ abstract class Gender
 		}
 	}
 
-	public function getBodyFatPercentage(Calculator $calculator) : Percentage
+	public function calcBodyFatPercentage(Calculator $calculator) : Percentage
 	{
 		$strategy = $this->getBodyFatPercentageStrategy($calculator);
 		if (!$strategy) {
-			throw (new FattyException("Missing data to determine your body fat percentage."))
-				->setAbbr('missingBodyFatPercentageInput');
+			throw FattyException::createFromAbbr('missingBodyFatPercentageInput');
 		}
 
 		switch ($strategy) {
 			case static::BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT:
-				return $this->getBodyFatPercentageByMeasurement($calculator);
+				return $this->calcBodyFatPercentageByMeasurement($calculator);
 				break;
 			case static::BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS:
-				return $this->getBodyFatPercentageByProportions($calculator);
+				return $this->calcBodyFatPercentageByProportions($calculator);
 				break;
 		}
 	}
 
-	protected function getBodyFatPercentageByMeasurement(Calculator $calculator)
+	protected function calcBodyFatPercentageByMeasurement(Calculator $calculator)
 	{
 		return $calculator->getBodyFatPercentage();
 	}
 
 	public function getBodyFatPercentageFormula(Calculator $calculator)
 	{
-		$result = $this->getBodyFatPercentage($calculator)->getAmount();
+		$result = $this->calcBodyFatPercentage($calculator)->getAmount();
 
 		switch ($this->getBodyFatPercentageStrategy($calculator)) {
 			case static::BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT:
 				return $result;
 				break;
 			case static::BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS:
-				return $this->getBodyFatPercentageByProportionsFormula($calculator) . ' = ' . $result;
+				return $this->calcBodyFatPercentageByProportionsFormula($calculator) . ' = ' . $result;
 				break;
 		}
+	}
+
+	public function calcEssentialFatPercentage() : Percentage
+	{
+		return new Percentage(new Amount((float)static::ESSENTIAL_FAT_PERCENTAGE));
 	}
 
 	/*****************************************************************************
 	 * Doporučený denní příjem - bonusy.
 	 */
-	public function getReferenceDailyIntakeBonus()
+	public function calcReferenceDailyIntakeBonus()
 	{
-		return new Energy(0);
+		return new Energy(new Amount(0));
 	}
 }
