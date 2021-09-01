@@ -26,7 +26,7 @@ class AmountWithUnit
 		try {
 			$amount = Amount::createFromString($value);
 			if ($amount) {
-				return new static($amount);
+				return new static(new Amount($amount->getValue()));
 			}
 
 			return null;

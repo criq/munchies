@@ -23,7 +23,7 @@ class Male extends \Fatty\Gender
 		$neck = $calculator->getProportions()->getNeck()->getInCm()->getAmount()->getValue();
 		$height = $calculator->getProportions()->getHeight()->getInCm()->getAmount()->getValue();
 
-		return new Percentage(new Amount(((495 / (1.0324 - (0.19077 * log10($waist - $neck)) + (0.15456 * log10($height)))) - 450) * .01));
+		return new Percentage(((495 / (1.0324 - (0.19077 * log10($waist - $neck)) + (0.15456 * log10($height)))) - 450) * .01);
 	}
 
 	public function calcBodyFatPercentageByProportionsFormula(Calculator $calculator) : string

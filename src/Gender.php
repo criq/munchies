@@ -147,7 +147,7 @@ abstract class Gender
 
 	public function getBodyFatPercentageFormula(Calculator $calculator)
 	{
-		$result = $this->calcBodyFatPercentage($calculator)->getAmount();
+		$result = $this->calcBodyFatPercentage($calculator);
 
 		switch ($this->getBodyFatPercentageStrategy($calculator)) {
 			case static::BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT:
@@ -161,7 +161,7 @@ abstract class Gender
 
 	public function calcEssentialFatPercentage() : Percentage
 	{
-		return new Percentage(new Amount((float)static::ESSENTIAL_FAT_PERCENTAGE));
+		return new Percentage((float)static::ESSENTIAL_FAT_PERCENTAGE);
 	}
 
 	/*****************************************************************************

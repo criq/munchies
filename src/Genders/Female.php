@@ -2,6 +2,7 @@
 
 namespace Fatty\Genders;
 
+use Fatty\Amount;
 use Fatty\Birthday;
 use Fatty\BodyType;
 use Fatty\BreastfeedingMode;
@@ -23,19 +24,25 @@ class Female extends \Fatty\Gender
 	private $isPregnant;
 	private $pregnancyChildbirthDate;
 
-
-
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
 	 */
 	protected function calcBodyFatPercentageByProportions(Calculator $calculator) : Percentage
 	{
-		return new Percentage(((495 / (1.0324 - (0.19077 * log10($calculator->getProportions()->getWaist()->getInCm()->getAmount() - $calculator->getProportions()->getNeck()->getInCm()->getAmount())) + (0.15456 * log10($calculator->getProportions()->getHeight()->getInCm()->getAmount())))) - 450) * .01);
+		$waist = $calculator->getProportions()->getWaist()->getInCm()->getAmount()->getValue();
+		$neck = $calculator->getProportions()->getNeck()->getInCm()->getAmount()->getValue();
+		$height = $calculator->getProportions()->getHeight()->getInCm()->getAmount()->getValue();
+
+		return new Percentage(((495 / (1.0324 - (0.19077 * log10($waist - $neck)) + (0.15456 * log10($height)))) - 450) * .01);
 	}
 
 	public function calcBodyFatPercentageByProportionsFormula(Calculator $calculator) : string
 	{
-		return '((495 / (1.0324 - (0.19077 * log10(waist[' . $calculator->getProportions()->getWaist()->getInCm()->getAmount() . '] - neck[' . $calculator->getProportions()->getNeck()->getInCm()->getAmount() . '])) + (0.15456 * log10(height[' . $calculator->getProportions()->getHeight()->getInCm()->getAmount() . '])))) - 450) * .01';
+		$waist = $calculator->getProportions()->getWaist()->getInCm()->getAmount()->getValue();
+		$neck = $calculator->getProportions()->getNeck()->getInCm()->getAmount()->getValue();
+		$height = $calculator->getProportions()->getHeight()->getInCm()->getAmount()->getValue();
+
+		return '((495 / (1.0324 - (0.19077 * log10(waist[' . $waist . '] - neck[' . $neck . '])) + (0.15456 * log10(height[' . $height . '])))) - 450) * .01';
 	}
 
 	/*****************************************************************************
@@ -61,7 +68,11 @@ class Female extends \Fatty\Gender
 			throw $exceptionList;
 		}
 
-		return new Energy((10 * $calculator->getWeight()->getInKg()->getAmount()) + (6.25 * $calculator->getProportions()->getHeight()->getInCm()->getAmount()) - (5 * $calculator->getBirthday()->getAge()) - 161, 'kCal');
+		$weight = $calculator->getWeight()->getInKg()->getAmount()->getValue();
+		$height = $calculator->getProportions()->getHeight()->getInCm()->getAmount()->getValue();
+		$age = $calculator->getBirthday()->getAge();
+
+		return new Energy(new Amount((10 * $weight) + (6.25 * $height) - (5 * $age) - 161), 'kCal');
 	}
 
 	public function getBasalMetabolicRateFormula(Calculator $calculator) : string
@@ -190,13 +201,13 @@ class Female extends \Fatty\Gender
 			throw $exceptionList;
 		}
 
-		return new Energy($referenceDailyIntakeBonusPregnancy->getAmount() + $referenceDailyIntakeBonusBreastfeeding->getAmount(), 'kCal');
+		return new Energy(new Amount($referenceDailyIntakeBonusPregnancy->getAmount()->getValue() + $referenceDailyIntakeBonusBreastfeeding->getAmount()->getValue()), 'kCal');
 	}
 
 	public function getReferenceDailyIntakeBonusPregnancy()
 	{
 		if (!$this->isPregnant()) {
-			return new Energy(0);
+			return new Energy(new Amount(0));
 		}
 
 		if (!($this->getPregnancyChildbirthDate() instanceof \Fatty\Birthday)) {
@@ -212,7 +223,7 @@ class Female extends \Fatty\Gender
 			$change = 475;
 		}
 
-		return new Energy($change, 'kCal');
+		return new Energy(new Amount($change), 'kCal');
 	}
 
 	public function getReferenceDailyIntakeBonusBreastfeeding()
@@ -220,7 +231,7 @@ class Female extends \Fatty\Gender
 		$exceptionList = new FattyExceptionList;
 
 		if (!$this->isBreastfeeding()) {
-			return new Energy(0);
+			return new Energy(new Amount(0));
 		}
 
 		if (!($this->getBreastfeedingChildbirthDate() instanceof \Fatty\Birthday)) {
@@ -254,7 +265,7 @@ class Female extends \Fatty\Gender
 			$change = 100;
 		}
 
-		return new Energy($change, 'kCal');
+		return new Energy(new Amount($change), 'kCal');
 	}
 
 	/*****************************************************************************
@@ -263,14 +274,13 @@ class Female extends \Fatty\Gender
 
 	public function calcBodyType(Calculator $calculator) : BodyType
 	{
-		$waistHipRatioAmount = $calculator->calcWaistHipRatio()->getAmount();
+		$waistHipRatio = $calculator->calcWaistHipRatio();
 
-		if ($waistHipRatioAmount < .75) {
-			// @TODO - hruška nebo přesýpací hodiny - budu muset zahrnout prsa.
+		if ($waistHipRatio->getValue() < .75) {
 			return new \Fatty\BodyTypes\PearOrHourglass;
-		} elseif ($waistHipRatioAmount >= .75 && $waistHipRatioAmount < .8) {
+		} elseif ($waistHipRatio->getValue() >= .75 && $waistHipRatio->getValue() < .8) {
 			return new \Fatty\BodyTypes\Balanced;
-		} elseif ($waistHipRatioAmount >= .8 && $waistHipRatioAmount < .85) {
+		} elseif ($waistHipRatio->getValue() >= .8 && $waistHipRatio->getValue() < .85) {
 			return new \Fatty\BodyTypes\Apple;
 		} else {
 			return new \Fatty\BodyTypes\AppleWithHigherRisk;

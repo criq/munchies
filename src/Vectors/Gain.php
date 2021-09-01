@@ -3,6 +3,7 @@
 namespace Fatty\Vectors;
 
 use Fatty\Calculator;
+use Fatty\Energy;
 
 class Gain extends \Fatty\Vector
 {
@@ -12,6 +13,6 @@ class Gain extends \Fatty\Vector
 
 	public function getTdeeChangePerDay(Calculator $calculator)
 	{
-		return new \Fatty\Energy($calculator->calcTotalDailyEnergyExpenditure()->getAmount() * ($this->getTdeeQuotient($calculator)->getValue() - 1), 'kCal');
+		return new Energy(new Amount($calculator->calcTotalDailyEnergyExpenditure()->getValue() * ($this->getTdeeQuotient($calculator)->getValue() - 1)), 'kCal');
 	}
 }

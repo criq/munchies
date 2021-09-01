@@ -16,7 +16,7 @@ abstract class Nutrient extends Weight
 		return new static(new Amount($energy->getInKJ()->getAmount()->getValue() / static::KJ_IN_G), 'g');
 	}
 
-	public function getEnergy()
+	public function getEnergy() : Energy
 	{
 		return new Energy(new Amount($this->getInG()->getAmount()->getValue() * static::KJ_IN_G), 'kJ');
 	}

@@ -119,7 +119,7 @@ class Calculator
 
 		if (trim($params['bodyFatPercentage'] ?? null)) {
 			try {
-				$value = Percentage::createFromString($params['bodyFatPercentage']);
+				$value = Percentage::createFromPercent($params['bodyFatPercentage']);
 				if (!$value) {
 					throw FattyException::createFromAbbr('invalidBodyFatPercentage');
 				}
@@ -612,12 +612,12 @@ class Calculator
 			throw FattyException::createFromAbbr('missingGender');
 		}
 
-		return new Weight(new Amount($weight->getInKg()->getAmount()->getValue() * $gender->calcBodyFatPercentage($this)->getAmount()->getValue()));
+		return new Weight(new Amount($weight->getInKg()->getAmount()->getValue() * $gender->calcBodyFatPercentage($this)->getValue()));
 	}
 
 	public function calcActiveBodyMassPercentage() : Percentage
 	{
-		return new Percentage(new Amount(1 - $this->calcBodyFatPercentage($this)->getAmount()->getValue()));
+		return new Percentage(1 - $this->calcBodyFatPercentage($this)->getValue());
 	}
 
 	public function calcActiveBodyMassWeight() : Weight
@@ -627,7 +627,7 @@ class Calculator
 			throw FattyException::createFromAbbr('missingWeight');
 		}
 
-		return new Weight(new Amount($weight->getInKg()->getAmount()->getValue() * $this->calcActiveBodyMassPercentage()->getAmount()->getValue()));
+		return new Weight(new Amount($weight->getInKg()->getAmount()->getValue() * $this->calcActiveBodyMassPercentage()->getValue()));
 	}
 
 	public function calcOptimalFatPercentage() : Interval
@@ -641,23 +641,23 @@ class Calculator
 
 		if ($gender instanceof Genders\Male) {
 			if ($age < 18) {
-				return new Interval(new Percentage(new Amount(0)), new Percentage(new Amount(0)));
+				return new Interval(new Percentage(0), new Percentage(0));
 			} elseif ($age >= 18 && $age < 30) {
-				return new Interval(new Percentage(new Amount(.10)), new Percentage(new Amount(.15)));
+				return new Interval(new Percentage(.10), new Percentage(.15));
 			} elseif ($age >= 30 && $age < 50) {
-				return new Interval(new Percentage(new Amount(.11)), new Percentage(new Amount(.17)));
+				return new Interval(new Percentage(.11), new Percentage(.17));
 			} else {
-				return new Interval(new Percentage(new Amount(.12)), new Percentage(new Amount(.19)));
+				return new Interval(new Percentage(.12), new Percentage(.19));
 			}
 		} elseif ($gender instanceof Genders\Female) {
 			if ($age < 18) {
-				return new Interval(new Percentage(new Amount(0)), new Percentage(new Amount(0)));
+				return new Interval(new Percentage(0), new Percentage(0));
 			} elseif ($age >= 18 && $age < 30) {
-				return new Interval(new Percentage(new Amount(.14)), new Percentage(new Amount(.21)));
+				return new Interval(new Percentage(.14), new Percentage(.21));
 			} elseif ($age >= 30 && $age < 50) {
-				return new Interval(new Percentage(new Amount(.15)), new Percentage(new Amount(.23)));
+				return new Interval(new Percentage(.15), new Percentage(.23));
 			} else {
-				return new Interval(new Percentage(new Amount(.16)), new Percentage(new Amount(.25)));
+				return new Interval(new Percentage(.16), new Percentage(.25));
 			}
 		}
 	}
@@ -675,8 +675,8 @@ class Calculator
 		}
 
 		return new Interval(
-			new Weight(new Amount($weight->getInKg()->getAmount()->getValue() * $this->calcOptimalFatPercentage()->getMin()->getAmount()->getValue())),
-			new Weight(new Amount($weight->getInKg()->getAmount()->getValue() * $this->calcOptimalFatPercentage()->getMax()->getAmount()->getValue())),
+			new Weight(new Amount($weight->getInKg()->getAmount()->getValue() * $this->calcOptimalFatPercentage()->getMin()->getValue())),
+			new Weight(new Amount($weight->getInKg()->getAmount()->getValue() * $this->calcOptimalFatPercentage()->getMax()->getValue())),
 		);
 	}
 
@@ -713,7 +713,7 @@ class Calculator
 			throw FattyException::createFromAbbr('unableEssentialFatPercentage');
 		}
 
-		return new Weight(new Amount($weight->getInKg()->getAmount()->getValue() * $essentialFatPercentage->getAmount()->getValue()));
+		return new Weight(new Amount($weight->getInKg()->getAmount()->getValue() * $essentialFatPercentage->getValue()));
 	}
 
 	public function calcFatWithinOptimalPercentage()
@@ -725,8 +725,8 @@ class Calculator
 		$max = $optimalFatWeight->getMax()->getInKg()->getAmount()->getValue() / $bodyFatWeight->getInKg()->getAmount()->getValue();
 
 		return new Interval(
-			new Percentage(new Amount($min <= 1 ? $min : 1)),
-			new Percentage(new Amount($max <= 1 ? $max : 1)),
+			new Percentage($min <= 1 ? $min : 1),
+			new Percentage($max <= 1 ? $max : 1),
 		);
 	}
 
@@ -753,8 +753,8 @@ class Calculator
 		$max = $fatOverOptimalWeight->getMax()->getInKg()->getAmount()->getValue() / $bodyFatWeight->getInKg()->getAmount()->getValue();
 
 		return new Interval(
-			new Percentage(new Amount($min)),
-			new Percentage(new Amount($max)),
+			new Percentage($min),
+			new Percentage($max),
 		);
 	}
 
@@ -947,24 +947,24 @@ class Calculator
 					'fit'   => [1.5, 2.2, 1.8],
 					'unfit' => [1.5, 2,   1.7],
 				];
-				$matrixSet = ($this->calcBodyFatPercentage()->getAmount() > .19 || $this->calcBodyMassIndex()->getValue() > 25) ? 'unfit' : 'fit';
+				$matrixSet = ($this->calcBodyFatPercentage()->getValue() > .19 || $this->calcBodyMassIndex()->getValue() > 25) ? 'unfit' : 'fit';
 
 				$optimalNutrients = [];
 				foreach ($this->getSportDurations()->getMaxDurations() as $sportDuration) {
 					if ($sportDuration instanceof SportDurations\LowFrequency) {
-						$optimalNutrients[] = $optimalWeight->getAmount() * $matrix[$matrixSet][0];
+						$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][0];
 					} elseif ($sportDuration instanceof SportDurations\Anaerobic) {
-						$optimalNutrients[] = $optimalWeight->getAmount() * $matrix[$matrixSet][1];
+						$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][1];
 					} elseif ($sportDuration instanceof SportDurations\Aerobic) {
-						$optimalNutrients[] = $optimalWeight->getAmount() * $matrix[$matrixSet][2];
+						$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][2];
 					}
 				}
 
 				if ($this->calcPhysicalActivityLevel()->getValue() >= 1.9) {
-					$optimalNutrients[] = $optimalWeight->getAmount() * $matrix[$matrixSet][1];
+					$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][1];
 				}
 
-				$nutrients->setProteins(new Nutrients\Proteins(max($optimalNutrients), 'g'));
+				$nutrients->setProteins(new Nutrients\Proteins(new Amount(max($optimalNutrients)), 'g'));
 
 			// 12
 			} elseif ($this->getGender() instanceof Genders\Female) {
@@ -987,24 +987,24 @@ class Calculator
 						'fit'   => [1.4, 1.8, 1.6],
 						'unfit' => [1.5, 1.8, 1.8],
 					];
-					$matrixSet = ($this->calcBodyFatPercentage()->getAmount() > .25 || $this->calcBodyMassIndex()->getValue() > 25) ? 'unfit' : 'fit';
+					$matrixSet = ($this->calcBodyFatPercentage()->getValue() > .25 || $this->calcBodyMassIndex()->getValue() > 25) ? 'unfit' : 'fit';
 
 					$optimalNutrients = [];
 					foreach ($this->getSportDurations()->getMaxDurations() as $sportDuration) {
 						if ($sportDuration instanceof SportDurations\LowFrequency) {
-							$optimalNutrients[] = $optimalWeight->getAmount() * $matrix[$matrixSet][0];
+							$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][0];
 						} elseif ($sportDuration instanceof SportDurations\Anaerobic) {
-							$optimalNutrients[] = $optimalWeight->getAmount() * $matrix[$matrixSet][1];
+							$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][1];
 						} elseif ($sportDuration instanceof SportDurations\Aerobic) {
-							$optimalNutrients[] = $optimalWeight->getAmount() * $matrix[$matrixSet][2];
+							$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][2];
 						}
 					}
 
 					if ($this->calcPhysicalActivityLevel()->getValue() >= 1.9) {
-						$optimalNutrients[] = $optimalWeight->getAmount() * $matrix[$matrixSet][1];
+						$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][1];
 					}
 
-					$nutrients->setProteins(new Nutrients\Proteins(max($optimalNutrients), 'g'));
+					$nutrients->setProteins(new Nutrients\Proteins(new Amount(max($optimalNutrients)), 'g'));
 
 					// 19
 					if ($this->getGender()->isPregnant() || $this->getGender()->isBreastfeeding()) {
@@ -1018,7 +1018,7 @@ class Calculator
 			// 3
 			if ($this->getGender() instanceof Genders\Female && ($this->getGender()->isPregnant() || $this->getGender()->isBreastfeeding())) {
 				// 11
-				$nutrients->setProteins(new Nutrients\Proteins(min(($this->getWeight()->getInKg()->getAmount() * 1.4) + 20, 90), 'g'));
+				$nutrients->setProteins(new Nutrients\Proteins(min(($this->getWeight()->getInKg()->getAmount()->getValue() * 1.4) + 20, 90), 'g'));
 
 			// 4
 			} else {
@@ -1059,7 +1059,7 @@ class Calculator
 		// 1
 		if ($dietApproach instanceof Approaches\Standard) {
 			// 4
-			if ($this->getSportDurations()->getAnaerobic() instanceof SportDuration && $this->getSportDurations()->getAnaerobic()->getAmount() >= 100) {
+			if ($this->getSportDurations()->getAnaerobic() instanceof SportDuration && $this->getSportDurations()->getAnaerobic()->getAmount()->getValue() >= 100) {
 				$nutrients->setCarbs(Nutrients\Carbs::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() * .58), 'kJ')));
 				$nutrients->setFats(Nutrients\Fats::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() - $nutrients->getEnergy()->getInKJ()->getAmount()->getValue()))));
 			// 5
