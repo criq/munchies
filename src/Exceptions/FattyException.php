@@ -2,6 +2,7 @@
 
 namespace Fatty\Exceptions;
 
-class FattyException extends \Katu\Exceptions\Exception
+class FattyException extends \Exception
 {
+	protected $abbr;
 }
