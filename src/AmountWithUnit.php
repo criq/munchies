@@ -15,10 +15,7 @@ class AmountWithUnit
 
 	public function __toString() : string
 	{
-		return implode(' ', [
-			\Katu\Utils\Formatter::getLocalReadableNumber(\Katu\Utils\Formatter::getPreferredLocale(), $this->getAmount()->getValue()),
-			$this->getUnit(),
-		]);
+		return $this->getFormatted();
 	}
 
 	public static function createFromString(string $value) : ?AmountWithUnit
@@ -45,11 +42,22 @@ class AmountWithUnit
 		return $this->unit;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	public function getArray() : array
 	{
 		return [
 			'amount' => $this->getAmount()->getValue(),
 			'unit' => $this->getUnit(),
 		];
+	}
+
+	public function getFormatted() : string
+	{
+		return implode(' ', [
+			\Katu\Utils\Formatter::getLocalReadableNumber(\Katu\Utils\Formatter::getPreferredLocale(), $this->getAmount()->getValue()),
+			$this->getUnit(),
+		]);
 	}
 }

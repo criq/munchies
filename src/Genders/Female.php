@@ -22,6 +22,7 @@ use Fatty\Exceptions\MissingHeightException;
 use Fatty\Exceptions\MissingPregnancyChildbirthDateException;
 use Fatty\Exceptions\MissingWeightException;
 use Fatty\Exceptions\PregnancyChildbirthDateInPastException;
+use Fatty\Metrics\AmountMetric;
 use Fatty\Percentage;
 
 class Female extends \Fatty\Gender
@@ -37,22 +38,16 @@ class Female extends \Fatty\Gender
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
 	 */
-	protected function calcBodyFatPercentageByProportions(Calculator $calculator) : Percentage
+	protected function calcBodyFatPercentageByProportions(Calculator $calculator) : AmountMetric
 	{
 		$waist = $calculator->getProportions()->getWaist()->getInCm()->getAmount()->getValue();
 		$neck = $calculator->getProportions()->getNeck()->getInCm()->getAmount()->getValue();
 		$height = $calculator->getProportions()->getHeight()->getInCm()->getAmount()->getValue();
 
-		return new Percentage(((495 / (1.0324 - (0.19077 * log10($waist - $neck)) + (0.15456 * log10($height)))) - 450) * .01);
-	}
+		$result = new Percentage(((495 / (1.0324 - (0.19077 * log10($waist - $neck)) + (0.15456 * log10($height)))) - 450) * .01);
+		$formula = '((495 / (1.0324 - (0.19077 * log10(waist[' . $waist . '] - neck[' . $neck . '])) + (0.15456 * log10(height[' . $height . '])))) - 450) * .01';
 
-	public function calcBodyFatPercentageByProportionsFormula(Calculator $calculator) : string
-	{
-		$waist = $calculator->getProportions()->getWaist()->getInCm()->getAmount()->getValue();
-		$neck = $calculator->getProportions()->getNeck()->getInCm()->getAmount()->getValue();
-		$height = $calculator->getProportions()->getHeight()->getInCm()->getAmount()->getValue();
-
-		return '((495 / (1.0324 - (0.19077 * log10(waist[' . $waist . '] - neck[' . $neck . '])) + (0.15456 * log10(height[' . $height . '])))) - 450) * .01';
+		return new AmountMetric('bodyFatPercentage', $result, $formula);
 	}
 
 	/*****************************************************************************

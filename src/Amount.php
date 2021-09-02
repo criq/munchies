@@ -2,7 +2,6 @@
 
 namespace Fatty;
 
-use Fatty\Exceptions\FattyException;
 use Fatty\Exceptions\InvalidAmountException;
 
 class Amount
@@ -43,5 +42,10 @@ class Amount
 	public function getMultiplied(float $value) : Amount
 	{
 		return new static($this->getValue() * $value);
+	}
+
+	public function getFormatted() : string
+	{
+		return (string)round($this->getValue(), 1);
 	}
 }

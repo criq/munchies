@@ -2,6 +2,8 @@
 
 namespace Fatty;
 
+use Fatty\Metrics\AmountWithUnitMetric;
+
 class Proportions
 {
 	private $height;
@@ -22,6 +24,11 @@ class Proportions
 	public function getHeight() : ?Length
 	{
 		return $this->height;
+	}
+
+	public function calcHeight() : ?AmountWithUnitMetric
+	{
+		return new AmountWithUnitMetric('proportions_height', $this->getHeight());
 	}
 
 	/*****************************************************************************

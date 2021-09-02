@@ -27,4 +27,9 @@ class Percentage extends Amount
 	{
 		return [];
 	}
+
+	public function getFormatted() : string
+	{
+		return ($this->getValue() * 100) . " %";
+	}
 }

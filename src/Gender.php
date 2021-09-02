@@ -4,6 +4,7 @@ namespace Fatty;
 
 use Fatty\Exceptions\FattyException;
 use Fatty\Exceptions\MissingBodyFatPercentageInputException;
+use Fatty\Metrics\AmountMetric;
 
 abstract class Gender
 {
@@ -11,10 +12,9 @@ abstract class Gender
 	const BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS = 'proportions';
 	const ESSENTIAL_FAT_PERCENTAGE = null;
 
-	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator) : Percentage;
+	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator) : AmountMetric;
 	abstract public function calcBasalMetabolicRate(Calculator $calculator) : Energy;
 	abstract public function getBasalMetabolicRateFormula(Calculator $calculator) : string;
-	abstract public function calcBodyFatPercentageByProportionsFormula(Calculator $calculator) : string;
 	abstract public function calcBodyType(Calculator $calculator) : BodyType;
 
 	public static function createFromString(string $value) : ?Gender
@@ -124,7 +124,7 @@ abstract class Gender
 		}
 	}
 
-	public function calcBodyFatPercentage(Calculator $calculator) : Percentage
+	public function calcBodyFatPercentage(Calculator $calculator) : AmountMetric
 	{
 		$strategy = $this->getBodyFatPercentageStrategy($calculator);
 		if (!$strategy) {
@@ -141,23 +141,9 @@ abstract class Gender
 		}
 	}
 
-	protected function calcBodyFatPercentageByMeasurement(Calculator $calculator)
+	protected function calcBodyFatPercentageByMeasurement(Calculator $calculator) : AmountMetric
 	{
-		return $calculator->getBodyFatPercentage();
-	}
-
-	public function getBodyFatPercentageFormula(Calculator $calculator)
-	{
-		$result = $this->calcBodyFatPercentage($calculator);
-
-		switch ($this->getBodyFatPercentageStrategy($calculator)) {
-			case static::BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT:
-				return $result;
-				break;
-			case static::BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS:
-				return $this->calcBodyFatPercentageByProportionsFormula($calculator) . ' = ' . $result;
-				break;
-		}
+		return new AmountMetric('bodyFatPercentage', $calculator->getBodyFatPercentage());
 	}
 
 	public function calcEssentialFatPercentage() : Percentage
