@@ -18,6 +18,7 @@ use Fatty\Exceptions\InvalidNeckException;
 use Fatty\Exceptions\InvalidSportDurationsAerobicException;
 use Fatty\Exceptions\InvalidSportDurationsAnaerobicException;
 use Fatty\Exceptions\InvalidSportDurationsLowFrequencyException;
+use Fatty\Exceptions\InvalidUnitsException;
 use Fatty\Exceptions\InvalidWaistException;
 use Fatty\Exceptions\InvalidWeightException;
 use Fatty\Exceptions\MissingDietApproachException;
@@ -36,17 +37,17 @@ use Fatty\SportDurations\LowFrequency;
 
 class Calculator
 {
-	protected $params;
 	protected $activity;
 	protected $birthday;
 	protected $bodyFatPercentage;
 	protected $diet;
 	protected $gender;
 	protected $goal;
+	protected $params;
 	protected $proportions;
 	protected $sportDurations;
-	protected $weight;
 	protected $units = 'kJ';
+	protected $weight;
 
 	public function __construct(?array $params = [])
 	{
@@ -312,6 +313,14 @@ class Calculator
 		// 	}
 		// }
 
+		if (trim($params['units'] ?? null)) {
+			try {
+				$this->setUnits($params['units']);
+			} catch (FattyException $e) {
+				$exceptionCollection->add($e);
+			}
+		}
+
 		if (count($exceptionCollection)) {
 			throw $exceptionCollection;
 		}
@@ -342,6 +351,25 @@ class Calculator
 		} catch (FattyException $e) {
 			return new Amount(0);
 		}
+	}
+
+	/*****************************************************************************
+	 * Units.
+	 */
+	public function setUnits(string $value) : Calculator
+	{
+		if (!in_array($value, ['kJ', 'kcal'])) {
+			throw new InvalidUnitsException;
+		}
+
+		$this->units = $value;
+
+		return $this;
+	}
+
+	public function getUnits() : string
+	{
+		return $this->units;
 	}
 
 	/*****************************************************************************
@@ -1798,7 +1826,7 @@ class Calculator
 		}
 
 		try {
-			$metric = $this->calcBasalMetabolicRate()->getInUnit($this->units);
+			$metric = $this->calcBasalMetabolicRate()->getInUnit($this->getUnits());
 			if ($metric) {
 				$res['output']['metrics']['basalMetabolicRate']['result'] = $metric->getArray();
 				$res['output']['metrics']['basalMetabolicRate']['string'] = (string)$metric;
@@ -1823,7 +1851,7 @@ class Calculator
 		}
 
 		try {
-			$metric = $this->calcTotalEnergyExpenditure()->getInUnit($this->units);
+			$metric = $this->calcTotalEnergyExpenditure()->getInUnit($this->getUnits());
 			if ($metric) {
 				$res['output']['metrics']['totalEnergyExpenditure']['result'] = $metric->getArray();
 				$res['output']['metrics']['totalEnergyExpenditure']['string'] = (string)$metric;
@@ -1834,7 +1862,7 @@ class Calculator
 		}
 
 		try {
-			$metric = $this->calcTotalDailyEnergyExpenditure()->getInUnit($this->units);
+			$metric = $this->calcTotalDailyEnergyExpenditure()->getInUnit($this->getUnits());
 			if ($metric) {
 				$res['output']['metrics']['totalDailyEnergyExpenditure']['result'] = $metric->getArray();
 				$res['output']['metrics']['totalDailyEnergyExpenditure']['string'] = (string)$metric;
@@ -1845,7 +1873,7 @@ class Calculator
 		}
 
 		try {
-			$metric = $this->calcReferenceDailyIntake()->getInUnit($this->units);
+			$metric = $this->calcReferenceDailyIntake()->getInUnit($this->getUnits());
 			if ($metric) {
 				$res['output']['metrics']['referenceDailyIntake']['result'] = $metric->getArray();
 				$res['output']['metrics']['referenceDailyIntake']['string'] = (string)$metric;
@@ -1879,7 +1907,7 @@ class Calculator
 		// }
 
 		try {
-			$metric = $this->getGoal()->calcGoalTdee($this)->getInUnit($this->units);
+			$metric = $this->getGoal()->calcGoalTdee($this)->getInUnit($this->getUnits());
 			if ($metric) {
 				$res['output']['metrics']['goalTdee']['result'] = $metric->getArray();
 				$res['output']['metrics']['goalTdee']['string'] = (string)$metric;
@@ -1947,50 +1975,6 @@ class Calculator
 		if (count($exceptionCollection)) {
 			throw $exceptionCollection;
 		}
-
-	// 	/*************************************************************************
-	// 	 * Save to database.
-	// 	 */
-	// 	$caloricCalculatorSession = \App\Models\CaloricCalculatorSession::create($user, $params);
-
-	// 	$res['reference'] = $caloricCalculatorSession->getReference();
-	// 	$res['url'] = (string)$caloricCalculatorSession->getUrl();
-
-	// 	return \Katu\Api::success($res);
-	// } catch (\Katu\Exceptions\ExceptionCollection $ec) {
-	// 	$errors = [];
-
-
-
-	// 	// var_dump($errors); die;
-
-
-
-
-
-
-	// 	uksort($errors, function ($a, $b) {
-	// 		$sortArray = [
-
-
-
-
-	// 		return (array_search($a, $sortArray) < array_search($b, $sortArray)) ? -1 : 1;
-	// 	});
-
-	// 	$errors = array_values($errors);
-
-	// 	return \Katu\Api::errors($errors);
-	// } catch (FattyException $e) {
-	// 	\App\Extensions\ErrorHandler::log($e);
-	// 	return \Katu\Api::error();
-	// }
-
-
-
-
-
-
 
 		if (count($exceptionCollection)) {
 			throw $exceptionCollection;
