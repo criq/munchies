@@ -7,6 +7,13 @@ class FattyExceptionCollection extends FattyException implements \Countable, \Ar
 	protected $exceptions = [];
 	protected $offset = 0;
 
+	public function __construct(?array $exceptions = [])
+	{
+		foreach ((array)$exceptions as $exception) {
+			$this->add($exception);
+		}
+	}
+
 	public function add(FattyException $e) : FattyExceptionCollection
 	{
 		if (is_iterable($e)) {
@@ -25,10 +32,14 @@ class FattyExceptionCollection extends FattyException implements \Countable, \Ar
 		return $this->exceptions;
 	}
 
+	public function getUnique() : FattyExceptionCollection
+	{
+		return new static(array_values(array_unique($this->getExceptions())));
+	}
+
 	/****************************************************************************
 	 * Interfaces.
 	 */
-
 	public function count() : int
 	{
 		return count($this->exceptions);
