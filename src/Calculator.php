@@ -3,20 +3,32 @@
 namespace Fatty;
 
 use Fatty\Exceptions\FattyException;
-use Fatty\Exceptions\FattyExceptionList;
+use Fatty\Exceptions\FattyExceptionCollection;
+use Fatty\Exceptions\InvalidActivityException;
 use Fatty\Exceptions\InvalidBirthdayException;
 use Fatty\Exceptions\InvalidBodyFatPercentageException;
+use Fatty\Exceptions\InvalidDietApproachException;
+use Fatty\Exceptions\InvalidDietCarbsException;
 use Fatty\Exceptions\InvalidGenderException;
+use Fatty\Exceptions\InvalidGoalVectorException;
+use Fatty\Exceptions\InvalidGoalWeightException;
 use Fatty\Exceptions\InvalidHeightException;
 use Fatty\Exceptions\InvalidHipsException;
 use Fatty\Exceptions\InvalidNeckException;
+use Fatty\Exceptions\InvalidSportDurationsAerobicException;
+use Fatty\Exceptions\InvalidSportDurationsAnaerobicException;
+use Fatty\Exceptions\InvalidSportDurationsLowFrequencyException;
 use Fatty\Exceptions\InvalidWaistException;
 use Fatty\Exceptions\InvalidWeightException;
+use Fatty\Exceptions\MissingDietApproachException;
 use Fatty\Exceptions\MissingGenderException;
+use Fatty\Exceptions\MissingGoalVectorException;
 use Fatty\Exceptions\MissingHeightException;
 use Fatty\Exceptions\MissingHipsException;
 use Fatty\Exceptions\MissingWaistException;
 use Fatty\Exceptions\MissingWeightException;
+use Fatty\Exceptions\UnableToCalcEssentialFatPercentageException;
+use Fatty\Exceptions\UnableToCalcOptimalFatPercentageException;
 use Fatty\Nutrients\Carbs;
 use Fatty\SportDurations\Aerobic;
 use Fatty\SportDurations\Anaerobic;
@@ -53,7 +65,7 @@ class Calculator
 	{
 		$this->params = $params;
 
-		$exceptionList = new FattyExceptionList;
+		$exceptionCollection = new FattyExceptionCollection;
 
 		if (trim($params['gender'] ?? null)) {
 			try {
@@ -64,7 +76,7 @@ class Calculator
 
 				$this->setGender($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -77,7 +89,7 @@ class Calculator
 
 				$this->setBirthday($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -90,7 +102,7 @@ class Calculator
 
 				$this->setWeight($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -103,7 +115,7 @@ class Calculator
 
 				$this->getProportions()->setHeight($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -116,7 +128,7 @@ class Calculator
 
 				$this->getProportions()->setWaist($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -129,7 +141,7 @@ class Calculator
 
 				$this->getProportions()->setHips($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -142,7 +154,7 @@ class Calculator
 
 				$this->getProportions()->setNeck($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -155,7 +167,7 @@ class Calculator
 
 				$this->setBodyFatPercentage($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -163,12 +175,12 @@ class Calculator
 			try {
 				$value = Activity::createFromString($params['activity']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidActivity');
+					throw new InvalidActivityException;
 				}
 
 				$this->setActivity($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -176,12 +188,12 @@ class Calculator
 			try {
 				$value = LowFrequency::createFromString($params['sportDurations_lowFrequency']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidSportDurationsLowFrequency');
+					throw new InvalidSportDurationsLowFrequencyException;
 				}
 
 				$this->getSportDurations()->setLowFrequency($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -189,12 +201,12 @@ class Calculator
 			try {
 				$value = Aerobic::createFromString($params['sportDurations_aerobic']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidSportDurationsAerobic');
+					throw new InvalidSportDurationsAerobicException;
 				}
 
 				$this->getSportDurations()->setAerobic($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -202,12 +214,12 @@ class Calculator
 			try {
 				$value = Anaerobic::createFromString($params['sportDurations_anaerobic']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidSportDurationsAnaerobic');
+					throw new InvalidSportDurationsAnaerobicException;
 				}
 
 				$this->getSportDurations()->setAnaerobic($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -217,12 +229,12 @@ class Calculator
 			try {
 				$value = Vector::createFromString($params['goal_vector']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidGoalVector');
+					throw new InvalidGoalVectorException;
 				}
 
 				$this->getGoal()->setVector($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -230,12 +242,12 @@ class Calculator
 			try {
 				$value = Weight::createFromString($params['goal_weight']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidGoalWeight');
+					throw new InvalidGoalWeightException;
 				}
 
 				$this->getGoal()->setWeight($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -243,12 +255,12 @@ class Calculator
 			try {
 				$value = Approach::createFromString($params['diet_approach']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidDietApproach');
+					throw new InvalidDietApproachException;
 				}
 
 				$this->getDiet()->setApproach($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -257,12 +269,12 @@ class Calculator
 			try {
 				$value = Carbs::createFromString($params['diet_carbs']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalid diet_carbs');
+					throw new InvalidDietCarbsException;
 				}
 
 				$this->getDiet()->setCarbs($value);
 			} catch (FattyException $e) {
-				$exceptionList->append($e);
+				$exceptionCollection->add($e);
 			}
 		}
 
@@ -274,7 +286,7 @@ class Calculator
 		// 			try {
 		// 				$this->getGender()->setPregnancyChildbirthDate($params['pregnancyChildbirthDate']);
 		// 			} catch (FattyException $e) {
-		// 				$exceptionList->append($e);
+		// 				$exceptionCollection->add($e);
 		// 			}
 		// 		}
 		// 	}
@@ -286,7 +298,7 @@ class Calculator
 		// 			try {
 		// 				$this->getGender()->setBreastfeedingChildbirthDate($params['breastfeeding']['childbirthDate']);
 		// 			} catch (FattyException $e) {
-		// 				$exceptionList->append($e);
+		// 				$exceptionCollection->add($e);
 		// 			}
 		// 		}
 
@@ -300,8 +312,8 @@ class Calculator
 		// 	}
 		// }
 
-		if (count($exceptionList)) {
-			throw $exceptionList;
+		if (count($exceptionCollection)) {
+			throw $exceptionCollection;
 		}
 
 		return $this;
@@ -454,22 +466,22 @@ class Calculator
 	 */
 	public function calcPhysicalActivityLevel() : Activity
 	{
-		$exceptionList = new FattyExceptionList;
+		$exceptionCollection = new FattyExceptionCollection;
 
 		try {
 			$activity = $this->calcActivity();
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
 			$sportActivity = $this->calcSportActivity();
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
-		if (count($exceptionList)) {
-			throw $exceptionList;
+		if (count($exceptionCollection)) {
+			throw $exceptionCollection;
 		}
 
 		return new Activity($activity->getValue() + $sportActivity->getValue());
@@ -507,18 +519,18 @@ class Calculator
 	 */
 	public function calcBodyMassIndex() : Amount
 	{
-		$exceptionList = new FattyExceptionList;
+		$exceptionCollection = new FattyExceptionCollection;
 
 		if (!($this->getWeight() instanceof Weight)) {
-			$exceptionList->append(new MissingWeightException);
+			$exceptionCollection->add(new MissingWeightException);
 		}
 
 		if (!($this->getProportions()->getHeight() instanceof Length)) {
-			$exceptionList->append(new MissingHeightException);
+			$exceptionCollection->add(new MissingHeightException);
 		}
 
-		if (count($exceptionList)) {
-			throw $exceptionList;
+		if (count($exceptionCollection)) {
+			throw $exceptionCollection;
 		}
 
 		return new Amount($this->getWeight()->getInKg()->getAmount()->getValue() / pow($this->getProportions()->getHeight()->getInM()->getAmount()->getValue(), 2));
@@ -541,18 +553,18 @@ class Calculator
 	 */
 	public function calcWaistHipRatio() : Amount
 	{
-		$exceptionList = new FattyExceptionList;
+		$exceptionCollection = new FattyExceptionCollection;
 
 		if (!($this->getProportions()->getWaist() instanceof Length)) {
-			$exceptionList->append(new MissingWaistException);
+			$exceptionCollection->add(new MissingWaistException);
 		}
 
 		if (!($this->getProportions()->getHips() instanceof Length)) {
-			$exceptionList->append(new MissingHipsException);
+			$exceptionCollection->add(new MissingHipsException);
 		}
 
-		if (count($exceptionList)) {
-			throw $exceptionList;
+		if (count($exceptionCollection)) {
+			throw $exceptionCollection;
 		}
 
 		return new Amount($this->getProportions()->getWaist()->getInCm()->getAmount()->getValue() / $this->getProportions()->getHips()->getInCm()->getAmount()->getValue());
@@ -707,7 +719,7 @@ class Calculator
 
 		$optimalFatPercentage = $this->calcOptimalFatPercentage();
 		if (!$optimalFatPercentage) {
-			throw FattyException::createFromAbbr('unableOptimalFatPercentage');
+			throw new UnableToCalcOptimalFatPercentageException;
 		}
 
 		return new Interval(
@@ -746,7 +758,7 @@ class Calculator
 
 		$essentialFatPercentage = $this->calcEssentialFatPercentage();
 		if (!$essentialFatPercentage) {
-			throw FattyException::createFromAbbr('unableEssentialFatPercentage');
+			throw new UnableToCalcEssentialFatPercentageException;
 		}
 
 		return new Weight(new Amount($weight->getInKg()->getAmount()->getValue() * $essentialFatPercentage->getValue()));
@@ -884,7 +896,7 @@ class Calculator
 	public function calcTotalDailyEnergyExpenditure()
 	{
 		if (!$this->getGoal()->getVector()) {
-			throw FattyException::createFromAbbr('missingGoalVector');
+			throw new MissingGoalVectorException;
 		}
 
 		return new Energy(new Amount($this->calcTotalEnergyExpenditure()->getAmount()->getValue() * $this->getGoal()->getVector()->getTdeeQuotient($this)->getValue()), 'kCal');
@@ -902,12 +914,12 @@ class Calculator
 	 */
 	public function calcReferenceDailyIntake()
 	{
-		$exceptionList = new FattyExceptionList;
+		$exceptionCollection = new FattyExceptionCollection;
 
 		try {
 			$totalDailyEnergyExpenditure = $this->calcTotalDailyEnergyExpenditure();
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -918,11 +930,11 @@ class Calculator
 
 			$referenceDailyIntakeBonus = $gender->calcReferenceDailyIntakeBonus();
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
-		if (count($exceptionList)) {
-			throw $exceptionList;
+		if (count($exceptionCollection)) {
+			throw $exceptionCollection;
 		}
 
 		if ($this->getDiet() instanceof Approaches\Ned) {
@@ -1089,7 +1101,7 @@ class Calculator
 		$diet = $this->getDiet();
 		$dietApproach = $this->getDiet()->getApproach();
 		if (!$dietApproach) {
-			throw FattyException::createFromAbbr('missingDietApproach');
+			throw new MissingDietApproachException;
 		}
 
 		// 1
@@ -1266,7 +1278,7 @@ class Calculator
 
 	// public function getGoalMessages()
 	// {
-	// 	$exceptionList = new FattyExceptionList;
+	// 	$exceptionCollection = new FattyExceptionCollection;
 
 	// 	$messages = [];
 
@@ -1461,32 +1473,32 @@ class Calculator
 
 	// public function getMessages()
 	// {
-	// 	$exceptionList = new FattyExceptionList;
+	// 	$exceptionCollection = new FattyExceptionCollection;
 
 	// 	$messages = [];
 
 	// 	try {
 	// 		$messages = array_merge($messages, $this->getBodyFatMessages());
 	// 	} catch (FattyException $e) {
-	// 		$exceptionList->append($e);
+	// 		$exceptionCollection->add($e);
 	// 	}
 
 	// 	try {
 	// 		$messages = array_merge($messages, $this->getBodyMassIndexMessages());
 	// 	} catch (FattyException $e) {
-	// 		$exceptionList->append($e);
+	// 		$exceptionCollection->add($e);
 	// 	}
 
 	// 	try {
 	// 		$messages = array_merge($messages, $this->getGoalMessages());
 	// 	} catch (FattyException $e) {
-	// 		$exceptionList->append($e);
+	// 		$exceptionCollection->add($e);
 	// 	}
 
 	// 	try {
 	// 		$messages = array_merge($messages, $this->getGoalNutrientMessages());
 	// 	} catch (FattyException $e) {
-	// 		$exceptionList->append($e);
+	// 		$exceptionCollection->add($e);
 	// 	}
 
 	// 	if ($ec->has()) {
@@ -1498,7 +1510,7 @@ class Calculator
 
 	public function getResponse() : array
 	{
-		$exceptionList = new FattyExceptionList;
+		$exceptionCollection = new FattyExceptionCollection;
 
 		$res = [];
 
@@ -1560,7 +1572,7 @@ class Calculator
 				$res['output']['metrics']['weight']['string'] = (string)$metric;
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1570,7 +1582,7 @@ class Calculator
 				$res['output']['metrics']['height']['string'] = (string)$metric;
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1584,7 +1596,7 @@ class Calculator
 				$res['output']['metrics']['bodyMassIndex']['formula'] = $this->getBodyMassIndexFormula();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1594,7 +1606,7 @@ class Calculator
 				'unit' => null,
 			];
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1608,7 +1620,7 @@ class Calculator
 				$res['output']['metrics']['waistHipRatio']['formula'] = $this->getWaistHipRatioFormula();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1618,7 +1630,7 @@ class Calculator
 				'unit' => null,
 			];
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1629,7 +1641,7 @@ class Calculator
 				$res['output']['metrics']['bodyFatPercentage']['formula'] = $this->getBodyFatPercentageFormula();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1639,7 +1651,7 @@ class Calculator
 				$res['output']['metrics']['bodyFatWeight']['string'] = (string)$metric;
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1649,7 +1661,7 @@ class Calculator
 				$res['output']['metrics']['activeBodyMassPercentage']['string'] = (string)$metric;
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1661,7 +1673,7 @@ class Calculator
 				$res['output']['metrics']['optimalFatPercentageMax']['string'] = (string)$metric->getMax();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1673,7 +1685,7 @@ class Calculator
 				$res['output']['metrics']['optimalFatWeightMax']['string'] = (string)$metric->getMax();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1683,7 +1695,7 @@ class Calculator
 				$res['output']['metrics']['essentialFatPercentage']['string'] = (string)$metric;
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1693,7 +1705,7 @@ class Calculator
 				$res['output']['metrics']['essentialFatWeight']['string'] = (string)$metric;
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1705,7 +1717,7 @@ class Calculator
 				$res['output']['metrics']['fatWithinOptimalPercentageMax']['string'] = (string)$metric->getMax();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1717,7 +1729,7 @@ class Calculator
 				$res['output']['metrics']['fatWithinOptimalWeightMax']['string'] = (string)$metric->getMax();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1729,7 +1741,7 @@ class Calculator
 				$res['output']['metrics']['fatOverOptimalPercentageMax']['string'] = (string)$metric->getMax();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1741,7 +1753,7 @@ class Calculator
 				$res['output']['metrics']['fatOverOptimalWeightMax']['string'] = (string)$metric->getMax();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1751,7 +1763,7 @@ class Calculator
 				'unit' => null,
 			];
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1761,7 +1773,7 @@ class Calculator
 				'unit' => null,
 			];
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1771,7 +1783,7 @@ class Calculator
 				$res['output']['metrics']['activeBodyMassWeight']['string'] = (string)$metric;
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1782,7 +1794,7 @@ class Calculator
 				$res['output']['metrics']['fatFreeMass']['formula'] = $this->getFatFreeMassFormula();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1793,7 +1805,7 @@ class Calculator
 				$res['output']['metrics']['basalMetabolicRate']['formula'] = $this->getBasalMetabolicRateFormula();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1807,7 +1819,7 @@ class Calculator
 				$res['output']['metrics']['physicalActivityLevel']['formula'] = $this->getPhysicalActivityLevelFormula();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1818,7 +1830,7 @@ class Calculator
 				$res['output']['metrics']['totalEnergyExpenditure']['formula'] = $this->getTotalEnergyExpenditureFormula();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1829,7 +1841,7 @@ class Calculator
 				$res['output']['metrics']['totalDailyEnergyExpenditure']['formula'] = $this->getTotalDailyEnergyExpenditureFormula();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1840,7 +1852,7 @@ class Calculator
 				$res['output']['metrics']['referenceDailyIntake']['formula'] = $this->getReferenceDailyIntakeFormula();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		// try {
@@ -1873,7 +1885,7 @@ class Calculator
 				$res['output']['metrics']['goalTdee']['string'] = (string)$metric;
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		// try {
@@ -1915,7 +1927,7 @@ class Calculator
 				$res['output']['metrics']['bodyType']['string'] = (string)$metric;
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
@@ -1929,11 +1941,11 @@ class Calculator
 				$res['output']['metrics']['nutrientsFats']['string'] = (string)$metric->getFats();
 			}
 		} catch (FattyException $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
-		if (count($exceptionList)) {
-			throw $exceptionList;
+		if (count($exceptionCollection)) {
+			throw $exceptionCollection;
 		}
 
 	// 	/*************************************************************************
@@ -1956,29 +1968,12 @@ class Calculator
 
 
 
-	// 	if (isset($errors['missingGoalTrend'], $errors['invalidGoalTrend'])) {
-	// 		unset($errors['missingGoalTrend']);
-	// 	}
-	// 	if (isset($errors['missingGoalWeight'], $errors['invalidGoalWeight'])) {
-	// 		unset($errors['missingGoalWeight']);
-	// 	}
-
-	// 	if (isset($errors['missingDiet'], $errors['invalidDiet'])) {
-	// 		unset($errors['missingDiet']);
-	// 	}
 
 	// 	uksort($errors, function ($a, $b) {
 	// 		$sortArray = [
 
-	// 			'missingActivityAmount',
-	// 			'missingSportDurations',
-	// 			'missingGoalTrend',
-	// 			'invalidGoalTrend',
-	// 			'missingGoalWeight',
-	// 			'invalidGoalWeight',
-	// 			'missingDiet',
-	// 			'invalidDiet',
-	// 		];
+
+
 
 	// 		return (array_search($a, $sortArray) < array_search($b, $sortArray)) ? -1 : 1;
 	// 	});
@@ -1997,8 +1992,8 @@ class Calculator
 
 
 
-		if (count($exceptionList)) {
-			throw $exceptionList;
+		if (count($exceptionCollection)) {
+			throw $exceptionCollection;
 		}
 
 		return $res;

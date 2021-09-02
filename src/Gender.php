@@ -3,6 +3,7 @@
 namespace Fatty;
 
 use Fatty\Exceptions\FattyException;
+use Fatty\Exceptions\MissingBodyFatPercentageInputException;
 
 abstract class Gender
 {
@@ -127,7 +128,7 @@ abstract class Gender
 	{
 		$strategy = $this->getBodyFatPercentageStrategy($calculator);
 		if (!$strategy) {
-			throw FattyException::createFromAbbr('missingBodyFatPercentageInput');
+			throw new MissingBodyFatPercentageInputException;
 		}
 
 		switch ($strategy) {

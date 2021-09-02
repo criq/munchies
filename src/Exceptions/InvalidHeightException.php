@@ -7,6 +7,6 @@ class InvalidHeightException extends FattyException
 	public function __construct()
 	{
 		$this->message = "Neplatná výška.";
-		$this->names = ['height'];
+		$this->names = ['proportions_height'];
 	}
 }

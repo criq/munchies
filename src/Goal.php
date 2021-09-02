@@ -2,7 +2,7 @@
 
 namespace Fatty;
 
-use Fatty\Exceptions\FattyException;
+use Fatty\Exceptions\MissingGoalVectorException;
 use Fatty\Exceptions\MissingWeightException;
 
 class Goal
@@ -75,7 +75,7 @@ class Goal
 	{
 		$vector = $this->getVector();
 		if (!$vector) {
-			throw FattyException::createFromAbbr('missingGoalvector');
+			throw new MissingGoalVectorException;
 		}
 
 		return $vector->calcGoalTdee($calculator);

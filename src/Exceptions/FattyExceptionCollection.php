@@ -2,16 +2,16 @@
 
 namespace Fatty\Exceptions;
 
-class FattyExceptionList extends FattyException implements \Countable, \ArrayAccess, \Iterator
+class FattyExceptionCollection extends FattyException implements \Countable, \ArrayAccess, \Iterator
 {
 	protected $exceptions = [];
 	protected $offset = 0;
 
-	public function append(FattyException $e) : FattyExceptionList
+	public function add(FattyException $e) : FattyExceptionCollection
 	{
 		if (is_iterable($e)) {
 			foreach ($e as $_e) {
-				$this->append($_e);
+				$this->add($_e);
 			}
 		} else {
 			$this->exceptions[] = $e;

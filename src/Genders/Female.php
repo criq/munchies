@@ -12,7 +12,7 @@ use Fatty\Calculator;
 use Fatty\Energy;
 use Fatty\Exceptions\BreastfeedingChildbirthDateInFutureException;
 use Fatty\Exceptions\FattyException;
-use Fatty\Exceptions\FattyExceptionList;
+use Fatty\Exceptions\FattyExceptionCollection;
 use Fatty\Exceptions\InvalidBreastfeedingChildbirthDateException;
 use Fatty\Exceptions\InvalidPregnancyChildbirthDateException;
 use Fatty\Exceptions\MissingBirthdayException;
@@ -60,22 +60,22 @@ class Female extends \Fatty\Gender
 	 */
 	public function calcBasalMetabolicRate(Calculator $calculator) : Energy
 	{
-		$exceptionList = new FattyExceptionList;
+		$exceptionCollection = new FattyExceptionCollection;
 
 		if (!$calculator->getWeight()) {
-			$exceptionList->append(new MissingWeightException);
+			$exceptionCollection->add(new MissingWeightException);
 		}
 
 		if (!$calculator->getProportions()->getHeight()) {
-			$exceptionList->append(new MissingHeightException);
+			$exceptionCollection->add(new MissingHeightException);
 		}
 
 		if (!$calculator->getBirthday()) {
-			$exceptionList->append(new MissingBirthdayException);
+			$exceptionCollection->add(new MissingBirthdayException);
 		}
 
-		if (count($exceptionList)) {
-			throw $exceptionList;
+		if (count($exceptionCollection)) {
+			throw $exceptionCollection;
 		}
 
 		$weight = $calculator->getWeight()->getInKg()->getAmount()->getValue();
@@ -193,22 +193,22 @@ class Female extends \Fatty\Gender
 	 */
 	public function calcReferenceDailyIntakeBonus()
 	{
-		$exceptionList = new FattyExceptionList;
+		$exceptionCollection = new FattyExceptionCollection;
 
 		try {
 			$referenceDailyIntakeBonusPregnancy = $this->getReferenceDailyIntakeBonusPregnancy();
 		} catch (\Throwable $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
 		try {
 			$referenceDailyIntakeBonusBreastfeeding = $this->getReferenceDailyIntakeBonusBreastfeeding();
 		} catch (\Throwable $e) {
-			$exceptionList->append($e);
+			$exceptionCollection->add($e);
 		}
 
-		if (count($exceptionList)) {
-			throw $exceptionList;
+		if (count($exceptionCollection)) {
+			throw $exceptionCollection;
 		}
 
 		return new Energy(new Amount($referenceDailyIntakeBonusPregnancy->getAmount()->getValue() + $referenceDailyIntakeBonusBreastfeeding->getAmount()->getValue()), 'kCal');
@@ -238,22 +238,22 @@ class Female extends \Fatty\Gender
 
 	public function getReferenceDailyIntakeBonusBreastfeeding()
 	{
-		$exceptionList = new FattyExceptionList;
+		$exceptionCollection = new FattyExceptionCollection;
 
 		if (!$this->isBreastfeeding()) {
 			return new Energy(new Amount(0));
 		}
 
 		if (!($this->getBreastfeedingChildbirthDate() instanceof \Fatty\Birthday)) {
-			$exceptionList->append(new MissingBreastfeedingChildbirthDateException);
+			$exceptionCollection->add(new MissingBreastfeedingChildbirthDateException);
 		}
 
 		if (!($this->getBreastfeedingMode() instanceof \Fatty\BreastfeedingMode)) {
-			$exceptionList->append(new MissingBreastfeedingModeException);
+			$exceptionCollection->add(new MissingBreastfeedingModeException);
 		}
 
-		if (count($exceptionList)) {
-			throw $exceptionList;
+		if (count($exceptionCollection)) {
+			throw $exceptionCollection;
 		}
 
 		$diff = $this->getBreastfeedingChildbirthDate()->diff(new \Katu\Utils\DateTime);

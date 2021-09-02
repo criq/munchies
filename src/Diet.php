@@ -2,7 +2,7 @@
 
 namespace Fatty;
 
-use Fatty\Exceptions\FattyException;
+use Fatty\Exceptions\InvalidDietCarbsException;
 use Fatty\Nutrients\Carbs;
 
 class Diet
@@ -25,7 +25,7 @@ class Diet
 	public function setCarbs(Carbs $carbs) : Diet
 	{
 		if ($this->getApproach() && $this->getApproach()->getCarbsMin() && $this->getApproach()->getCarbsMax() && ($carbs->getAmount() < $this->getApproach()->getCarbsMin() || $carbs->getAmount() > $this->getApproach()->getCarbsMax())) {
-			throw FattyException::createFromAbbr('invalidDietCarbs');
+			throw new InvalidDietCarbsException;
 		}
 
 		$this->carbs = $carbs;

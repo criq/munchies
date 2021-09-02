@@ -7,7 +7,7 @@ use Fatty\BodyType;
 use Fatty\Calculator;
 use Fatty\Energy;
 use Fatty\Exceptions\FattyException;
-use Fatty\Exceptions\FattyExceptionList;
+use Fatty\Exceptions\FattyExceptionCollection;
 use Fatty\Exceptions\MissingBirthdayException;
 use Fatty\Exceptions\MissingHeightException;
 use Fatty\Exceptions\MissingWeightException;
@@ -43,22 +43,22 @@ class Male extends \Fatty\Gender
 	 */
 	public function calcBasalMetabolicRate(Calculator $calculator) : Energy
 	{
-		$exceptionList = new FattyExceptionList;
+		$exceptionCollection = new FattyExceptionCollection;
 
 		if (!$calculator->getWeight()) {
-			$exceptionList->append(new MissingWeightException);
+			$exceptionCollection->add(new MissingWeightException);
 		}
 
 		if (!$calculator->getProportions()->getHeight()) {
-			$exceptionList->append(new MissingHeightException);
+			$exceptionCollection->add(new MissingHeightException);
 		}
 
 		if (!$calculator->getBirthday()) {
-			$exceptionList->append(new MissingBirthdayException);
+			$exceptionCollection->add(new MissingBirthdayException);
 		}
 
-		if (count($exceptionList)) {
-			throw $exceptionList;
+		if (count($exceptionCollection)) {
+			throw $exceptionCollection;
 		}
 
 		$amount = new Amount((10 * $calculator->getWeight()->getInKg()->getAmount()->getValue()) + (6.25 * $calculator->getProportions()->getHeight()->getInCm()->getAmount()->getValue()) - (5 * $calculator->getBirthday()->getAge()) + 5);

@@ -7,6 +7,6 @@ class MissingNeckException extends FattyException
 	public function __construct()
 	{
 		$this->message = "Chybějící obvod krku.";
-		$this->names = ['neck'];
+		$this->names = ['proportions_neck'];
 	}
 }

@@ -7,6 +7,6 @@ class InvalidHipsException extends FattyException
 	public function __construct()
 	{
 		$this->message = "Neplatný obvod boků.";
-		$this->names = ['hips'];
+		$this->names = ['proportions_hips'];
 	}
 }
