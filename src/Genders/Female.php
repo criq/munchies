@@ -17,6 +17,7 @@ use Fatty\Exceptions\InvalidBreastfeedingChildbirthDateException;
 use Fatty\Exceptions\InvalidPregnancyChildbirthDateException;
 use Fatty\Exceptions\MissingBirthdayException;
 use Fatty\Exceptions\MissingBreastfeedingChildbirthDateException;
+use Fatty\Exceptions\MissingBreastfeedingModeException;
 use Fatty\Exceptions\MissingHeightException;
 use Fatty\Exceptions\MissingPregnancyChildbirthDateException;
 use Fatty\Exceptions\MissingWeightException;
@@ -179,7 +180,7 @@ class Female extends \Fatty\Gender
 		}
 
 		if (!($breastfeedingMode instanceof BreastfeedingMode)) {
-			throw FattyException::createFromAbbr('invalidBreastfeedingMode');
+			throw new InvalidBreastfeedingChildbirthDateException;
 		}
 
 		$this->breastfeedingMode = $breastfeedingMode;
@@ -248,7 +249,7 @@ class Female extends \Fatty\Gender
 		}
 
 		if (!($this->getBreastfeedingMode() instanceof \Fatty\BreastfeedingMode)) {
-			$exceptionList->append(FattyException::createFromAbbr('missingBreastfeedingMode'));
+			$exceptionList->append(new MissingBreastfeedingModeException);
 		}
 
 		if (count($exceptionList)) {

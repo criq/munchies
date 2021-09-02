@@ -1970,8 +1970,6 @@ class Calculator
 	// 	uksort($errors, function ($a, $b) {
 	// 		$sortArray = [
 
-	// 			'missingBreastfeedingMode',
-	// 			'invalidBreastfeedingMode',
 	// 			'missingActivityAmount',
 	// 			'missingSportDurations',
 	// 			'missingGoalTrend',

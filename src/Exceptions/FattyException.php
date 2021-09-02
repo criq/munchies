@@ -37,18 +37,6 @@ class FattyException extends \Exception
 	}
 }
 
-// case 'missingBreastfeedingMode':
-// 	$errors['missingBreastfeedingMode'] = [
-// 		'fields' => ['breastfeedingMode'],
-// 		'messages' => ["Chybějící způsob kojení."],
-// 	];
-// 	break;
-// case 'invalidBreastfeedingMode':
-// 	$errors['invalidBreastfeedingMode'] = [
-// 		'fields' => ['breastfeedingMode'],
-// 		'messages' => ["Neplatný způsob kojení."],
-// 	];
-// 	break;
 // case 'missingActivityAmount':
 // 	$errors['missingActivityAmount'] = [
 // 		'fields' => ['activity'],
