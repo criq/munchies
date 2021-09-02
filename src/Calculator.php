@@ -4,6 +4,19 @@ namespace Fatty;
 
 use Fatty\Exceptions\FattyException;
 use Fatty\Exceptions\FattyExceptionList;
+use Fatty\Exceptions\InvalidBirthdayException;
+use Fatty\Exceptions\InvalidBodyFatPercentageException;
+use Fatty\Exceptions\InvalidGenderException;
+use Fatty\Exceptions\InvalidHeightException;
+use Fatty\Exceptions\InvalidHipsException;
+use Fatty\Exceptions\InvalidNeckException;
+use Fatty\Exceptions\InvalidWaistException;
+use Fatty\Exceptions\InvalidWeightException;
+use Fatty\Exceptions\MissingGenderException;
+use Fatty\Exceptions\MissingHeightException;
+use Fatty\Exceptions\MissingHipsException;
+use Fatty\Exceptions\MissingWaistException;
+use Fatty\Exceptions\MissingWeightException;
 use Fatty\Nutrients\Carbs;
 use Fatty\SportDurations\Aerobic;
 use Fatty\SportDurations\Anaerobic;
@@ -11,6 +24,7 @@ use Fatty\SportDurations\LowFrequency;
 
 class Calculator
 {
+	protected $params;
 	protected $activity;
 	protected $birthday;
 	protected $bodyFatPercentage;
@@ -24,13 +38,28 @@ class Calculator
 
 	public function __construct(?array $params = [])
 	{
+		$this->setParams($params);
+	}
+
+	public static function createFromParams(array $params) : Calculator
+	{
+		$object = new static;
+		$object->setParams($params);
+
+		return $object;
+	}
+
+	public function setParams(array $params) : Calculator
+	{
+		$this->params = $params;
+
 		$exceptionList = new FattyExceptionList;
 
 		if (trim($params['gender'] ?? null)) {
 			try {
 				$value = \Fatty\Gender::createFromString($params['gender']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidGender');
+					throw new InvalidGenderException;
 				}
 
 				$this->setGender($value);
@@ -43,7 +72,7 @@ class Calculator
 			try {
 				$value = \Fatty\Birthday::createFromString($params['birthday']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidBirthday');
+					throw new InvalidBirthdayException;
 				}
 
 				$this->setBirthday($value);
@@ -56,7 +85,7 @@ class Calculator
 			try {
 				$value = Weight::createFromString($params['weight']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidWeight');
+					throw new InvalidWeightException;
 				}
 
 				$this->setWeight($value);
@@ -69,7 +98,7 @@ class Calculator
 			try {
 				$value = Length::createFromString($params['proportions_height']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidHeight');
+					throw new InvalidHeightException;
 				}
 
 				$this->getProportions()->setHeight($value);
@@ -82,7 +111,7 @@ class Calculator
 			try {
 				$value = Length::createFromString($params['proportions_waist']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidWaist');
+					throw new InvalidWaistException;
 				}
 
 				$this->getProportions()->setWaist($value);
@@ -95,7 +124,7 @@ class Calculator
 			try {
 				$value = Length::createFromString($params['proportions_hips']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidHips');
+					throw new InvalidHipsException;
 				}
 
 				$this->getProportions()->setHips($value);
@@ -108,7 +137,7 @@ class Calculator
 			try {
 				$value = Length::createFromString($params['proportions_neck']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidNeck');
+					throw new InvalidNeckException;
 				}
 
 				$this->getProportions()->setNeck($value);
@@ -121,7 +150,7 @@ class Calculator
 			try {
 				$value = Percentage::createFromPercent($params['bodyFatPercentage']);
 				if (!$value) {
-					throw FattyException::createFromAbbr('invalidBodyFatPercentage');
+					throw new InvalidBodyFatPercentageException;
 				}
 
 				$this->setBodyFatPercentage($value);
@@ -274,6 +303,13 @@ class Calculator
 		if (count($exceptionList)) {
 			throw $exceptionList;
 		}
+
+		return $this;
+	}
+
+	public function getParams() : array
+	{
+		return $this->params;
 	}
 
 	public static function getDeviation($value, $ideal, $extremes) : Amount
@@ -370,7 +406,7 @@ class Calculator
 	{
 		$gender = $this->getGender();
 		if (!$gender) {
-			throw FattyException::createFromAbbr('missingGender');
+			throw new MissingGenderException;
 		}
 
 		return $this->getGender()->calcBodyFatPercentage($this);
@@ -474,11 +510,11 @@ class Calculator
 		$exceptionList = new FattyExceptionList;
 
 		if (!($this->getWeight() instanceof Weight)) {
-			$exceptionList->append(FattyException::createFromAbbr('missingWeight'));
+			$exceptionList->append(new MissingWeightException);
 		}
 
 		if (!($this->getProportions()->getHeight() instanceof Length)) {
-			$exceptionList->append(FattyException::createFromAbbr('missingHeight'));
+			$exceptionList->append(new MissingHeightException);
 		}
 
 		if (count($exceptionList)) {
@@ -508,11 +544,11 @@ class Calculator
 		$exceptionList = new FattyExceptionList;
 
 		if (!($this->getProportions()->getWaist() instanceof Length)) {
-			$exceptionList->append(FattyException::createFromAbbr('missingWaist'));
+			$exceptionList->append(new MissingWaistException);
 		}
 
 		if (!($this->getProportions()->getHips() instanceof Length)) {
-			$exceptionList->append(FattyException::createFromAbbr('missingHips'));
+			$exceptionList->append(new MissingHipsException);
 		}
 
 		if (count($exceptionList)) {
@@ -604,12 +640,12 @@ class Calculator
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
-			throw FattyException::createFromAbbr('missingWeight');
+			throw new MissingWeightException;
 		}
 
 		$gender = $this->getGender();
 		if (!$gender) {
-			throw FattyException::createFromAbbr('missingGender');
+			throw new MissingGenderException;
 		}
 
 		return new Weight(new Amount($weight->getInKg()->getAmount()->getValue() * $gender->calcBodyFatPercentage($this)->getValue()));
@@ -624,7 +660,7 @@ class Calculator
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
-			throw FattyException::createFromAbbr('missingWeight');
+			throw new MissingWeightException;
 		}
 
 		return new Weight(new Amount($weight->getInKg()->getAmount()->getValue() * $this->calcActiveBodyMassPercentage()->getValue()));
@@ -633,7 +669,7 @@ class Calculator
 	public function calcOptimalFatPercentage() : Interval
 	{
 		if (!$this->getBirthday()) {
-			throw FattyException::createFromAbbr('invalidBirthday');
+			throw new InvalidBirthdayException;
 		}
 
 		$gender = $this->getGender();
@@ -666,7 +702,7 @@ class Calculator
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
-			throw FattyException::createFromAbbr('missingWeight');
+			throw new MissingWeightException;
 		}
 
 		$optimalFatPercentage = $this->calcOptimalFatPercentage();
@@ -695,7 +731,7 @@ class Calculator
 	{
 		$gender = $this->getGender();
 		if (!$gender) {
-			throw new FattyException('missingGender');
+			throw new MissingGenderException;
 		}
 
 		return $this->getGender()->calcEssentialFatPercentage();
@@ -705,7 +741,7 @@ class Calculator
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
-			throw FattyException::createFromAbbr('missingWeight');
+			throw new MissingWeightException;
 		}
 
 		$essentialFatPercentage = $this->calcEssentialFatPercentage();
@@ -795,7 +831,7 @@ class Calculator
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
-			throw FattyException::createFromAbbr('missingWeight');
+			throw new MissingWeightException;
 		}
 
 		return new Weight(new Amount($weight->getInKg()->getAmount()->getValue() - ($this->calcBodyFatPercentage()->getAsPercentage() * $weight->getInKg()->getAmount()->getValue())));
@@ -814,7 +850,7 @@ class Calculator
 	public function calcBasalMetabolicRate() : Energy
 	{
 		if (!$this->getGender()) {
-			throw FattyException::createFromAbbr('missingGender');
+			throw new MissingGenderException;
 		}
 
 		return $this->getGender()->calcBasalMetabolicRate($this);
@@ -877,7 +913,7 @@ class Calculator
 		try {
 			$gender = $this->getGender();
 			if (!$gender) {
-				throw FattyException::createFromAbbr('missingGender');
+				throw new MissingGenderException;
 			}
 
 			$referenceDailyIntakeBonus = $gender->calcReferenceDailyIntakeBonus();
@@ -914,7 +950,7 @@ class Calculator
 	{
 		$gender = $this->getGender();
 		if (!$gender) {
-			throw FattyException::createFromAbbr('missingGender');
+			throw new MissingGenderException;
 		}
 
 		return $gender->calcBodyType($this);
@@ -1460,15 +1496,6 @@ class Calculator
 	// 	return $messages;
 	// }
 
-
-
-
-
-
-
-
-
-
 	public function getResponse() : array
 	{
 		$exceptionList = new FattyExceptionList;
@@ -1921,320 +1948,13 @@ class Calculator
 	// } catch (\Katu\Exceptions\ExceptionCollection $ec) {
 	// 	$errors = [];
 
-	// 	foreach ($ec as $e) {
-	// 		// if (!method_exists($e, 'getAbbr')) {
-	// 		// 	print_r($e); die;
-	// 		// }
-	// 		if (method_exists($e, 'getAbbr')) {
-	// 			switch ($e->getAbbr()) {
-	// 				case 'missingGender':
-	// 					$errors['missingGender'] = [
-	// 						'fields' => ['gender'],
-	// 						'messages' => ["Chybějící pohlaví."],
-	// 					];
-	// 					break;
-	// 				case 'invalidGender':
-	// 					$errors['invalidGender'] = [
-	// 						'fields' => ['gender'],
-	// 						'messages' => ["Neplatné pohlaví."],
-	// 					];
-	// 					break;
-	// 				case 'missingBirthday':
-	// 					$errors['missingBirthday'] = [
-	// 						'fields' => ['birthday'],
-	// 						'messages' => ["Chybějící datum narození."],
-	// 					];
-	// 					break;
-	// 				case 'invalidBirthday':
-	// 					$errors['invalidBirthday'] = [
-	// 						'fields' => ['birthday'],
-	// 						'messages' => ["Neplatné datum narození."],
-	// 					];
-	// 					break;
-	// 				case 'lowAge':
-	// 					$errors['lowAge'] = [
-	// 						'fields' => ['birthday'],
-	// 						'messages' => ["Výživa dětí v růstu je zcela specifická. Je nam lito, ale tato kalkulačka je nastavena pro dospělé osoby od 18 let. Pokud potřebujete poradit, obraťte se na nutričního terapeuta."],
-	// 					];
-	// 					break;
-	// 				case 'missingWeight':
-	// 					$errors['missingWeight'] = [
-	// 						'fields' => ['weight'],
-	// 						'messages' => ["Chybějící hmotnost."],
-	// 					];
-	// 					break;
-	// 				case 'invalidWeightAmount':
-	// 					$errors['invalidWeightAmount'] = [
-	// 						'fields' => ['weight'],
-	// 						'messages' => ["Neplatná hmotnost."],
-	// 					];
-	// 					break;
-	// 				case 'missingHeight':
-	// 					$errors['missingHeight'] = [
-	// 						'fields' => ['height'],
-	// 						'messages' => ["Chybějící výška."],
-	// 					];
-	// 					break;
-	// 				case 'invalidHeightAmount':
-	// 					$errors['invalidHeightAmount'] = [
-	// 						'fields' => ['height'],
-	// 						'messages' => ["Neplatná výška."],
-	// 					];
-	// 					break;
-	// 				case 'missingWaist':
-	// 					$errors['missingWaist'] = [
-	// 						'fields' => ['waist'],
-	// 						'messages' => ["Chybějící obvod pasu."],
-	// 					];
-	// 					break;
-	// 				case 'invalidWaistAmount':
-	// 					$errors['invalidWaistAmount'] = [
-	// 						'fields' => ['waist'],
-	// 						'messages' => ["Neplatný obvod pasu."],
-	// 					];
-	// 					break;
-	// 				case 'missingHips':
-	// 					$errors['missingHips'] = [
-	// 						'fields' => ['hips'],
-	// 						'messages' => ["Chybějící obvod boků."],
-	// 					];
-	// 					break;
-	// 				case 'invalidHipsAmount':
-	// 					$errors['invalidHipsAmount'] = [
-	// 						'fields' => ['hips'],
-	// 						'messages' => ["Neplatný obvod boků."],
-	// 					];
-	// 					break;
-	// 				case 'missingNeck':
-	// 					$errors['missingNeck'] = [
-	// 						'fields' => ['neck'],
-	// 						'messages' => ["Chybějící obvod krku."],
-	// 					];
-	// 					break;
-	// 				case 'invalidNeckAmount':
-	// 					$errors['invalidNeckAmount'] = [
-	// 						'fields' => ['neck'],
-	// 						'messages' => ["Neplatný obvod krku."],
-	// 					];
-	// 					break;
-	// 				case 'invalidMeasurementBodyFatPercentage':
-	// 					$errors['invalidMeasurementBodyFatPercentage'] = [
-	// 						'fields' => ['measurements[bodyFatPercentage]'],
-	// 						'messages' => ["Neplatné procento tělesného tuku."],
-	// 					];
-	// 					break;
-	// 				case 'missingPregnancyChildbirthDate':
-	// 					$errors['missingPregnancyChildbirthDate'] = [
-	// 						'fields' => ['pregnancyChildbirthDate'],
-	// 						'messages' => ["Chybějící očekáváné datum porodu."],
-	// 					];
-	// 					break;
-	// 				case 'invalidPregnancyChildbirthDate':
-	// 					$errors['invalidPregnancyChildbirthDate'] = [
-	// 						'fields' => ['pregnancyChildbirthDate'],
-	// 						'messages' => ["Neplatné očekávané datum porodu."],
-	// 					];
-	// 					break;
-	// 				case 'pregnancyChildbirthDateInPast':
-	// 					$errors['pregnancyChildbirthDateInPast'] = [
-	// 						'fields' => ['pregnancyChildbirthDate'],
-	// 						'messages' => ["Očekávané datum porodu je v minulosti."],
-	// 					];
-	// 					break;
-	// 				case 'missingBreastfeedingChildbirthDate':
-	// 					$errors['missingBreastfeedingChildbirthDate'] = [
-	// 						'fields' => ['breastfeedingChildbirthDate'],
-	// 						'messages' => ["Chybějící datum narození dítěte."],
-	// 					];
-	// 					break;
-	// 				case 'invalidBreastfeedingChildbirthDate':
-	// 					$errors['invalidBreastfeedingChildbirthDate'] = [
-	// 						'fields' => ['breastfeedingChildbirthDate'],
-	// 						'messages' => ["Neplatné datum narození dítěte."],
-	// 					];
-	// 					break;
-	// 				case 'breastfeedingChildbirthDateInFuture':
-	// 					$errors['breastfeedingChildbirthDateInFuture'] = [
-	// 						'fields' => ['breastfeedingChildbirthDate'],
-	// 						'messages' => ["Datum narození dítěte je v budoucnosti."],
-	// 					];
-	// 					break;
-	// 				case 'missingBreastfeedingMode':
-	// 					$errors['missingBreastfeedingMode'] = [
-	// 						'fields' => ['breastfeedingMode'],
-	// 						'messages' => ["Chybějící způsob kojení."],
-	// 					];
-	// 					break;
-	// 				case 'invalidBreastfeedingMode':
-	// 					$errors['invalidBreastfeedingMode'] = [
-	// 						'fields' => ['breastfeedingMode'],
-	// 						'messages' => ["Neplatný způsob kojení."],
-	// 					];
-	// 					break;
-	// 				case 'missingActivityAmount':
-	// 					$errors['missingActivityAmount'] = [
-	// 						'fields' => ['activity'],
-	// 						'messages' => ["Chybějící úroveň aktivity."],
-	// 					];
-	// 					break;
-	// 				case 'missingSportDurations':
-	// 					$errors['missingSportDurations'] = [
-	// 						'fields' => ['activity'],
-	// 						'messages' => ["Chybějící informace o sportu."],
-	// 					];
-	// 					break;
-	// 				case 'invalidLowFrequencySportDuration':
-	// 					$errors['invalidLowFrequencySportDuration'] = [
-	// 						'fields' => ['sportDurations[lowFrequency]'],
-	// 						'messages' => ["Neplatná délka cvičení nízkofrekvenčních sportů."],
-	// 					];
-	// 					break;
-	// 				case 'invalidAerobicSportDuration':
-	// 					$errors['invalidAerobicSportDuration'] = [
-	// 						'fields' => ['sportDurations[aerobic]'],
-	// 						'messages' => ["Neplatná délka cvičení aerobních sportů."],
-	// 					];
-	// 					break;
-	// 				case 'invalidAnaerobicSportDuration':
-	// 					$errors['invalidAnaerobicSportDuration'] = [
-	// 						'fields' => ['sportDurations[anaerobic]'],
-	// 						'messages' => ["Neplatná délka cvičení anaerobních sportů."],
-	// 					];
-	// 					break;
-	// 				case 'missingGoalTrend':
-	// 					$errors['missingGoalTrend'] = [
-	// 						'fields' => ['goalTrend'],
-	// 						'messages' => ["Chybějící hmotnostní cíl."],
-	// 					];
-	// 					break;
-	// 				case 'invalidGoalTrend':
-	// 					$errors['invalidGoalTrend'] = [
-	// 						'fields' => ['goalTrend'],
-	// 						'messages' => ["Neplatný hmotnostní cíl."],
-	// 					];
-	// 					break;
-	// 				case 'missingGoalWeight':
-	// 					$errors['missingGoalWeight'] = [
-	// 						'fields' => ['goalWeight'],
-	// 						'messages' => ["Chybějící cílová hmotnost."],
-	// 					];
-	// 					break;
-	// 				case 'invalidGoalWeight':
-	// 					$errors['invalidGoalWeight'] = [
-	// 						'fields' => ['goalWeight'],
-	// 						'messages' => ["Neplatná cílová hmotnost."],
-	// 					];
-	// 					break;
-	// 				case 'goalWeightHigherThanCurrentWeight':
-	// 					$errors['goalWeightHigherThanCurrentWeight'] = [
-	// 						'fields' => ['goalWeight'],
-	// 						'messages' => ["Cílová hmotnost je vyšší než současná."],
-	// 					];
-	// 					break;
-	// 				case 'goalWeightLowerThanCurrentWeight':
-	// 					$errors['goalWeightLowerThanCurrentWeight'] = [
-	// 						'fields' => ['goalWeight'],
-	// 						'messages' => ["Cílová hmotnost je nižší než současná."],
-	// 					];
-	// 					break;
-	// 				case 'goalWeightUnchanged':
-	// 					$errors['goalWeightUnchanged'] = [
-	// 						'fields' => ['goalWeight'],
-	// 						'messages' => ["Cílová hmotnost je stejná jako současná."],
-	// 					];
-	// 					break;
-	// 				case 'missingDiet':
-	// 					$errors['missingDiet'] = [
-	// 						'fields' => ['diet'],
-	// 						'messages' => ["Chybějící výživový trend."],
-	// 					];
-	// 					break;
-	// 				case 'invalidDiet':
-	// 					$errors['invalidDiet'] = [
-	// 						'fields' => ['diet'],
-	// 						'messages' => ["Neplatný výživový trend."],
-	// 					];
-	// 					break;
-	// 				case 'invalidDietCarbs':
-	// 					$errors['invalidDietCarbs'] = [
-	// 						'fields' => ['dietCarbs'],
-	// 						'messages' => ["Neplatné množství sacharidů v dietě."],
-	// 					];
-	// 					break;
-	// 				case 'missingBodyFatPercentageInput':
-	// 					$errors['missingBodyFatPercentageInput'] = [
-	// 						'fields' => ['proportions[height]', 'proportions[neck]', 'proportions[waist]', 'measurements[bodyFatPercentage]'],
-	// 						'messages' => ["Chybí míry k výpočtu procenta tělesného tuku, nebo jeho přímé zadání."],
-	// 					];
-	// 					break;
-	// 				case 'unableEssentialFatPercentage':
-	// 					$errors['unableEssentialFatPercentage'] = [
-	// 						'fields' => [],
-	// 						'messages' => ["Chybí údaje k výpočtu procenta esenciálního tělesného tuku."],
-	// 					];
-	// 					break;
-	// 				case 'unableOptimalFatPercentage':
-	// 					$errors['unableOptimalFatPercentage'] = [
-	// 						'fields' => [],
-	// 						'messages' => ["Chybí údaje k výpočtu procenta optimálního tělesného tuku."],
-	// 					];
-	// 					break;
-	// 				default:
-	// 					// var_dump($e);
-	// 					// die;
-	// 					break;
-	// 			}
-	// 		}
-	// 	}
+
 
 	// 	// var_dump($errors); die;
 
-	// 	if (isset($errors['missingGender'], $errors['invalidGender'])) {
-	// 		unset($errors['missingGender']);
-	// 	}
 
-	// 	if (isset($errors['missingBirthday'], $errors['invalidBirthday'])) {
-	// 		unset($errors['missingBirthday']);
-	// 	}
-	// 	if (isset($errors['invalidBirthday'], $errors['lowAge'])) {
-	// 		unset($errors['invalidBirthday']);
-	// 	}
-	// 	if (isset($errors['missingBirthday'], $errors['lowAge'])) {
-	// 		unset($errors['missingBirthday']);
-	// 	}
 
-	// 	if (isset($errors['missingWeight'], $errors['invalidWeightAmount'])) {
-	// 		unset($errors['missingWeight']);
-	// 	}
-	// 	if (isset($errors['missingHeight'], $errors['invalidHeightAmount'])) {
-	// 		unset($errors['missingHeight']);
-	// 	}
-	// 	if (isset($errors['missingWaist'], $errors['invalidWaistAmount'])) {
-	// 		unset($errors['missingWaist']);
-	// 	}
-	// 	if (isset($errors['missingHips'], $errors['invalidHipsAmount'])) {
-	// 		unset($errors['missingHips']);
-	// 	}
-	// 	if (isset($errors['missingNeck'], $errors['invalidNeckAmount'])) {
-	// 		unset($errors['missingNeck']);
-	// 	}
 
-	// 	if (isset($errors['missingPregnancyChildbirthDate'], $errors['invalidPregnancyChildbirthDate'])) {
-	// 		unset($errors['missingPregnancyChildbirthDate']);
-	// 	}
-	// 	if (isset($errors['missingPregnancyChildbirthDate'], $errors['pregnancyChildbirthDateInPast'])) {
-	// 		unset($errors['missingPregnancyChildbirthDate']);
-	// 	}
-
-	// 	if (isset($errors['missingBreastfeedingChildbirthDate'], $errors['invalidBreastfeedingChildbirthDate'])) {
-	// 		unset($errors['missingBreastfeedingChildbirthDate']);
-	// 	}
-	// 	if (isset($errors['missingBreastfeedingChildbirthDate'], $errors['breastfeedingChildbirthDateInFuture'])) {
-	// 		unset($errors['missingBreastfeedingChildbirthDate']);
-	// 	}
-	// 	if (isset($errors['missingBreastfeedingMode'], $errors['invalidBreastfeedingMode'])) {
-	// 		unset($errors['missingBreastfeedingMode']);
-	// 	}
 
 	// 	if (isset($errors['missingGoalTrend'], $errors['invalidGoalTrend'])) {
 	// 		unset($errors['missingGoalTrend']);
@@ -2249,25 +1969,7 @@ class Calculator
 
 	// 	uksort($errors, function ($a, $b) {
 	// 		$sortArray = [
-	// 			'missingGender',
-	// 			'invalidGender',
-	// 			'missingBirthday',
-	// 			'invalidBirthday',
-	// 			'missingWeight',
-	// 			'invalidWeightAmount',
-	// 			'missingHeight',
-	// 			'invalidHeightAmount',
-	// 			'missingWaist',
-	// 			'invalidWaistAmount',
-	// 			'missingHips',
-	// 			'invalidHipsAmount',
-	// 			'missingNeck',
-	// 			'missingPregnancyChildbirthDate',
-	// 			'invalidPregnancyChildbirthDate',
-	// 			'pregnancyChildbirthDateInPast',
-	// 			'missingBreastfeedingChildbirthDate',
-	// 			'invalidBreastfeedingChildbirthDate',
-	// 			'breastfeedingChildbirthDateInFuture',
+
 	// 			'missingBreastfeedingMode',
 	// 			'invalidBreastfeedingMode',
 	// 			'missingActivityAmount',

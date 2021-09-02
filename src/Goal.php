@@ -3,6 +3,7 @@
 namespace Fatty;
 
 use Fatty\Exceptions\FattyException;
+use Fatty\Exceptions\MissingWeightException;
 
 class Goal
 {
@@ -55,7 +56,7 @@ class Goal
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
-			throw FattyException::createFromAbbr('missingWeight');
+			throw new MissingWeightException;
 		}
 
 		return new Weight($weight->getInKg()->getAmount() + $this->getChange()->getInKg()->getAmount(), 'kg');

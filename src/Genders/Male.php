@@ -8,6 +8,9 @@ use Fatty\Calculator;
 use Fatty\Energy;
 use Fatty\Exceptions\FattyException;
 use Fatty\Exceptions\FattyExceptionList;
+use Fatty\Exceptions\MissingBirthdayException;
+use Fatty\Exceptions\MissingHeightException;
+use Fatty\Exceptions\MissingWeightException;
 use Fatty\Percentage;
 
 class Male extends \Fatty\Gender
@@ -43,15 +46,15 @@ class Male extends \Fatty\Gender
 		$exceptionList = new FattyExceptionList;
 
 		if (!$calculator->getWeight()) {
-			$exceptionList->append(FattyException::createFromAbbr('missingWeight'));
+			$exceptionList->append(new MissingWeightException);
 		}
 
 		if (!$calculator->getProportions()->getHeight()) {
-			$exceptionList->append(FattyException::createFromAbbr('missingHeight'));
+			$exceptionList->append(new MissingHeightException);
 		}
 
 		if (!$calculator->getBirthday()) {
-			$exceptionList->append(FattyException::createFromAbbr('missingBirthday'));
+			$exceptionList->append(new MissingBirthdayException);
 		}
 
 		if (count($exceptionList)) {

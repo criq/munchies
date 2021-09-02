@@ -3,6 +3,7 @@
 namespace Fatty;
 
 use Fatty\Exceptions\FattyException;
+use Fatty\Exceptions\InvalidAmountException;
 
 class Amount
 {
@@ -23,7 +24,7 @@ class Amount
 		try {
 			$value = trim($value);
 			if (!preg_match('/^\-?[0-9]+([\,\.][0-9]+)?$/', $value)) {
-				throw FattyException::createFromAbbr('invalidAmount');
+				throw new InvalidAmountException;
 			}
 
 			return new static((new \Katu\Types\TString(trim($value)))->getAsFloat());

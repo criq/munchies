@@ -10,8 +10,17 @@ use Fatty\BreastfeedingModes\Full;
 use Fatty\BreastfeedingModes\Partial;
 use Fatty\Calculator;
 use Fatty\Energy;
+use Fatty\Exceptions\BreastfeedingChildbirthDateInFutureException;
 use Fatty\Exceptions\FattyException;
 use Fatty\Exceptions\FattyExceptionList;
+use Fatty\Exceptions\InvalidBreastfeedingChildbirthDateException;
+use Fatty\Exceptions\InvalidPregnancyChildbirthDateException;
+use Fatty\Exceptions\MissingBirthdayException;
+use Fatty\Exceptions\MissingBreastfeedingChildbirthDateException;
+use Fatty\Exceptions\MissingHeightException;
+use Fatty\Exceptions\MissingPregnancyChildbirthDateException;
+use Fatty\Exceptions\MissingWeightException;
+use Fatty\Exceptions\PregnancyChildbirthDateInPastException;
 use Fatty\Percentage;
 
 class Female extends \Fatty\Gender
@@ -53,15 +62,15 @@ class Female extends \Fatty\Gender
 		$exceptionList = new FattyExceptionList;
 
 		if (!$calculator->getWeight()) {
-			$exceptionList->append(FattyException::createFromAbbr('missingWeight'));
+			$exceptionList->append(new MissingWeightException);
 		}
 
 		if (!$calculator->getProportions()->getHeight()) {
-			$exceptionList->append(FattyException::createFromAbbr('missingHeight'));
+			$exceptionList->append(new MissingHeightException);
 		}
 
 		if (!$calculator->getBirthday()) {
-			$exceptionList->append(FattyException::createFromAbbr('missingBirthday'));
+			$exceptionList->append(new MissingBirthdayException);
 		}
 
 		if (count($exceptionList)) {
@@ -96,7 +105,7 @@ class Female extends \Fatty\Gender
 	public function setPregnancyChildbirthDate($pregnancyChildbirthDate)
 	{
 		if (!$pregnancyChildbirthDate) {
-			throw FattyException::createFromAbbr('missingPregnancyChildbirthDate');
+			throw new MissingPregnancyChildbirthDateException;
 		}
 
 		if (is_string($pregnancyChildbirthDate)) {
@@ -108,11 +117,11 @@ class Female extends \Fatty\Gender
 		}
 
 		if (!($pregnancyChildbirthDate instanceof Birthday)) {
-			throw FattyException::createFromAbbr('invalidPregnancyChildbirthDate');
+			throw new InvalidPregnancyChildbirthDateException;
 		}
 
 		if ($pregnancyChildbirthDate->getBirthday()->isInPast()) {
-			throw FattyException::createFromAbbr('pregnancyChildbirthDateInPast');
+			throw new PregnancyChildbirthDateInPastException;
 		}
 
 		$this->pregnancyChildbirthDate = $pregnancyChildbirthDate;
@@ -136,7 +145,7 @@ class Female extends \Fatty\Gender
 	public function setBreastfeedingChildbirthDate($breastfeedingChildbirthDate)
 	{
 		if (!$breastfeedingChildbirthDate) {
-			throw FattyException::createFromAbbr('missingBreastfeedingChildbirthDate');
+			throw new MissingBreastfeedingChildbirthDateException;
 		}
 
 		if (is_string($breastfeedingChildbirthDate)) {
@@ -148,11 +157,11 @@ class Female extends \Fatty\Gender
 		}
 
 		if (!($breastfeedingChildbirthDate instanceof Birthday)) {
-			throw FattyException::createFromAbbr('invalidBreastfeedingChildbirthDate');
+			throw new InvalidBreastfeedingChildbirthDateException;
 		}
 
 		if ($breastfeedingChildbirthDate->getBirthday()->isInFuture()) {
-			throw FattyException::createFromAbbr('breastfeedingChildbirthDateInFuture');
+			throw new BreastfeedingChildbirthDateInFutureException;
 		}
 
 		$this->breastfeedingChildbirthDate = $breastfeedingChildbirthDate;
@@ -211,7 +220,7 @@ class Female extends \Fatty\Gender
 		}
 
 		if (!($this->getPregnancyChildbirthDate() instanceof \Fatty\Birthday)) {
-			throw FattyException::createFromAbbr('missingPregnancyChildbirthDate');
+			throw new MissingPregnancyChildbirthDateException;
 		}
 
 		$diff = $this->getPregnancyChildbirthDate()->diff(new \Katu\Utils\DateTime);
@@ -235,7 +244,7 @@ class Female extends \Fatty\Gender
 		}
 
 		if (!($this->getBreastfeedingChildbirthDate() instanceof \Fatty\Birthday)) {
-			$exceptionList->append(FattyException::createFromAbbr('missingBreastfeedingChildbirthDate'));
+			$exceptionList->append(new MissingBreastfeedingChildbirthDateException);
 		}
 
 		if (!($this->getBreastfeedingMode() instanceof \Fatty\BreastfeedingMode)) {
