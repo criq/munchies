@@ -2,7 +2,7 @@
 
 namespace Fatty;
 
-abstract class SportDuration extends AmountWithUnit
+abstract class SportDuration extends Duration
 {
 	const QUOTIENT = null;
 
