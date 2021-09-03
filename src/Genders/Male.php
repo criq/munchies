@@ -4,6 +4,10 @@ namespace Fatty\Genders;
 
 use Fatty\Amount;
 use Fatty\BodyType;
+use Fatty\BodyTypes\Apple;
+use Fatty\BodyTypes\AppleWithHigherRisk;
+use Fatty\BodyTypes\Balanced;
+use Fatty\BodyTypes\PearOrHourglass;
 use Fatty\Calculator;
 use Fatty\Energy;
 use Fatty\Exceptions\FattyExceptionCollection;
@@ -12,6 +16,7 @@ use Fatty\Exceptions\MissingHeightException;
 use Fatty\Exceptions\MissingWeightException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\AmountWithUnitMetric;
+use Fatty\Metrics\StringMetric;
 use Fatty\Percentage;
 
 class Male extends \Fatty\Gender
@@ -75,18 +80,20 @@ class Male extends \Fatty\Gender
 	/*****************************************************************************
 	 * Typ postavy.
 	 */
-	public function calcBodyType(Calculator $calculator): BodyType
+	public function calcBodyType(Calculator $calculator): StringMetric
 	{
 		$waistHipRatioValue = $calculator->calcWaistHipRatio()->getResult()->getValue();
 
 		if ($waistHipRatioValue < .85) {
-			return new \Fatty\BodyTypes\PearOrHourglass;
+			$result = new PearOrHourglass;
 		} elseif ($waistHipRatioValue >= .8 && $waistHipRatioValue < .9) {
-			return new \Fatty\BodyTypes\Balanced;
+			$result = new Balanced;
 		} elseif ($waistHipRatioValue >= .9 && $waistHipRatioValue < .95) {
-			return new \Fatty\BodyTypes\Apple;
+			$result = new Apple;
 		} else {
-			return new \Fatty\BodyTypes\AppleWithHigherRisk;
+			$result = new AppleWithHigherRisk;
 		}
+
+		return new StringMetric('bodyType', $result->getCode(), $result->getLabel());
 	}
 }

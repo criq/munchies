@@ -4,14 +4,16 @@ namespace Fatty\Genders;
 
 use Fatty\Amount;
 use Fatty\Birthday;
-use Fatty\BodyType;
+use Fatty\BodyTypes\Apple;
+use Fatty\BodyTypes\AppleWithHigherRisk;
+use Fatty\BodyTypes\Balanced;
+use Fatty\BodyTypes\PearOrHourglass;
 use Fatty\BreastfeedingMode;
 use Fatty\BreastfeedingModes\Full;
 use Fatty\BreastfeedingModes\Partial;
 use Fatty\Calculator;
 use Fatty\Energy;
 use Fatty\Exceptions\BreastfeedingChildbirthDateInFutureException;
-use Fatty\Exceptions\FattyException;
 use Fatty\Exceptions\FattyExceptionCollection;
 use Fatty\Exceptions\InvalidBreastfeedingChildbirthDateException;
 use Fatty\Exceptions\InvalidPregnancyChildbirthDateException;
@@ -24,6 +26,7 @@ use Fatty\Exceptions\MissingWeightException;
 use Fatty\Exceptions\PregnancyChildbirthDateInPastException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\AmountWithUnitMetric;
+use Fatty\Metrics\StringMetric;
 use Fatty\Percentage;
 
 class Female extends \Fatty\Gender
@@ -282,18 +285,20 @@ class Female extends \Fatty\Gender
 	 * Typ postavy.
 	 */
 
-	public function calcBodyType(Calculator $calculator): BodyType
+	public function calcBodyType(Calculator $calculator): StringMetric
 	{
 		$waistHipRatioValue = $calculator->calcWaistHipRatio()->getResult()->getValue();
 
 		if ($waistHipRatioValue < .75) {
-			return new \Fatty\BodyTypes\PearOrHourglass;
+			$result = new PearOrHourglass;
 		} elseif ($waistHipRatioValue >= .75 && $waistHipRatioValue < .8) {
-			return new \Fatty\BodyTypes\Balanced;
+			$result = new Balanced;
 		} elseif ($waistHipRatioValue >= .8 && $waistHipRatioValue < .85) {
-			return new \Fatty\BodyTypes\Apple;
+			$result = new Apple;
 		} else {
-			return new \Fatty\BodyTypes\AppleWithHigherRisk;
+			$result = new AppleWithHigherRisk;
 		}
+
+		return new StringMetric('bodyType', $result->getCode(), $result->getLabel());
 	}
 }

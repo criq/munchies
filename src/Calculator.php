@@ -32,6 +32,7 @@ use Fatty\Exceptions\UnableToCalcEssentialFatPercentageException;
 use Fatty\Exceptions\UnableToCalcOptimalFatPercentageException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\AmountWithUnitMetric;
+use Fatty\Metrics\StringMetric;
 use Fatty\Nutrients\Carbs;
 use Fatty\SportDurations\Aerobic;
 use Fatty\SportDurations\Anaerobic;
@@ -1068,7 +1069,7 @@ class Calculator
 	/*****************************************************************************
 	 * Body type - typ postavy.
 	 */
-	public function calcBodyType(): BodyType
+	public function calcBodyType(Calculator $calculator): StringMetric
 	{
 		$gender = $this->getGender();
 		if (!$gender) {
@@ -1899,7 +1900,7 @@ class Calculator
 		// }
 
 		try {
-			$metricCollection->append($this->calcBodyType());
+			$metricCollection->append($this->calcBodyType($this));
 		} catch (FattyException $e) {
 			$exceptionCollection->add($e);
 		}

@@ -6,6 +6,7 @@ use Fatty\Exceptions\FattyException;
 use Fatty\Exceptions\MissingBodyFatPercentageInputException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\AmountWithUnitMetric;
+use Fatty\Metrics\StringMetric;
 
 abstract class Gender
 {
@@ -15,7 +16,7 @@ abstract class Gender
 
 	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
 	abstract public function calcBasalMetabolicRate(Calculator $calculator): AmountWithUnitMetric;
-	abstract public function calcBodyType(Calculator $calculator): BodyType;
+	abstract public function calcBodyType(Calculator $calculator): StringMetric;
 
 	public static function createFromString(string $value): ?Gender
 	{
