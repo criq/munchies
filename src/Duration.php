@@ -37,10 +37,10 @@ class Duration extends AmountWithUnit
 	{
 		switch (mb_strtolower($this->getUnit())) {
 			case 'days':
-				return implode(' ', [$this->getAmount()->getValue(), 'dnů']);
+				return "{$this->getAmount()->getValue()} dní";
 				break;
 			case 'weeks':
-				return implode(' ', [$this->getAmount()->getValue(), 'týdnů']);
+				return "{$this->getAmount()->getValue()} týdnů";
 				break;
 		}
 	}
