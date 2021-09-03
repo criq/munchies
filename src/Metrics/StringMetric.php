@@ -2,6 +2,7 @@
 
 namespace Fatty\Metrics;
 
+use Fatty\Locale;
 use Fatty\Metric;
 
 class StringMetric extends Metric
@@ -24,12 +25,12 @@ class StringMetric extends Metric
 		return $this->formatted ?: $this->result;
 	}
 
-	public function getResponse(): array
+	public function getResponse(?Locale $locale = null): array
 	{
 		return [
 			'name' => $this->getName(),
 			'result' => $this->getResult(),
-			'formatted' => $this->getFormatted(),
+			'formatted' => $this->getFormatted($locale),
 			'formula' => $this->getFormula(),
 		];
 	}

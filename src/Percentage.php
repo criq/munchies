@@ -6,7 +6,7 @@ class Percentage extends Amount
 {
 	public function __toString(): string
 	{
-		return \Katu\Utils\Formatter::getLocalPercent(\Katu\Utils\Formatter::getPreferredLocale(), $this->getValue());
+		return $this->getFormatted();
 	}
 
 	public static function createFromPercent(string $value): ?Amount
@@ -18,21 +18,13 @@ class Percentage extends Amount
 		}
 	}
 
-	public function getAsPercentage(): float
+	public function getFormatted(?Locale $locale = null): string
 	{
-		return $this->getValue();
-	}
+		$locale = $locale ?: Locale::getDefault();
 
-	/**
-	 * @deprecated
-	 */
-	public function getArray(): array
-	{
-		return [];
-	}
+		$numberFormatter = new \NumberFormatter($locale, \NumberFormatter::PERCENT);
+		$numberFormatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 1);
 
-	public function getFormatted(): string
-	{
-		return ($this->getValue() * 100) . " %";
+		return $numberFormatter->format($this->getValue());
 	}
 }

@@ -66,10 +66,15 @@ abstract class AmountWithUnit
 		];
 	}
 
-	public function getFormatted(): string
+	public function getFormatted(?Locale $locale = null): string
 	{
+		$locale = $locale ?: Locale::getDefault();
+
+		$numberFormatter = new \NumberFormatter($locale, \NumberFormatter::DECIMAL);
+		$numberFormatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 1);
+
 		return implode(' ', [
-			\Katu\Utils\Formatter::getLocalReadableNumber(\Katu\Utils\Formatter::getPreferredLocale(), $this->getAmount()->getValue()),
+			$numberFormatter->format($this->getAmount()->getValue()),
 			$this->getUnit(),
 		]);
 	}

@@ -15,7 +15,7 @@ class Amount
 
 	public function __toString(): string
 	{
-		return \Katu\Utils\Formatter::getLocalReadableNumber(\Katu\Utils\Formatter::getPreferredLocale(), $this->getValue());
+		return $this->getFormatted();
 	}
 
 	public static function createFromString(string $value): ?Amount
@@ -44,8 +44,13 @@ class Amount
 		return new static($this->getValue() * $value);
 	}
 
-	public function getFormatted(): string
+	public function getFormatted(?Locale $locale = null): string
 	{
-		return (string)round($this->getValue(), 1);
+		$locale = $locale ?: Locale::getDefault();
+
+		$numberFormatter = new \NumberFormatter($locale, \NumberFormatter::DECIMAL);
+		$numberFormatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 1);
+
+		return $numberFormatter->format($this->getValue());
 	}
 }

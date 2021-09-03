@@ -3,6 +3,7 @@
 namespace Fatty\Metrics;
 
 use Fatty\AmountWithUnit;
+use Fatty\Locale;
 use Fatty\Metric;
 
 class AmountWithUnitMetric extends Metric
@@ -19,12 +20,12 @@ class AmountWithUnitMetric extends Metric
 		return $this->result;
 	}
 
-	public function getResponse(): array
+	public function getResponse(?Locale $locale = null): array
 	{
 		return [
 			'name' => $this->getName(),
 			'result' => $this->getResult()->getAmount()->getValue(),
-			'formatted' => $this->getResult()->getFormatted(),
+			'formatted' => $this->getResult()->getFormatted($locale),
 			'formula' => $this->getFormula(),
 		];
 	}

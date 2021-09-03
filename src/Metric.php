@@ -9,7 +9,7 @@ abstract class Metric
 	protected $formula;
 
 	abstract public function getResult();
-	abstract public function getResponse(): array;
+	abstract public function getResponse(?Locale $locale = null): array;
 
 	public function getName(): string
 	{

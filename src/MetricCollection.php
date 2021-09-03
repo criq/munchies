@@ -20,10 +20,10 @@ class MetricCollection extends \ArrayObject
 		})));
 	}
 
-	public function getResponse(): array
+	public function getResponse(?Locale $locale = null): array
 	{
-		return array_map(function ($metric) {
-			return $metric->getResponse();
+		return array_map(function ($metric) use ($locale) {
+			return $metric->getResponse($locale);
 		}, $this->getArrayCopy());
 	}
 }

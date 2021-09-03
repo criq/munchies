@@ -2047,7 +2047,8 @@ class Calculator
 			throw $exceptionCollection;
 		}
 
-		$res['output']['metrics'] = $metricCollection->getResponse();
+		$locale = new Locale('cs_CZ');
+		$res['output']['metrics'] = $metricCollection->getResponse($locale);
 
 		return $res;
 	}
