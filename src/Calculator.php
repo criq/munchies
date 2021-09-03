@@ -25,6 +25,7 @@ use Fatty\Exceptions\InvalidSportDurationsLowFrequencyException;
 use Fatty\Exceptions\InvalidUnitsException;
 use Fatty\Exceptions\InvalidWaistException;
 use Fatty\Exceptions\InvalidWeightException;
+use Fatty\Exceptions\MissingActivityException;
 use Fatty\Exceptions\MissingDietApproachException;
 use Fatty\Exceptions\MissingGenderException;
 use Fatty\Exceptions\MissingGoalVectorException;
@@ -490,9 +491,14 @@ class Calculator
 		return $this->activity;
 	}
 
-	public function calcActivity(): Activity
+	public function calcActivity(): AmountMetric
 	{
-		return $this->activity ?: new Activity(0);
+		$activity = $this->activity;
+		if (!$activity) {
+			throw new MissingActivityException;
+		}
+
+		return new AmountMetric('activity', $activity);
 	}
 
 	public function getSportDurations(): SportDurations
@@ -502,7 +508,7 @@ class Calculator
 		return $this->sportDurations;
 	}
 
-	public function calcSportActivity(): Activity
+	public function calcSportActivity(): AmountMetric
 	{
 		return $this->getSportDurations()->calcSportActivity();
 	}
@@ -530,8 +536,11 @@ class Calculator
 			throw $exceptionCollection;
 		}
 
-		$result = new Activity($activity->getValue() + $sportActivity->getValue());
-		$formula = 'activityPal[' . $this->calcActivity()->getValue() . '] + sportPal[' . $this->calcSportActivity()->getValue() . '] = ' . $result->getValue();
+		$activityValue = $activity->getResult()->getValue();
+		$sportActivityValue = $sportActivity->getResult()->getValue();
+
+		$result = new Activity($activityValue + $sportActivityValue);
+		$formula = 'activityPal[' . $activityValue . '] + sportPal[' . $sportActivityValue . '] = ' . $result->getValue();
 
 		return new AmountMetric('physicalActivityLevel', $result, $formula);
 	}
