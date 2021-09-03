@@ -1994,15 +1994,11 @@ class Calculator
 			$exceptionCollection->add($e);
 		}
 
-		// try {
-		// 	$metric = $this->getDiet();
-		// 	if ($metric) {
-		// 		$res['output']['metrics']['dietApproach']['result'] = $metric->getArray();
-		// 		$res['output']['metrics']['dietApproach']['string'] = (string)$metric;
-		// 	}
-		// } catch (FattyException $e) {
-		// 	$ec->add($e);
-		// }
+		try {
+			$metricCollection->append($this->getDiet()->calcDietApproach());
+		} catch (FattyException $e) {
+			$ec->add($e);
+		}
 
 		// try {
 		// 	$diet = $calculator->getDiet();

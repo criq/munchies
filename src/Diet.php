@@ -3,6 +3,8 @@
 namespace Fatty;
 
 use Fatty\Exceptions\InvalidDietCarbsException;
+use Fatty\Exceptions\MissingDietApproachException;
+use Fatty\Metrics\StringMetric;
 use Fatty\Nutrients\Carbs;
 
 class Diet
@@ -20,6 +22,16 @@ class Diet
 	public function getApproach(): ?Approach
 	{
 		return $this->approach;
+	}
+
+	public function calcDietApproach(): StringMetric
+	{
+		$approach = $this->getApproach();
+		if (!$approach) {
+			throw new MissingDietApproachException;
+		}
+
+		return new StringMetric('dietApproach', $approach->getCode(), $approach->getLabelDeclinated());
 	}
 
 	public function setCarbs(Carbs $carbs): Diet
