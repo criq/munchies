@@ -57,15 +57,15 @@ class SportDurations
 
 		if ($this->lowFrequency || $this->aerobic || $this->anaerobic) {
 			if ($this->lowFrequency) {
-				$amount += $this->lowFrequency->getActivityAmount()->getValue();
+				$amount += $this->getLowFrequency()->getActivity()->getValue();
 			}
 
 			if ($this->aerobic) {
-				$amount += $this->aerobic->getActivityAmount()->getValue();
+				$amount += $this->getAerobic()->getActivity()->getValue();
 			}
 
 			if ($this->anaerobic) {
-				$amount += $this->anaerobic->getActivityAmount()->getValue();
+				$amount += $this->getAnaerobic()->getActivity()->getValue();
 			}
 		} else {
 			$amount = static::DEFAULT_PAL;
