@@ -2,6 +2,7 @@
 
 namespace Fatty;
 
+use Fatty\Exceptions\MissingGoalDurationException;
 use Fatty\Exceptions\MissingGoalVectorException;
 use Fatty\Exceptions\MissingGoalWeightException;
 use Fatty\Exceptions\MissingWeightException;
@@ -24,6 +25,16 @@ class Goal
 	public function getDuration(): ?Duration
 	{
 		return $this->duration;
+	}
+
+	public function calcGoalDuration(): AmountWithUnitMetric
+	{
+		$duration = $this->getDuration();
+		if (!$duration) {
+			throw new MissingGoalDurationException;
+		}
+
+		return new AmountWithUnitMetric('goalDuration', $duration);
 	}
 
 	public function setVector(?Vector $value): Goal

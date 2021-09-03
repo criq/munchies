@@ -2022,14 +2022,11 @@ class Calculator
 		// 	$ec->add($e);
 		// }
 
-		// try {
-		// 	if ($metric) {
-		// 		$res['output']['metrics']['dietDuration']['result'] = $calculator->getGoal()->getDuration()->getAmount() . " weeks";
-		// 		$res['output']['metrics']['dietDuration']['string'] = $calculator->getGoal()->getDuration()->getAmount() . " týdnů";
-		// 	}
-		// } catch (FattyException $e) {
-		// 	$ec->add($e);
-		// }
+		try {
+			$metricCollection->append($this->getGoal()->calcGoalDuration());
+		} catch (FattyException $e) {
+			$exceptionCollection->add($e);
+		}
 
 		try {
 			$metricCollection->append($this->calcBodyType($this));

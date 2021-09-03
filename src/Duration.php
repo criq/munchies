@@ -32,4 +32,16 @@ class Duration extends AmountWithUnit
 				break;
 		}
 	}
+
+	public function getFormatted(?Locale $locale = null): string
+	{
+		switch (mb_strtolower($this->getUnit())) {
+			case 'days':
+				return implode(' ', [$this->getAmount()->getValue(), 'dnů']);
+				break;
+			case 'weeks':
+				return implode(' ', [$this->getAmount()->getValue(), 'týdnů']);
+				break;
+		}
+	}
 }
