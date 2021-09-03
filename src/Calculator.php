@@ -432,7 +432,12 @@ class Calculator
 
 	public function calcWeight(): ?Metric
 	{
-		return new AmountWithUnitMetric('weight', $this->getWeight());
+		$weight = $this->getWeight();
+		if (!$weight) {
+			throw new MissingWeightException;
+		}
+
+		return new AmountWithUnitMetric('weight', $weight);
 	}
 
 	/*****************************************************************************

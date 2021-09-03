@@ -84,7 +84,12 @@ class Goal
 
 	public function calcGoalVector(): StringMetric
 	{
-		return new StringMetric('goalVector', $this->getVector()->getCode(), $this->getVector()->getLabelInfinitive());
+		$vector = $this->getVector();
+		if (!$vector) {
+			throw new MissingGoalVectorException;
+		}
+
+		return new StringMetric('goalVector', $vector->getCode(), $vector->getLabelInfinitive());
 	}
 
 	public function calcGoalWeight(): AmountWithUnitMetric
