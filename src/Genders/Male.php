@@ -28,12 +28,12 @@ class Male extends \Fatty\Gender
 	 */
 	protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric
 	{
-		$waist = $calculator->getProportions()->getWaist()->getInUnit('cm')->getAmount()->getValue();
-		$neck = $calculator->getProportions()->getNeck()->getInUnit('cm')->getAmount()->getValue();
-		$height = $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue();
+		$waistValue = $calculator->getProportions()->getWaist()->getInUnit('cm')->getAmount()->getValue();
+		$neckValue = $calculator->getProportions()->getNeck()->getInUnit('cm')->getAmount()->getValue();
+		$heightValue = $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue();
 
-		$result = new Percentage(((495 / (1.0324 - (0.19077 * log10($waist - $neck)) + (0.15456 * log10($height)))) - 450) * .01);
-		$formula = '((495 / (1.0324 - (0.19077 * log10(waist[' . $waist . '] - neck[' . $neck . '])) + (0.15456 * log10(height[' . $height . '])))) - 450) * .01';
+		$result = new Percentage(((495 / (1.0324 - (0.19077 * log10($waistValue - $neckValue)) + (0.15456 * log10($heightValue)))) - 450) * .01);
+		$formula = "((495 / (1.0324 - (0.19077 * log10(waist[{$waistValue}] - neck[{$neckValue}])) + (0.15456 * log10(height[{$heightValue}])))) - 450) * .01 = {$result->getValue()}";
 
 		return new AmountMetric('bodyFatPercentage', $result, $formula);
 	}

@@ -438,7 +438,11 @@ class Calculator
 			throw new MissingWeightException;
 		}
 
-		return new AmountWithUnitMetric('weight', $weight);
+		$weightValue = $weight->getAmount()->getValue();
+
+		$formula = "weight[{$weightValue}] = {$weightValue}";
+
+		return new AmountWithUnitMetric('weight', $weight, $formula);
 	}
 
 	/*****************************************************************************
@@ -595,7 +599,9 @@ class Calculator
 
 	public function calcBodyMassIndexDeviation(): AmountMetric
 	{
-		return new AmountMetric('bodyMassIndexDeviation', static::getDeviation($this->calcBodyMassIndex()->getResult()->getValue(), 22, [17.7, 40]));
+		$result = static::getDeviation($this->calcBodyMassIndex()->getResult()->getValue(), 22, [17.7, 40]);
+
+		return new AmountMetric('bodyMassIndexDeviation', $result);
 	}
 
 	/*****************************************************************************
@@ -711,19 +717,27 @@ class Calculator
 			throw new MissingGenderException;
 		}
 
+		$weightValue = $weight->getInUnit('kg')->getAmount()->getValue();
+		$bodyFatPercentageValue = $gender->calcBodyFatPercentage($this)->getResult()->getValue();
+
 		$result = new Weight(
-			new Amount(
-				$weight->getInUnit('kg')->getAmount()->getValue() * $gender->calcBodyFatPercentage($this)->getResult()->getValue()
-			),
+			new Amount($weightValue * $bodyFatPercentageValue),
 			'kg',
 		);
 
-		return new AmountWithUnitMetric('bodyFatWeight', $result);
+		$formula = "weight[{$weightValue}] * bodyFatPercentageValue[{$bodyFatPercentageValue}] = {$result->getAmount()->getValue()}";
+
+		return new AmountWithUnitMetric('bodyFatWeight', $result, $formula);
 	}
 
 	public function calcActiveBodyMassPercentage(): AmountMetric
 	{
-		return new AmountMetric('activeBodyMassPercentage', new Percentage(1 - $this->calcBodyFatPercentage($this)->getResult()->getValue()));
+		$bodyFatPercentageValue = $this->calcBodyFatPercentage($this)->getResult()->getValue();
+
+		$result = new Percentage(1 - $bodyFatPercentageValue);
+		$formula = "1 - bodyFatPercentage[$bodyFatPercentageValue] = {$result->getValue()}";
+
+		return new AmountMetric('activeBodyMassPercentage', $result, $formula);
 	}
 
 	public function calcActiveBodyMassWeight(): AmountWithUnitMetric
@@ -1825,12 +1839,6 @@ class Calculator
 
 		try {
 			$metricCollection->append($this->calcWeight());
-		} catch (FattyException $e) {
-			$exceptionCollection->add($e);
-		}
-
-		try {
-			$metricCollection->append($this->getProportions()->calcHeight());
 		} catch (FattyException $e) {
 			$exceptionCollection->add($e);
 		}

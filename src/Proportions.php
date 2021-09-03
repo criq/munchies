@@ -34,7 +34,11 @@ class Proportions
 			throw new MissingHeightException;
 		}
 
-		return new AmountWithUnitMetric('height', $height);
+		$heightValue = $height->getAmount()->getValue();
+
+		$formula = "height[{$heightValue}] = {$heightValue}";
+
+		return new AmountWithUnitMetric('height', $height, $formula);
 	}
 
 	/*****************************************************************************
