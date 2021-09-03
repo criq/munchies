@@ -88,7 +88,7 @@ class Female extends \Fatty\Gender
 			'kCal',
 		);
 
-		$formula = '(10 * weight[' . $weightValue . ']) + (6.25 * height[' . $heightValue . ']) - (5 * age[' . $age . ']) - 161';
+		$formula = "(10 * weight[{$weightValue}]) + (6.25 * height[{$heightValue}]) - (5 * age[{$age}]) - 161";
 
 		return new AmountWithUnitMetric('basalMetabolicRate', $result, $formula);
 	}

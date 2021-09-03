@@ -3,7 +3,6 @@
 namespace Fatty\Genders;
 
 use Fatty\Amount;
-use Fatty\BodyType;
 use Fatty\BodyTypes\Apple;
 use Fatty\BodyTypes\AppleWithHigherRisk;
 use Fatty\BodyTypes\Balanced;
@@ -72,7 +71,7 @@ class Male extends \Fatty\Gender
 			'kCal',
 		);
 
-		$formula = '(10 * weight[' . $weightValue . ']) + (6.25 * height[' . $heightValue . ']) - (5 * age[' . $age . ']) + 5';
+		$formula = "(10 * weight[{$weightValue}]) + (6.25 * height[{$heightValue}]) - (5 * age[{$age}]) + 5";
 
 		return new AmountWithUnitMetric('basalMetabolicRate', $result, $formula);
 	}
