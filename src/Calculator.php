@@ -1898,15 +1898,11 @@ class Calculator
 		// 	$ec->add($e);
 		// }
 
-		// try {
-		// 	$metric = $this->calcBodyType();
-		// 	if ($metric) {
-		// 		$res['output']['metrics']['bodyType']['result'] = $metric->getCode();
-		// 		$res['output']['metrics']['bodyType']['string'] = (string)$metric;
-		// 	}
-		// } catch (FattyException $e) {
-		// 	$exceptionCollection->add($e);
-		// }
+		try {
+			$metricCollection->append($this->calcBodyType());
+		} catch (FattyException $e) {
+			$exceptionCollection->add($e);
+		}
 
 		// try {
 		// 	$metric = $this->getGoalNutrients();

@@ -56,20 +56,20 @@ class Male extends \Fatty\Gender
 			throw $exceptionCollection;
 		}
 
-		return new AmountWithUnitMetric(
-			'basalMetabolicRate',
-			new Energy(
-				new Amount(
-					(10 * $calculator->getWeight()->getInUnit('kg')->getAmount()->getValue()) + (6.25 * $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue()) - (5 * $calculator->getBirthday()->getAge()) + 5
-				),
-				'kCal',
-			),
-		);
-	}
+		$weightValue = $calculator->getWeight()->getInUnit('kg')->getAmount()->getValue();
+		$heightValue = $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue();
+		$age = $calculator->getBirthday()->getAge();
 
-	public function getBasalMetabolicRateFormula(Calculator $calculator): string
-	{
-		return '(10 * weight[' . $calculator->getWeight()->getInUnit('kg')->getAmount() . ']) + (6.25 * height[' . $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount() . ']) - (5 * age[' . $calculator->getBirthday()->getAge() . ']) + 5';
+		$result = new Energy(
+			new Amount(
+				(10 * $weightValue) + (6.25 * $heightValue) - (5 * $age) + 5
+			),
+			'kCal',
+		);
+
+		$formula = '(10 * weight[' . $weightValue . ']) + (6.25 * height[' . $heightValue . ']) - (5 * age[' . $age . ']) + 5';
+
+		return new AmountWithUnitMetric('basalMetabolicRate', $result, $formula);
 	}
 
 	/*****************************************************************************
@@ -77,13 +77,13 @@ class Male extends \Fatty\Gender
 	 */
 	public function calcBodyType(Calculator $calculator): BodyType
 	{
-		$waistHipRatio = $calculator->calcWaistHipRatio();
+		$waistHipRatioValue = $calculator->calcWaistHipRatio()->getResult()->getValue();
 
-		if ($waistHipRatio->getValue() < .85) {
+		if ($waistHipRatioValue < .85) {
 			return new \Fatty\BodyTypes\PearOrHourglass;
-		} elseif ($waistHipRatio->getValue() >= .8 && $waistHipRatio->getValue() < .9) {
+		} elseif ($waistHipRatioValue >= .8 && $waistHipRatioValue < .9) {
 			return new \Fatty\BodyTypes\Balanced;
-		} elseif ($waistHipRatio->getValue() >= .9 && $waistHipRatio->getValue() < .95) {
+		} elseif ($waistHipRatioValue >= .9 && $waistHipRatioValue < .95) {
 			return new \Fatty\BodyTypes\Apple;
 		} else {
 			return new \Fatty\BodyTypes\AppleWithHigherRisk;

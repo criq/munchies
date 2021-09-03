@@ -15,7 +15,6 @@ abstract class Gender
 
 	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
 	abstract public function calcBasalMetabolicRate(Calculator $calculator): AmountWithUnitMetric;
-	abstract public function getBasalMetabolicRateFormula(Calculator $calculator): string;
 	abstract public function calcBodyType(Calculator $calculator): BodyType;
 
 	public static function createFromString(string $value): ?Gender
@@ -157,6 +156,6 @@ abstract class Gender
 	 */
 	public function calcReferenceDailyIntakeBonus()
 	{
-		return new Energy(new Amount(0));
+		return new Energy(new Amount(0), 'kJ');
 	}
 }
