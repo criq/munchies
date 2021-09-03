@@ -5,6 +5,7 @@ namespace Fatty;
 use Fatty\Exceptions\FattyException;
 use Fatty\Exceptions\MissingBodyFatPercentageInputException;
 use Fatty\Metrics\AmountMetric;
+use Fatty\Metrics\AmountWithUnitMetric;
 
 abstract class Gender
 {
@@ -13,7 +14,7 @@ abstract class Gender
 	const ESSENTIAL_FAT_PERCENTAGE = null;
 
 	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
-	abstract public function calcBasalMetabolicRate(Calculator $calculator): Energy;
+	abstract public function calcBasalMetabolicRate(Calculator $calculator): AmountWithUnitMetric;
 	abstract public function getBasalMetabolicRateFormula(Calculator $calculator): string;
 	abstract public function calcBodyType(Calculator $calculator): BodyType;
 

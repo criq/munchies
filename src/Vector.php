@@ -8,7 +8,7 @@ abstract class Vector
 	const TDEE_QUOTIENT = null;
 	const WEIGHT_CHANGE_PER_WEEK = '';
 
-	abstract public function getTdeeChangePerDay(Calculator $calculator);
+	abstract public function calcTdeeChangePerDay(Calculator $calculator);
 
 	public function __toString()
 	{
@@ -46,7 +46,7 @@ abstract class Vector
 
 	public function calcGoalTdee(Calculator $calculator)
 	{
-		return new Energy($calculator->calcTotalDailyEnergyExpenditure()->getAmount() + $this->getTdeeChangePerDay($calculator)->getAmount(), 'kCal');
+		return new Energy($calculator->calcTotalDailyEnergyExpenditure()->getAmount() + $this->calcTdeeChangePerDay($calculator)->getAmount(), 'kCal');
 	}
 
 	public function getLabelInfinitive()

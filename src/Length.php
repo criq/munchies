@@ -11,20 +11,19 @@ class Length extends AmountWithUnit
 
 	public function getInBaseUnit(): Length
 	{
-		switch ($this->getUnit()) {
+		switch (mb_strtolower($this->getUnit())) {
 			case 'm':
 				return clone $this;
 				break;
 			case 'cm':
 				return new static($this->getAmount()->getMultiplied(.01), 'm');
 				break;
-
 		}
 	}
 
 	public function getInUnit(string $unit): Length
 	{
-		switch ($unit) {
+		switch (mb_strtolower($unit)) {
 			case 'm':
 				return $this->getInBaseUnit();
 				break;

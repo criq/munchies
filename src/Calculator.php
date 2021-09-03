@@ -499,7 +499,7 @@ class Calculator
 	/*****************************************************************************
 	 * Physical activity level.
 	 */
-	public function calcPhysicalActivityLevel(): Activity
+	public function calcPhysicalActivityLevel(): AmountMetric
 	{
 		$exceptionCollection = new FattyExceptionCollection;
 
@@ -519,14 +519,10 @@ class Calculator
 			throw $exceptionCollection;
 		}
 
-		return new Activity($activity->getValue() + $sportActivity->getValue());
-	}
+		$result = new Activity($activity->getValue() + $sportActivity->getValue());
+		$formula = 'activityPal[' . $this->calcActivity()->getValue() . '] + sportPal[' . $this->calcSportActivity()->getValue() . '] = ' . $result->getValue();
 
-	public function getPhysicalActivityLevelFormula(): string
-	{
-		$result = $this->calcPhysicalActivityLevel()->getValue();
-
-		return 'activityPal[' . $this->calcActivity()->getValue() . '] + sportPal[' . $this->calcSportActivity()->getValue() . '] = ' . $result;
+		return new AmountMetric('physicalActivityLevel', $result, $formula);
 	}
 
 	/*****************************************************************************
@@ -717,12 +713,14 @@ class Calculator
 			throw new MissingWeightException;
 		}
 
-		return new AmountWithUnitMetric('activeBodyMassWeight', new Weight(
+		$result = new Weight(
 			new Amount(
 				$weight->getInUnit('kg')->getAmount()->getValue() * $this->calcActiveBodyMassPercentage()->getResult()->getValue()
 			),
 			'kg',
-		));
+		);
+
+		return new AmountWithUnitMetric('activeBodyMassWeight', $result);
 	}
 
 	public function calcOptimalFatPercentage(): MetricCollection
@@ -943,32 +941,30 @@ class Calculator
 	/*****************************************************************************
 	 * Beztuková tělesná hmotnost - FFM.
 	 */
-	public function calcFatFreeMass()
+	public function calcFatFreeMass(): AmountWithUnitMetric
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
 			throw new MissingWeightException;
 		}
 
-		return new Weight(
-			new Amount(
-				$weight->getInUnit('kg')->getAmount()->getValue() - ($this->calcBodyFatPercentage()->getAsPercentage() * $weight->getInUnit('kg')->getAmount()->getValue())
-			),
+		$weightValue = $weight->getInUnit('kg')->getAmount()->getValue();
+		$bodyFatPercentageValue = $this->calcBodyFatPercentage()->getResult()->getValue();
+
+		$result = new Weight(
+			new Amount($weightValue - ($bodyFatPercentageValue * $weightValue)),
 			'kg',
 		);
-	}
 
-	public function getFatFreeMassFormula()
-	{
-		$result = $this->calcFatFreeMass()->getInUnit('kg')->getAmount();
+		$formula = 'weight[' . $weightValue . '] - (bodyFatPercentage[' . $bodyFatPercentageValue . '] * weight[' . $weightValue . ']) = ' . $result->getAmount()->getValue();
 
-		return 'weight[' . $this->getWeight()->getInUnit('kg')->getAmount() . '] - (bodyFatPercentage[' . $this->calcBodyFatPercentage()->getAsPercentage() . '] * weight[' . $this->getWeight()->getInUnit('kg')->getAmount() . ']) = ' . $result;
+		return new AmountWithUnitMetric('fatFreeMass', $result, $formula);
 	}
 
 	/*****************************************************************************
 	 * Bazální metabolismus - BMR.
 	 */
-	public function calcBasalMetabolicRate(): Energy
+	public function calcBasalMetabolicRate(): AmountWithUnitMetric
 	{
 		if (!$this->getGender()) {
 			throw new MissingGenderException;
@@ -977,51 +973,50 @@ class Calculator
 		return $this->getGender()->calcBasalMetabolicRate($this);
 	}
 
-	public function getBasalMetabolicRateFormula(): string
-	{
-		$result = $this->calcBasalMetabolicRate()->getAmount();
-
-		return $this->getGender()->getBasalMetabolicRateFormula($this) . ' = ' . $result;
-	}
-
 	/*****************************************************************************
 	 * Total Energy Expenditure - Termický efekt pohybu - TEE.
 	 */
-	public function calcTotalEnergyExpenditure()
+	public function calcTotalEnergyExpenditure(): AmountWithUnitMetric
 	{
-		return new Energy(new Amount($this->calcBasalMetabolicRate()->getAmount()->getValue() * $this->calcPhysicalActivityLevel()->getValue()), 'kCal');
-	}
+		$basalMetabolicRate = $this->calcBasalMetabolicRate()->getResult()->getAmount()->getValue();
+		$physicalActivityLevel = $this->calcPhysicalActivityLevel()->getResult()->getValue();
 
-	public function getTotalEnergyExpenditureFormula()
-	{
-		$result = $this->calcTotalEnergyExpenditure()->getAmount();
+		$result = new Energy(
+			new Amount($basalMetabolicRate * $physicalActivityLevel),
+			'kCal',
+		);
 
-		return 'basalMetabolicRate[' . $this->calcBasalMetabolicRate()->getAmount()->getValue() . '] * physicalActivityLevel[' . $this->calcPhysicalActivityLevel()->getValue() . '] = ' . $result;
+		$formula = 'basalMetabolicRate[' . $basalMetabolicRate . '] * physicalActivityLevel[' . $physicalActivityLevel . '] = ' . $result->getAmount()->getValue();
+
+		return new AmountWithUnitMetric('totalEnergyExpenditure', $result, $formula);
 	}
 
 	/*****************************************************************************
 	 * Total Daily Energy Expenditure - Celkový doporučený denní příjem - TDEE.
 	 */
-	public function calcTotalDailyEnergyExpenditure()
+	public function calcTotalDailyEnergyExpenditure(): AmountWithUnitMetric
 	{
 		if (!$this->getGoal()->getVector()) {
 			throw new MissingGoalVectorException;
 		}
 
-		return new Energy(new Amount($this->calcTotalEnergyExpenditure()->getAmount()->getValue() * $this->getGoal()->getVector()->getTdeeQuotient($this)->getValue()), 'kCal');
-	}
+		$totalEnergyExpenditure = $this->calcTotalEnergyExpenditure()->getResult()->getAmount()->getValue();
+		$tdeeQuotient = $this->getGoal()->getVector()->getTdeeQuotient($this)->getValue();
 
-	public function getTotalDailyEnergyExpenditureFormula()
-	{
-		$result = $this->calcTotalDailyEnergyExpenditure()->getAmount();
+		$result = new Energy(
+			new Amount($totalEnergyExpenditure * $tdeeQuotient),
+			'kCal',
+		);
 
-		return 'totalEnergyExpenditure[' . $this->calcTotalEnergyExpenditure()->getAmount() . '] * weightGoalQuotient[' . $this->getGoal()->getVector()->getTdeeQuotient($this)->getValue() . '] = ' . $result;
+		$formula = 'totalEnergyExpenditure[' . $totalEnergyExpenditure . '] * weightGoalQuotient[' . $tdeeQuotient . '] = ' . $result->getAmount()->getValue();
+
+		return new AmountWithUnitMetric('totalDailyEnergyExpenditure', $result, $formula);
 	}
 
 	/*****************************************************************************
 	 * Reference Daily Intake - Doporučený denní příjem - DDP.
 	 */
-	public function calcReferenceDailyIntake()
+	public function calcReferenceDailyIntake(): AmountWithUnitMetric
 	{
 		$exceptionCollection = new FattyExceptionCollection;
 
@@ -1047,21 +1042,27 @@ class Calculator
 		}
 
 		if ($this->getDiet() instanceof Approaches\Ned) {
-			return new Energy(new Amount((float)Approaches\Ned::ENERGY_DEFAULT), 'kCal');
-		} else {
-			return new Energy(new Amount($totalDailyEnergyExpenditure->getAmount()->getValue() + $referenceDailyIntakeBonus->getAmount()->getValue()), 'kCal');
-		}
-	}
+			$result = new Energy(
+				new Amount(
+					(float)Approaches\Ned::ENERGY_DEFAULT
+				),
+				'kCal',
+			);
 
-	public function getReferenceDailyIntakeFormula()
-	{
-		$result = $this->calcReferenceDailyIntake()->getAmount();
-
-		if ($this->getDiet() instanceof Approaches\Ned) {
-			return $result;
+			$formula = $result->getAmount()->getValue();
 		} else {
-			return 'totalDailyEnergyExpenditure[' . $this->calcTotalDailyEnergyExpenditure()->getAmount() . '] + referenceDailyIntakeBonus[' . $this->gender->calcReferenceDailyIntakeBonus()->getAmount() . '] = ' . $result;
+			$totalDailyEnergyExpenditureValue = $totalDailyEnergyExpenditure->getResult()->getAmount()->getValue();
+			$referenceDailyIntakeBonusValue = $referenceDailyIntakeBonus->getAmount()->getValue();
+
+			$result = new Energy(
+				new Amount($totalDailyEnergyExpenditureValue + $referenceDailyIntakeBonusValue),
+				'kCal',
+			);
+
+			$formula = 'totalDailyEnergyExpenditure[' . $totalDailyEnergyExpenditureValue . '] + referenceDailyIntakeBonus[' . $referenceDailyIntakeBonusValue . '] = ' . $result->getAmount()->getValue();
 		}
+
+		return new AmountWithUnitMetric('referenceDailyIntake', $result, $formula);
 	}
 
 	/*****************************************************************************
@@ -1796,74 +1797,41 @@ class Calculator
 			$exceptionCollection->add($e);
 		}
 
-		// try {
-		// 	$metric = $this->calcFatFreeMass();
-		// 	if ($metric) {
-		// 		$res['output']['metrics']['fatFreeMass']['result'] = $metric->getArray();
-		// 		$res['output']['metrics']['fatFreeMass']['string'] = (string)$metric;
-		// 		$res['output']['metrics']['fatFreeMass']['formula'] = $this->getFatFreeMassFormula();
-		// 	}
-		// } catch (FattyException $e) {
-		// 	$exceptionCollection->add($e);
-		// }
+		try {
+			$metricCollection->append($this->calcFatFreeMass());
+		} catch (FattyException $e) {
+			$exceptionCollection->add($e);
+		}
 
-		// try {
-		// 	$metric = $this->calcBasalMetabolicRate()->getInUnit($this->getUnits());
-		// 	if ($metric) {
-		// 		$res['output']['metrics']['basalMetabolicRate']['result'] = $metric->getArray();
-		// 		$res['output']['metrics']['basalMetabolicRate']['string'] = (string)$metric;
-		// 		$res['output']['metrics']['basalMetabolicRate']['formula'] = $this->getBasalMetabolicRateFormula();
-		// 	}
-		// } catch (FattyException $e) {
-		// 	$exceptionCollection->add($e);
-		// }
+		try {
+			$metricCollection->append($this->calcBasalMetabolicRate());
+		} catch (FattyException $e) {
+			$exceptionCollection->add($e);
+		}
 
-		// try {
-		// 	$metric = $this->calcPhysicalActivityLevel();
-		// 	if ($metric) {
-		// 		$res['output']['metrics']['physicalActivityLevel']['result'] = [
-		// 			'amount' => $metric->getValue(),
-		// 			'unit' => null,
-		// 		];
-		// 		$res['output']['metrics']['physicalActivityLevel']['string'] = (string)$metric;
-		// 		$res['output']['metrics']['physicalActivityLevel']['formula'] = $this->getPhysicalActivityLevelFormula();
-		// 	}
-		// } catch (FattyException $e) {
-		// 	$exceptionCollection->add($e);
-		// }
+		try {
+			$metricCollection->append($this->calcPhysicalActivityLevel());
+		} catch (FattyException $e) {
+			$exceptionCollection->add($e);
+		}
 
-		// try {
-		// 	$metric = $this->calcTotalEnergyExpenditure()->getInUnit($this->getUnits());
-		// 	if ($metric) {
-		// 		$res['output']['metrics']['totalEnergyExpenditure']['result'] = $metric->getArray();
-		// 		$res['output']['metrics']['totalEnergyExpenditure']['string'] = (string)$metric;
-		// 		$res['output']['metrics']['totalEnergyExpenditure']['formula'] = $this->getTotalEnergyExpenditureFormula();
-		// 	}
-		// } catch (FattyException $e) {
-		// 	$exceptionCollection->add($e);
-		// }
+		try {
+			$metricCollection->append($this->calcTotalEnergyExpenditure());
+		} catch (FattyException $e) {
+			$exceptionCollection->add($e);
+		}
 
-		// try {
-		// 	$metric = $this->calcTotalDailyEnergyExpenditure()->getInUnit($this->getUnits());
-		// 	if ($metric) {
-		// 		$res['output']['metrics']['totalDailyEnergyExpenditure']['result'] = $metric->getArray();
-		// 		$res['output']['metrics']['totalDailyEnergyExpenditure']['string'] = (string)$metric;
-		// 		$res['output']['metrics']['totalDailyEnergyExpenditure']['formula'] = $this->getTotalDailyEnergyExpenditureFormula();
-		// 	}
-		// } catch (FattyException $e) {
-		// 	$exceptionCollection->add($e);
-		// }
+		try {
+			$metricCollection->append($this->calcTotalDailyEnergyExpenditure());
+		} catch (FattyException $e) {
+			$exceptionCollection->add($e);
+		}
 
-		// try {
-		// 	$metric = $this->calcReferenceDailyIntake()->getInUnit($this->getUnits());
-		// 	if ($metric) {
-		// 		$res['output']['metrics']['referenceDailyIntake']['result'] = $metric->getArray();
-		// 		$res['output']['metrics']['referenceDailyIntake']['string'] = (string)$metric;
-		// 		$res['output']['metrics']['referenceDailyIntake']['formula'] = $this->getReferenceDailyIntakeFormula();
-		// 	}
-		// } catch (FattyException $e) {
-		// 	$exceptionCollection->add($e);
-		// }
+		try {
+			$metricCollection->append($this->calcReferenceDailyIntake());
+		} catch (FattyException $e) {
+			$exceptionCollection->add($e);
+		}
 
 		// try {
 		// 	$metric = $this->getGoalTrend();

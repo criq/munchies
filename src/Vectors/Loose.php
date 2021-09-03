@@ -10,7 +10,7 @@ class Loose extends \Fatty\Vector
 	const TDEE_QUOTIENT = 1;
 	const WEIGHT_CHANGE_PER_WEEK = -.8;
 
-	public function getTdeeChangePerDay(Calculator $calculator)
+	public function calcTdeeChangePerDay(Calculator $calculator)
 	{
 		return new \Fatty\Energy(($calculator->calcTotalDailyEnergyExpenditure()->getAmount() - ($calculator->calcBasalMetabolicRate()->getAmount() + 50)) * -1, 'kCal');
 	}

@@ -11,7 +11,7 @@ class Duration extends AmountWithUnit
 
 	public function getInBaseUnit(): Duration
 	{
-		switch ($this->getUnit()) {
+		switch (mb_strtolower($this->getUnit())) {
 			case 'days':
 				return clone $this;
 				break;
@@ -23,12 +23,12 @@ class Duration extends AmountWithUnit
 
 	public function getInUnit(string $unit): AmountWithUnit
 	{
-		switch ($unit) {
+		switch (mb_strtolower($unit)) {
 			case 'days':
 				return $this->getInBaseUnit();
 				break;
 			case 'weeks':
-				return new static($this->getAmount()->getMultiplied(1/7), 'weeks');
+				return new static($this->getAmount()->getMultiplied(1 / 7), 'weeks');
 				break;
 		}
 	}

@@ -23,6 +23,7 @@ use Fatty\Exceptions\MissingPregnancyChildbirthDateException;
 use Fatty\Exceptions\MissingWeightException;
 use Fatty\Exceptions\PregnancyChildbirthDateInPastException;
 use Fatty\Metrics\AmountMetric;
+use Fatty\Metrics\AmountWithUnitMetric;
 use Fatty\Percentage;
 
 class Female extends \Fatty\Gender
@@ -53,7 +54,7 @@ class Female extends \Fatty\Gender
 	/*****************************************************************************
 	 * Bazální metabolismus - BMR.
 	 */
-	public function calcBasalMetabolicRate(Calculator $calculator): Energy
+	public function calcBasalMetabolicRate(Calculator $calculator): AmountWithUnitMetric
 	{
 		$exceptionCollection = new FattyExceptionCollection;
 
@@ -77,7 +78,15 @@ class Female extends \Fatty\Gender
 		$height = $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue();
 		$age = $calculator->getBirthday()->getAge();
 
-		return new Energy(new Amount((10 * $weight) + (6.25 * $height) - (5 * $age) - 161), 'kCal');
+		return new AmountWithUnitMetric(
+			'basalMetabolicRate',
+			new Energy(
+				new Amount(
+					(10 * $weight) + (6.25 * $height) - (5 * $age) - 161
+				),
+				'kCal',
+			)
+		);
 	}
 
 	public function getBasalMetabolicRateFormula(Calculator $calculator): string
@@ -212,7 +221,7 @@ class Female extends \Fatty\Gender
 	public function getReferenceDailyIntakeBonusPregnancy()
 	{
 		if (!$this->isPregnant()) {
-			return new Energy(new Amount(0));
+			return new Energy(new Amount(0), 'kJ');
 		}
 
 		if (!($this->getPregnancyChildbirthDate() instanceof \Fatty\Birthday)) {
@@ -236,7 +245,7 @@ class Female extends \Fatty\Gender
 		$exceptionCollection = new FattyExceptionCollection;
 
 		if (!$this->isBreastfeeding()) {
-			return new Energy(new Amount(0));
+			return new Energy(new Amount(0), 'kJ');
 		}
 
 		if (!($this->getBreastfeedingChildbirthDate() instanceof \Fatty\Birthday)) {

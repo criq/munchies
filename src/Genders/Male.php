@@ -11,6 +11,7 @@ use Fatty\Exceptions\MissingBirthdayException;
 use Fatty\Exceptions\MissingHeightException;
 use Fatty\Exceptions\MissingWeightException;
 use Fatty\Metrics\AmountMetric;
+use Fatty\Metrics\AmountWithUnitMetric;
 use Fatty\Percentage;
 
 class Male extends \Fatty\Gender
@@ -35,7 +36,7 @@ class Male extends \Fatty\Gender
 	/*****************************************************************************
 	 * Bazální metabolismus - BMR.
 	 */
-	public function calcBasalMetabolicRate(Calculator $calculator): Energy
+	public function calcBasalMetabolicRate(Calculator $calculator): AmountWithUnitMetric
 	{
 		$exceptionCollection = new FattyExceptionCollection;
 
@@ -55,9 +56,15 @@ class Male extends \Fatty\Gender
 			throw $exceptionCollection;
 		}
 
-		$amount = new Amount((10 * $calculator->getWeight()->getInUnit('kg')->getAmount()->getValue()) + (6.25 * $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue()) - (5 * $calculator->getBirthday()->getAge()) + 5);
-
-		return new Energy($amount, 'kCal');
+		return new AmountWithUnitMetric(
+			'basalMetabolicRate',
+			new Energy(
+				new Amount(
+					(10 * $calculator->getWeight()->getInUnit('kg')->getAmount()->getValue()) + (6.25 * $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue()) - (5 * $calculator->getBirthday()->getAge()) + 5
+				),
+				'kCal',
+			),
+		);
 	}
 
 	public function getBasalMetabolicRateFormula(Calculator $calculator): string

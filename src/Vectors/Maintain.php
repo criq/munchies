@@ -4,6 +4,8 @@ namespace Fatty\Vectors;
 
 use Fatty\Amount;
 use Fatty\Calculator;
+use Fatty\Energy;
+use Fatty\Metrics\AmountWithUnitMetric;
 
 class Maintain extends \Fatty\Vector
 {
@@ -14,15 +16,15 @@ class Maintain extends \Fatty\Vector
 
 	public function getTdeeQuotient(Calculator $calculator): Amount
 	{
-		return new Amount($calculator->calcPhysicalActivityLevel()->getValue() >= 2 ? static::TDEE_QUOTIENT__LARGE : static::TDEE_QUOTIENT);
+		return new Amount($calculator->calcPhysicalActivityLevel()->getResult()->getValue() >= 2 ? static::TDEE_QUOTIENT__LARGE : static::TDEE_QUOTIENT);
 	}
 
-	public function getTdeeChangePerDay(Calculator $calculator)
+	public function calcTdeeChangePerDay(Calculator $calculator): AmountWithUnitMetric
 	{
-		return new \Fatty\Energy(new Amount(0), 'kCal');
+		return new AmountWithUnitMetric('tdeeChangePerDay', new Energy(new Amount(0), 'kCal'));
 	}
 
-	public function calcGoalTdee(Calculator $calculator)
+	public function calcGoalTdee(Calculator $calculator): AmountWithUnitMetric
 	{
 		return $calculator->calcTotalDailyEnergyExpenditure();
 	}

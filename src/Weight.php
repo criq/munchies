@@ -11,7 +11,7 @@ class Weight extends AmountWithUnit
 
 	public function getInBaseUnit(): Weight
 	{
-		switch ($this->getUnit()) {
+		switch (mb_strtolower($this->getUnit())) {
 			case 'g':
 				return clone $this;
 				break;
@@ -23,7 +23,7 @@ class Weight extends AmountWithUnit
 
 	public function getInUnit(string $unit): Weight
 	{
-		switch ($unit) {
+		switch (mb_strtolower($unit)) {
 			case 'g':
 				return $this->getInBaseUnit();
 				break;

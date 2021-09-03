@@ -6,38 +6,31 @@ class Energy extends AmountWithUnit
 {
 	const KCAL_TO_KJ_RATIO = 4.128;
 
-	public function __construct(Amount $amount, string $unit = 'kJ')
+	public function __construct(Amount $amount, string $unit)
 	{
 		return parent::__construct($amount, $unit);
 	}
 
-	public function getInUnit($unit): Energy
+	public function getInBaseUnit(): Energy
 	{
-		$function = "getIn" . $unit;
-
-		return $this->$function();
-	}
-
-	public function getInKJ(): Energy
-	{
-		switch ($this->getUnit()) {
-			case 'kJ':
-				return new static($this->getAmount(), 'kJ');
+		switch (strtolower($this->getUnit())) {
+			case 'kj':
+				return clone $this;
 				break;
-			case 'kCal':
-				return new static(new Amount($this->getAmount()->getValue() * static::KCAL_TO_KJ_RATIO), 'kJ');
+			case 'kcal':
+				return new static($this->getAmount()->getMultiplied(1 / static::KCAL_TO_KJ_RATIO), 'kCal');
 				break;
 		}
 	}
 
-	public function getInKCal(): Energy
+	public function getInUnit(string $unit): Energy
 	{
-		switch ($this->getUnit()) {
-			case 'kJ':
-				return new static(new Amount($this->getAmount()->getValue() / static::KCAL_TO_KJ_RATIO), 'kCal');
+		switch (strtolower($unit)) {
+			case 'kj':
+				return $this->getInBaseUnit();
 				break;
-			case 'kCal':
-				return new static($this->getAmount(), 'kCal');
+			case 'kcal':
+				return new static($this->getAmount()->getMultiplied(static::KCAL_TO_KJ_RATIO), 'kCal');
 				break;
 		}
 	}
