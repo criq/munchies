@@ -2,6 +2,10 @@
 
 namespace Fatty;
 
+use Fatty\Approaches\Keto;
+use Fatty\Approaches\LowCarb;
+use Fatty\Approaches\Ned;
+use Fatty\Approaches\Standard;
 use Fatty\Exceptions\FattyException;
 use Fatty\Exceptions\FattyExceptionCollection;
 use Fatty\Exceptions\InvalidActivityException;
@@ -34,6 +38,7 @@ use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\AmountWithUnitMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Nutrients\Carbs;
+use Fatty\Nutrients\Fats;
 use Fatty\SportDurations\Aerobic;
 use Fatty\SportDurations\Anaerobic;
 use Fatty\SportDurations\LowFrequency;
@@ -190,7 +195,7 @@ class Calculator
 
 		if (trim($params['sportDurations_lowFrequency'] ?? null)) {
 			try {
-				$value = LowFrequency::createFromString($params['sportDurations_lowFrequency']);
+				$value = LowFrequency::createFromString($params['sportDurations_lowFrequency'], 'minutesPerWeek');
 				if (!$value) {
 					throw new InvalidSportDurationsLowFrequencyException;
 				}
@@ -203,7 +208,7 @@ class Calculator
 
 		if (trim($params['sportDurations_aerobic'] ?? null)) {
 			try {
-				$value = Aerobic::createFromString($params['sportDurations_aerobic']);
+				$value = Aerobic::createFromString($params['sportDurations_aerobic'], 'minutesPerWeek');
 				if (!$value) {
 					throw new InvalidSportDurationsAerobicException;
 				}
@@ -216,7 +221,7 @@ class Calculator
 
 		if (trim($params['sportDurations_anaerobic'] ?? null)) {
 			try {
-				$value = Anaerobic::createFromString($params['sportDurations_anaerobic']);
+				$value = Anaerobic::createFromString($params['sportDurations_anaerobic'], 'minutesPerWeek');
 				if (!$value) {
 					throw new InvalidSportDurationsAnaerobicException;
 				}
@@ -797,20 +802,18 @@ class Calculator
 
 	public function getOptimalWeight(): Interval
 	{
-		$activeBodyMassWeight = $this->calcActiveBodyMassWeight();
+		$activeBodyMassWeightValue = $this->calcActiveBodyMassWeight()->getResult()->getInUnit('kg')->getAmount()->getValue();
 		$optimalFatWeight = $this->calcOptimalFatWeight();
+		$optimalFatWeightMinValue = $optimalFatWeight->filterByName('optimalFatWeightMin')[0]->getResult()->getInUnit('kg')->getAmount()->getValue();
+		$optimalFatWeightMaxValue = $optimalFatWeight->filterByName('optimalFatWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()->getValue();
 
 		return new Interval(
 			new Weight(
-				new Amount(
-					$activeBodyMassWeight->getInUnit('kg')->getAmount()->getValue() + $optimalFatWeight->getMin()->getInUnit('kg')->getAmount()->getValue()
-				),
+				new Amount($activeBodyMassWeightValue + $optimalFatWeightMinValue),
 				'kg',
 			),
 			new Weight(
-				new Amount(
-					$activeBodyMassWeight->getInUnit('kg')->getAmount()->getValue() + $optimalFatWeight->getMax()->getInUnit('kg')->getAmount()->getValue()
-				),
+				new Amount($activeBodyMassWeightValue + $optimalFatWeightMaxValue),
 				'kg',
 			),
 		);
@@ -1001,15 +1004,15 @@ class Calculator
 			throw new MissingGoalVectorException;
 		}
 
-		$totalEnergyExpenditure = $this->calcTotalEnergyExpenditure()->getResult()->getAmount()->getValue();
-		$tdeeQuotient = $this->getGoal()->getVector()->getTdeeQuotient($this)->getValue();
+		$totalEnergyExpenditureValue = $this->calcTotalEnergyExpenditure()->getResult()->getAmount()->getValue();
+		$tdeeQuotientValue = $this->getGoal()->getVector()->calcTdeeQuotient($this)->getResult()->getValue();
 
 		$result = new Energy(
-			new Amount($totalEnergyExpenditure * $tdeeQuotient),
+			new Amount($totalEnergyExpenditureValue * $tdeeQuotientValue),
 			'kCal',
 		);
 
-		$formula = 'totalEnergyExpenditure[' . $totalEnergyExpenditure . '] * weightGoalQuotient[' . $tdeeQuotient . '] = ' . $result->getAmount()->getValue();
+		$formula = 'totalEnergyExpenditure[' . $totalEnergyExpenditureValue . '] * weightGoalQuotient[' . $tdeeQuotientValue . '] = ' . $result->getAmount()->getValue();
 
 		return new AmountWithUnitMetric('totalDailyEnergyExpenditure', $result, $formula);
 	}
@@ -1042,10 +1045,10 @@ class Calculator
 			throw $exceptionCollection;
 		}
 
-		if ($this->getDiet() instanceof Approaches\Ned) {
+		if ($this->getDiet() instanceof Ned) {
 			$result = new Energy(
 				new Amount(
-					(float)Approaches\Ned::ENERGY_DEFAULT
+					(float)Ned::ENERGY_DEFAULT
 				),
 				'kCal',
 			);
@@ -1082,7 +1085,7 @@ class Calculator
 	/*****************************************************************************
 	 * Živiny.
 	 */
-	public function getGoalNutrients()
+	public function calcGoalNutrients(): MetricCollection
 	{
 		$nutrients = new Nutrients;
 
@@ -1090,11 +1093,11 @@ class Calculator
 		 * Proteins.
 		 */
 		// 1
-		if ($this->getSportDurations()->getTotalDuration() > 60 || $this->calcPhysicalActivityLevel()->getValue() >= 1.9) {
+		if ($this->getSportDurations()->getTotalDuration() > 60 || $this->calcPhysicalActivityLevel()->getResult()->getValue() >= 1.9) {
 			// 13
 			if ($this->getGender() instanceof Genders\Male) {
 				// 14
-				if ($this->calcFatOverOptimalWeight()->getMax()->getInUnit('kg')->getAmount()) {
+				if ($this->calcFatOverOptimalWeight()->filterByName('fatOverOptimalWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()) {
 					$optimalWeight = $this->getOptimalWeight()->getMax();
 
 				// 15
@@ -1106,20 +1109,20 @@ class Calculator
 					'fit'   => [1.5, 2.2, 1.8],
 					'unfit' => [1.5, 2,   1.7],
 				];
-				$matrixSet = ($this->calcBodyFatPercentage()->getValue() > .19 || $this->calcBodyMassIndex()->getValue() > 25) ? 'unfit' : 'fit';
+				$matrixSet = ($this->calcBodyFatPercentage()->getResult()->getValue() > .19 || $this->calcBodyMassIndex()->getResult()->getValue() > 25) ? 'unfit' : 'fit';
 
 				$optimalNutrients = [];
 				foreach ($this->getSportDurations()->getMaxDurations() as $sportDuration) {
-					if ($sportDuration instanceof SportDurations\LowFrequency) {
+					if ($sportDuration instanceof LowFrequency) {
 						$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][0];
-					} elseif ($sportDuration instanceof SportDurations\Anaerobic) {
+					} elseif ($sportDuration instanceof Anaerobic) {
 						$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][1];
-					} elseif ($sportDuration instanceof SportDurations\Aerobic) {
+					} elseif ($sportDuration instanceof Aerobic) {
 						$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][2];
 					}
 				}
 
-				if ($this->calcPhysicalActivityLevel()->getValue() >= 1.9) {
+				if ($this->calcPhysicalActivityLevel()->getResult()->getValue() >= 1.9) {
 					$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][1];
 				}
 
@@ -1134,7 +1137,7 @@ class Calculator
 				// 16
 				} else {
 					// 17
-					if ($this->calcFatOverOptimalWeight()->getMax()->getInUnit('kg')->getAmount()) {
+					if ($this->calcFatOverOptimalWeight()->filterByName('fatOverOptimalWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()) {
 						$optimalWeight = $this->getOptimalWeight()->getMax();
 
 					// 18
@@ -1146,20 +1149,20 @@ class Calculator
 						'fit'   => [1.4, 1.8, 1.6],
 						'unfit' => [1.5, 1.8, 1.8],
 					];
-					$matrixSet = ($this->calcBodyFatPercentage()->getValue() > .25 || $this->calcBodyMassIndex()->getValue() > 25) ? 'unfit' : 'fit';
+					$matrixSet = ($this->calcBodyFatPercentage()->getResult()->getValue() > .25 || $this->calcBodyMassIndex()->getResult()->getValue() > 25) ? 'unfit' : 'fit';
 
 					$optimalNutrients = [];
 					foreach ($this->getSportDurations()->getMaxDurations() as $sportDuration) {
-						if ($sportDuration instanceof SportDurations\LowFrequency) {
+						if ($sportDuration instanceof LowFrequency) {
 							$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][0];
-						} elseif ($sportDuration instanceof SportDurations\Anaerobic) {
+						} elseif ($sportDuration instanceof Anaerobic) {
 							$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][1];
-						} elseif ($sportDuration instanceof SportDurations\Aerobic) {
+						} elseif ($sportDuration instanceof Aerobic) {
 							$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][2];
 						}
 					}
 
-					if ($this->calcPhysicalActivityLevel()->getValue() >= 1.9) {
+					if ($this->calcPhysicalActivityLevel()->getResult()->getValue() >= 1.9) {
 						$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][1];
 					}
 
@@ -1184,7 +1187,7 @@ class Calculator
 				// 5
 				if ($this->getGender() instanceof Genders\Male) {
 					// 7
-					if ($this->calcFatOverOptimalWeight()->getMax()->getInUnit('kg')->getAmount()) {
+					if ($this->calcFatOverOptimalWeight()->filterByName('fatOverOptimalWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()) {
 						$nutrients->setProteins(new Nutrients\Proteins(new Amount($this->getOptimalWeight()->getMax()->getInUnit('kg')->getAmount()->getValue() * 1.5), 'g'));
 
 					// 8
@@ -1194,7 +1197,7 @@ class Calculator
 				// 6
 				} elseif ($this->getGender() instanceof Genders\Female) {
 					// 9
-					if ($this->calcFatOverOptimalWeight()->getMax()->getInUnit('kg')->getAmount()) {
+					if ($this->calcFatOverOptimalWeight()->filterByName('fatOverOptimalWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()) {
 						$nutrients->setProteins(new Nutrients\Proteins(new Amount($this->getOptimalWeight()->getMax()->getInUnit('kg')->getAmount()->getValue() * 1.4), 'g'));
 
 					// 10
@@ -1216,48 +1219,158 @@ class Calculator
 		}
 
 		// 1
-		if ($dietApproach instanceof Approaches\Standard) {
+		if ($dietApproach instanceof Standard) {
 			// 4
 			if ($this->getSportDurations()->getAnaerobic() instanceof SportDuration && $this->getSportDurations()->getAnaerobic()->getAmount()->getValue() >= 100) {
-				$nutrients->setCarbs(Nutrients\Carbs::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() * .58), 'kJ')));
-				$nutrients->setFats(Nutrients\Fats::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() - $nutrients->getEnergy()->getInKJ()->getAmount()->getValue()))));
+				$nutrients->setCarbs(
+					Carbs::createFromEnergy(
+						new Energy(
+							new Amount($goalTdee->getResult()->getInUnit('kJ')->getAmount()->getValue() * .58),
+							'kJ',
+						),
+					),
+				);
+				$nutrients->setFats(
+					Fats::createFromEnergy(
+						new Energy(
+							new Amount(
+								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue(),
+							),
+							Energy::getBaseUnit(),
+						),
+					),
+				);
 			// 5
 			} elseif ($this->getGender() instanceof Genders\Female && ($this->getGender()->isPregnant() || $this->getGender()->isBreastfeeding())) {
-				$nutrients->setFats(Nutrients\Fats::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() * .35), 'kJ')));
-				$nutrients->setCarbs(Nutrients\Carbs::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() - $nutrients->getEnergy()->getInKJ()->getAmount()->getValue()))));
+				$nutrients->setFats(
+					Fats::createFromEnergy(
+						new Energy(
+							new Amount(
+								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() * .35
+							),
+							Energy::getBaseUnit(),
+						),
+					),
+				);
+				$nutrients->setCarbs(
+					Carbs::createFromEnergy(
+						new Energy(
+							new Amount(
+								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+							),
+							Energy::getBaseUnit(),
+						),
+					),
+				);
 			} else {
-				$nutrients->setCarbs(Nutrients\Carbs::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() * .55), 'kJ')));
-				$nutrients->setFats(Nutrients\Fats::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() - $nutrients->getEnergy()->getInKJ()->getAmount()->getValue()))));
+				$nutrients->setCarbs(
+					Carbs::createFromEnergy(
+						new Energy(
+							new Amount(
+								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() * .55
+							),
+							Energy::getBaseUnit(),
+						),
+					),
+				);
+				$nutrients->setFats(
+					Fats::createFromEnergy(
+						new Energy(
+							new Amount(
+								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+							),
+							Energy::getBaseUnit(),
+						),
+					),
+				);
 			}
 
 		// Mediterranean diet.
-		} elseif ($dietApproach instanceof Approaches\Standard) {
-			$nutrients->setFats(Nutrients\Fats::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() * .4), 'kJ')));
-			$nutrients->setCarbs(Nutrients\Carbs::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() - $nutrients->getEnergy()->getInKJ()->getAmount()->getValue()))));
+		} elseif ($dietApproach instanceof Standard) {
+			$nutrients->setFats(
+				Fats::createFromEnergy(
+					new Energy(
+						new Amount(
+							$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() * .4
+						),
+						Energy::getBaseUnit(),
+					),
+				),
+			);
+			$nutrients->setCarbs(
+				Carbs::createFromEnergy(
+					new Energy(
+						new Amount(
+							$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+						),
+						Energy::getBaseUnit(),
+					),
+				),
+			);
 
 		// 2
-		} elseif ($dietApproach instanceof Approaches\LowCarb) {
+		} elseif ($dietApproach instanceof LowCarb) {
 			// 7
 			if ($this->getGender() instanceof Genders\Female && $this->getGender()->isPregnant()) {
 				$dietCarbs = $diet->getCarbs();
-				$nutrients->setCarbs(new Nutrients\Carbs($dietCarbs->getAmount(), $dietCarbs->getUnit()));
-				$nutrients->setFats(Nutrients\Fats::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() - $nutrients->getEnergy()->getInKJ()->getAmount()->getValue()))));
+				$nutrients->setCarbs(
+					new Carbs(
+						$dietCarbs->getAmount(),
+						$dietCarbs->getUnit(),
+					),
+				);
+				$nutrients->setFats(
+					Fats::createFromEnergy(
+						new Energy(
+							new Amount(
+								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+							),
+							Energy::getBaseUnit(),
+						),
+					),
+				);
 				// @TODO - message
 			// 8
 			} elseif ($this->getGender() instanceof Genders\Female && $this->getGender()->isBreastfeeding()) {
 				$dietCarbs = $diet->getCarbs();
-				$nutrients->setCarbs(new Nutrients\Carbs($dietCarbs->getAmount(), $dietCarbs->getUnit()));
-				$nutrients->setFats(Nutrients\Fats::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() - $nutrients->getEnergy()->getInKJ()->getAmount()->getValue()))));
+				$nutrients->setCarbs(new Carbs(
+					$dietCarbs->getAmount(),
+					$dietCarbs->getUnit(),
+				));
+				$nutrients->setFats(
+					Fats::createFromEnergy(
+						new Energy(
+							new Amount(
+								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+							),
+							Energy::getBaseUnit(),
+						),
+					),
+				);
 				// @TODO - message
 			// 9
 			} else {
 				$dietCarbs = $diet->getCarbs();
-				$nutrients->setCarbs(new Nutrients\Carbs($dietCarbs->getAmount(), $dietCarbs->getUnit()));
-				$nutrients->setFats(Nutrients\Fats::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() - $nutrients->getEnergy()->getInKJ()->getAmount()->getValue()))));
+				$nutrients->setCarbs(
+					new Carbs(
+						$dietCarbs->getAmount(),
+						$dietCarbs->getUnit(),
+					),
+				);
+				$nutrients->setFats(
+					Fats::createFromEnergy(
+						new Energy(
+							new Amount(
+								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+							),
+							Energy::getBaseUnit(),
+						),
+					),
+				);
 			}
 
 		// 3
-		} elseif ($dietApproach instanceof Approaches\Keto) {
+		} elseif ($dietApproach instanceof Keto) {
 			// 7
 			if ($this->getGender() instanceof Genders\Female && $this->getGender()->isPregnant()) {
 				// @TODO - message
@@ -1267,36 +1380,54 @@ class Calculator
 			// 9
 			} else {
 				$dietCarbs = $diet->getCarbs();
-				$nutrients->setCarbs(new Nutrients\Carbs($dietCarbs->getAmount(), $dietCarbs->getUnit()));
-				$nutrients->setFats(Nutrients\Fats::createFromEnergy(new Energy(new Amount($goalTdee->getInKJ()->getAmount()->getValue() - $nutrients->getEnergy()->getInKJ()->getAmount()->getValue()))));
+				$nutrients->setCarbs(
+					new Carbs(
+						$dietCarbs->getAmount(),
+						$dietCarbs->getUnit(),
+					),
+				);
+				$nutrients->setFats(
+					Fats::createFromEnergy(
+						new Energy(
+							new Amount(
+								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+							),
+							Energy::getBaseUnit(),
+						),
+					),
+				);
 			}
 		// NED diet.
-		} elseif ($dietApproach instanceof Approaches\Ned) {
-			$nutrients->setCarbs((new Approaches\Ned)->getCarbsDefault());
-			$nutrients->setFats((new Approaches\Ned)->getFatsDefault());
-			$nutrients->setProteins((new Approaches\Ned)->getProteinsDefault());
+		} elseif ($dietApproach instanceof Ned) {
+			$nutrients->setCarbs((new Ned)->getCarbsDefault());
+			$nutrients->setFats((new Ned)->getFatsDefault());
+			$nutrients->setProteins((new Ned)->getProteinsDefault());
 		}
 
-		return $nutrients;
+		return new MetricCollection([
+			new AmountWithUnitMetric('goalNutrientsCarbs', $nutrients->getCarbs()),
+			new AmountWithUnitMetric('goalNutrientsFats', $nutrients->getFats()),
+			new AmountWithUnitMetric('goalNutrientsProteins', $nutrients->getProteins()),
+		]);
 	}
 
 	/*****************************************************************************
 	 * Messages.
 	 */
-	public function getBodyFatMessages()
-	{
-		$messages = [];
+	// public function getBodyFatMessages()
+	// {
+	// 	$messages = [];
 
-		// High sport physical activity level (>= 2).
-		if ($this->calcPhysicalActivityLevel()->getValue() >= 2 && ($this->getSportDurations()->getAerobic()->getAmount() || $this->getSportDurations()->getAnaerobic()->getAmount())) {
-			$messages[] = [
-				'message' => \Katu\Config::get('caloricCalculator', 'messages', 'highSportPhysicalActivityLevel'),
-				'fields' => ['sportDurations[aerobic]', 'sportDurations[anaerobic]'],
-			];
-		}
+	// 	// High sport physical activity level (>= 2).
+	// 	if ($this->calcPhysicalActivityLevel()->getValue() >= 2 && ($this->getSportDurations()->getAerobic()->getAmount() || $this->getSportDurations()->getAnaerobic()->getAmount())) {
+	// 		$messages[] = [
+	// 			'message' => \Katu\Config::get('caloricCalculator', 'messages', 'highSportPhysicalActivityLevel'),
+	// 			'fields' => ['sportDurations[aerobic]', 'sportDurations[anaerobic]'],
+	// 		];
+	// 	}
 
-		return $messages;
-	}
+	// 	return $messages;
+	// }
 
 	// public function getBodyMassIndexMessages()
 	// {
@@ -1905,19 +2036,11 @@ class Calculator
 			$exceptionCollection->add($e);
 		}
 
-		// try {
-		// 	$metric = $this->getGoalNutrients();
-		// 	if ($metric) {
-		// 		$res['output']['metrics']['nutrientsCarbs']['result'] = $metric->getCarbs()->getArray();
-		// 		$res['output']['metrics']['nutrientsCarbs']['string'] = (string)$metric->getCarbs();
-		// 		$res['output']['metrics']['nutrientsProteins']['result'] = $metric->getProteins()->getArray();
-		// 		$res['output']['metrics']['nutrientsProteins']['string'] = (string)$metric->getProteins();
-		// 		$res['output']['metrics']['nutrientsFats']['result'] = $metric->getFats()->getArray();
-		// 		$res['output']['metrics']['nutrientsFats']['string'] = (string)$metric->getFats();
-		// 	}
-		// } catch (FattyException $e) {
-		// 	$exceptionCollection->add($e);
-		// }
+		try {
+			$metricCollection->merge($this->calcGoalNutrients());
+		} catch (FattyException $e) {
+			$exceptionCollection->add($e);
+		}
 
 		if (count($exceptionCollection)) {
 			throw $exceptionCollection;

@@ -2,7 +2,10 @@
 
 namespace Fatty\Vectors;
 
+use Fatty\Amount;
 use Fatty\Calculator;
+use Fatty\Energy;
+use Fatty\Metrics\AmountWithUnitMetric;
 
 class Loose extends \Fatty\Vector
 {
@@ -10,8 +13,18 @@ class Loose extends \Fatty\Vector
 	const TDEE_QUOTIENT = 1;
 	const WEIGHT_CHANGE_PER_WEEK = -.8;
 
-	public function calcTdeeChangePerDay(Calculator $calculator)
+	public function calcTdeeChangePerDay(Calculator $calculator): AmountWithUnitMetric
 	{
-		return new \Fatty\Energy(($calculator->calcTotalDailyEnergyExpenditure()->getAmount() - ($calculator->calcBasalMetabolicRate()->getAmount() + 50)) * -1, 'kCal');
+		$totalDailyEnergyExpenditureValue = $calculator->calcTotalDailyEnergyExpenditure()->getResult()->getInUnit('kCal')->getAmount()->getValue();
+		$basalMetabolicRateValue = $calculator->calcBasalMetabolicRate()->getResult()->getInUnit('kCal')->getAmount()->getValue();
+
+		$result = new Energy(
+			new Amount(
+				$totalDailyEnergyExpenditureValue - ($basalMetabolicRateValue + 50) * -1
+			),
+			'kCal',
+		);
+
+		return new AmountWithUnitMetric('tdeeChangePerDay', $result);
 	}
 }

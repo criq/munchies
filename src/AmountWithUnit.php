@@ -4,6 +4,8 @@ namespace Fatty;
 
 abstract class AmountWithUnit
 {
+	const BASE_UNIT = null;
+
 	protected $amount;
 	protected $unit;
 
@@ -41,6 +43,11 @@ abstract class AmountWithUnit
 	public function getAmount(): ?Amount
 	{
 		return $this->amount;
+	}
+
+	public static function getBaseUnit(): string
+	{
+		return (string)static::BASE_UNIT;
 	}
 
 	public function getUnit(): ?string

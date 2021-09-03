@@ -4,6 +4,7 @@ namespace Fatty;
 
 class Energy extends AmountWithUnit
 {
+	const BASE_UNIT = 'kJ';
 	const KCAL_TO_KJ_RATIO = 4.128;
 
 	public function __construct(Amount $amount, string $unit)
@@ -14,11 +15,11 @@ class Energy extends AmountWithUnit
 	public function getInBaseUnit(): Energy
 	{
 		switch (strtolower($this->getUnit())) {
-			case 'kj':
+			case mb_strtolower(static::getBaseUnit()):
 				return clone $this;
 				break;
 			case 'kcal':
-				return new static($this->getAmount()->getMultiplied(1 / static::KCAL_TO_KJ_RATIO), 'kCal');
+				return new static($this->getAmount()->getMultiplied(static::KCAL_TO_KJ_RATIO), static::getBaseUnit());
 				break;
 		}
 	}
@@ -26,11 +27,11 @@ class Energy extends AmountWithUnit
 	public function getInUnit(string $unit): Energy
 	{
 		switch (strtolower($unit)) {
-			case 'kj':
+			case mb_strtolower(static::getBaseUnit()):
 				return $this->getInBaseUnit();
 				break;
 			case 'kcal':
-				return new static($this->getAmount()->getMultiplied(static::KCAL_TO_KJ_RATIO), 'kCal');
+				return new static($this->getAmount()->getMultiplied(1 / static::KCAL_TO_KJ_RATIO), 'kCal');
 				break;
 		}
 	}

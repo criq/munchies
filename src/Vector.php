@@ -2,17 +2,20 @@
 
 namespace Fatty;
 
+use Fatty\Metrics\AmountMetric;
+use Fatty\Metrics\AmountWithUnitMetric;
+
 abstract class Vector
 {
 	const LABEL_INFINITIVE = null;
 	const TDEE_QUOTIENT = null;
 	const WEIGHT_CHANGE_PER_WEEK = '';
 
-	abstract public function calcTdeeChangePerDay(Calculator $calculator);
+	abstract public function calcTdeeChangePerDay(Calculator $calculator): AmountWithUnitMetric;
 
 	public function __toString()
 	{
-		return $this->getLabelInfinitive();
+		return (string)$this->getLabelInfinitive();
 	}
 
 	public static function createFromString(string $value)
@@ -31,9 +34,9 @@ abstract class Vector
 		return lcfirst(array_slice(explode('\\', get_called_class()), -1, 1)[0]);
 	}
 
-	public function getTdeeQuotient(Calculator $calculator): Amount
+	public function calcTdeeQuotient(Calculator $calculator): AmountMetric
 	{
-		return new Amount((float)static::TDEE_QUOTIENT);
+		return new AmountMetric('tdeeQuotient', new Amount((float)static::TDEE_QUOTIENT));
 	}
 
 	public function getChangePerWeek()
@@ -44,9 +47,19 @@ abstract class Vector
 		);
 	}
 
-	public function calcGoalTdee(Calculator $calculator)
+	public function calcGoalTdee(Calculator $calculator): AmountWithUnitMetric
 	{
-		return new Energy($calculator->calcTotalDailyEnergyExpenditure()->getAmount() + $this->calcTdeeChangePerDay($calculator)->getAmount(), 'kCal');
+		$totalDailyEnergyExpenditureValue = $calculator->calcTotalDailyEnergyExpenditure()->getResult()->getInUnit('kCal')->getAmount()->getValue();
+		$tdeeChangePerDayValue = $this->calcTdeeChangePerDay($calculator)->getResult()->getInUnit('kCal')->getAmount()->getValue();
+
+		$result = new Energy(
+			new Amount(
+				$totalDailyEnergyExpenditureValue + $tdeeChangePerDayValue
+			),
+			'kCal',
+		);
+
+		return new AmountWithUnitMetric('goalTdee', $result);
 	}
 
 	public function getLabelInfinitive()

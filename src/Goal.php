@@ -4,6 +4,7 @@ namespace Fatty;
 
 use Fatty\Exceptions\MissingGoalVectorException;
 use Fatty\Exceptions\MissingWeightException;
+use Fatty\Metrics\AmountWithUnitMetric;
 
 class Goal
 {
@@ -79,7 +80,7 @@ class Goal
 		}
 	}
 
-	public function calcGoalTdee(Calculator $calculator)
+	public function calcGoalTdee(Calculator $calculator): AmountWithUnitMetric
 	{
 		$vector = $this->getVector();
 		if (!$vector) {
