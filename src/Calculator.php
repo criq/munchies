@@ -622,9 +622,9 @@ class Calculator
 		$waistHipRatioValue = $this->calcWaistHipRatio()->getResult()->getValue();
 
 		if ($this->getGender() instanceof Genders\Male) {
-			$result = static::getDeviation($waistHipRatioValue, .8, [.8, .95]);
+			$result = new Amount(static::getDeviation($waistHipRatioValue, .8, [.8, .95])->getValue() - 1);
 		} elseif ($this->getGender() instanceof Genders\Female) {
-			$result = static::getDeviation($waistHipRatioValue, .9, [.9, 1]);
+			$result = new Amount(static::getDeviation($waistHipRatioValue, .9, [.9, 1])->getValue() - 1);
 		}
 
 		return new AmountMetric('waistHipRatioDeviation', $result);
