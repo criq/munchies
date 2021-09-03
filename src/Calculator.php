@@ -1997,7 +1997,7 @@ class Calculator
 		try {
 			$metricCollection->append($this->getDiet()->calcDietApproach());
 		} catch (FattyException $e) {
-			$ec->add($e);
+			$exceptionCollection->add($e);
 		}
 
 		// try {
