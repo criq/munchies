@@ -634,11 +634,16 @@ class Calculator
 
 	public function calcWaistHipRatioDeviation(): AmountMetric
 	{
+		$gender = $this->getGender();
+		if (!$gender) {
+			throw new MissingGenderException;
+		}
+
 		$waistHipRatioValue = $this->calcWaistHipRatio()->getResult()->getValue();
 
-		if ($this->getGender() instanceof Genders\Male) {
+		if ($gender instanceof Genders\Male) {
 			$result = new Amount(static::getDeviation($waistHipRatioValue, .8, [.8, .95])->getValue() - 1);
-		} elseif ($this->getGender() instanceof Genders\Female) {
+		} elseif ($gender instanceof Genders\Female) {
 			$result = new Amount(static::getDeviation($waistHipRatioValue, .9, [.9, 1])->getValue() - 1);
 		}
 
