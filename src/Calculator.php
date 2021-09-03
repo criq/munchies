@@ -1971,27 +1971,16 @@ class Calculator
 			$exceptionCollection->add($e);
 		}
 
-		// try {
-		// 	$metric = $this->getGoalTrend();
-		// 	if ($metric) {
-		// 		$res['output']['metrics']['goalTrend']['result'] = [
-		// 			'amount' => $metric->getCode(),
-		// 			'unit' => null,
-		// 		];
-		// 		$res['output']['metrics']['goalTrend']['string'] = (string)$metric;
-		// 	}
-		// } catch (FattyException $e) {
-		// 	$ec->add($e);
-		// }
+		try {
+			$metricCollection->append($this->getGoal()->calcGoalVector());
+		} catch (FattyException $e) {
+			$exceptionCollection->add($e);
+		}
 
 		// try {
-		// 	$metric = $this->getGoalWeight();
-		// 	if ($metric) {
-		// 		$res['output']['metrics']['goalWeight']['result'] = $metric->getArray();
-		// 		$res['output']['metrics']['goalWeight']['string'] = (string)$metric;
-		// 	}
+		// 	$metricCollection->append($this->getGoal()->calcGoalWeight());
 		// } catch (FattyException $e) {
-		// 	$ec->add($e);
+		// 	$exceptionCollection->add($e);
 		// }
 
 		try {

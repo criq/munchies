@@ -3,8 +3,10 @@
 namespace Fatty;
 
 use Fatty\Exceptions\MissingGoalVectorException;
+use Fatty\Exceptions\MissingGoalWeightException;
 use Fatty\Exceptions\MissingWeightException;
 use Fatty\Metrics\AmountWithUnitMetric;
+use Fatty\Metrics\StringMetric;
 
 class Goal
 {
@@ -78,6 +80,21 @@ class Goal
 		} elseif ($this->getVector() instanceof Vectors\Gain) {
 			return $this->getWeight()->getInUnit('kg')->getAmount() - $this->getFinal($calculator)->getInUnit('kg')->getAmount();
 		}
+	}
+
+	public function calcGoalVector(): StringMetric
+	{
+		return new StringMetric('goalVector', $this->getVector()->getCode(), $this->getVector()->getLabelInfinitive());
+	}
+
+	public function calcGoalWeight(): AmountWithUnitMetric
+	{
+		$weight = $this->getWeight();
+		if (!$weight) {
+			throw new MissingGoalWeightException;
+		}
+
+		return new AmountWithUnitMetric('goalWeight', $this->getWeight());
 	}
 
 	public function calcGoalTotalDailyEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
