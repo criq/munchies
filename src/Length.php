@@ -4,31 +4,32 @@ namespace Fatty;
 
 class Length extends AmountWithUnit
 {
-	public function __construct(Amount $amount, string $unit = 'cm')
+	public function __construct(Amount $amount, string $unit)
 	{
 		return parent::__construct($amount, $unit);
 	}
 
-	public function getInCm() : Length
+	public function getInBaseUnit(): Length
 	{
 		switch ($this->getUnit()) {
-			case 'cm':
-				return new static($this->getAmount(), 'cm');
-				break;
 			case 'm':
-				return new static($this->getAmount()->getMultiplied(.01), 'cm');
+				return clone $this;
 				break;
-		}
-	}
-
-	public function getInM() : Length
-	{
-		switch ($this->getUnit()) {
 			case 'cm':
 				return new static($this->getAmount()->getMultiplied(.01), 'm');
 				break;
+
+		}
+	}
+
+	public function getInUnit(string $unit): Length
+	{
+		switch ($unit) {
 			case 'm':
-				return new static($this->getAmount(), 'm');
+				return $this->getInBaseUnit();
+				break;
+			case 'cm':
+				return new static($this->getInBaseUnit()->getAmount()->getMultiplied(100), 'cm');
 				break;
 		}
 	}

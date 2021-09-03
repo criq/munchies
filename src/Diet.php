@@ -10,19 +10,19 @@ class Diet
 	protected $approach;
 	protected $carbs;
 
-	public function setApproach(?Approach $value) : Diet
+	public function setApproach(?Approach $value): Diet
 	{
 		$this->approach = $value;
 
 		return $this;
 	}
 
-	public function getApproach() : ?Approach
+	public function getApproach(): ?Approach
 	{
 		return $this->approach;
 	}
 
-	public function setCarbs(Carbs $carbs) : Diet
+	public function setCarbs(Carbs $carbs): Diet
 	{
 		if ($this->getApproach() && $this->getApproach()->getCarbsMin() && $this->getApproach()->getCarbsMax() && ($carbs->getAmount() < $this->getApproach()->getCarbsMin() || $carbs->getAmount() > $this->getApproach()->getCarbsMax())) {
 			throw new InvalidDietCarbsException;
@@ -33,7 +33,7 @@ class Diet
 		return $this;
 	}
 
-	public function getCarbs() : Carbs
+	public function getCarbs(): Carbs
 	{
 		return $this->carbs ?: $this->getApproach()->getCarbsDefault();
 	}

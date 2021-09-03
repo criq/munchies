@@ -12,7 +12,7 @@ class Maintain extends \Fatty\Vector
 	const TDEE_QUOTIENT__LARGE = 1.07;
 	const WEIGHT_CHANGE_PER_WEEK = 0;
 
-	public function getTdeeQuotient(Calculator $calculator) : Amount
+	public function getTdeeQuotient(Calculator $calculator): Amount
 	{
 		return new Amount($calculator->calcPhysicalActivityLevel()->getValue() >= 2 ? static::TDEE_QUOTIENT__LARGE : static::TDEE_QUOTIENT);
 	}

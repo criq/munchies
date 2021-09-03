@@ -14,7 +14,7 @@ class FattyExceptionCollection extends FattyException implements \Countable, \Ar
 		}
 	}
 
-	public function add(FattyException $e) : FattyExceptionCollection
+	public function add(FattyException $e): FattyExceptionCollection
 	{
 		if (is_iterable($e)) {
 			foreach ($e as $_e) {
@@ -27,12 +27,12 @@ class FattyExceptionCollection extends FattyException implements \Countable, \Ar
 		return $this;
 	}
 
-	public function getExceptions() : array
+	public function getExceptions(): array
 	{
 		return $this->exceptions;
 	}
 
-	public function getUnique() : FattyExceptionCollection
+	public function getUnique(): FattyExceptionCollection
 	{
 		return new static(array_values(array_unique($this->getExceptions())));
 	}
@@ -40,12 +40,12 @@ class FattyExceptionCollection extends FattyException implements \Countable, \Ar
 	/****************************************************************************
 	 * Interfaces.
 	 */
-	public function count() : int
+	public function count(): int
 	{
 		return count($this->exceptions);
 	}
 
-	public function offsetExists($offset) : bool
+	public function offsetExists($offset): bool
 	{
 		return isset($this->exceptions[$offset]);
 	}
@@ -55,7 +55,7 @@ class FattyExceptionCollection extends FattyException implements \Countable, \Ar
 		return $this->exceptions[$offset];
 	}
 
-	public function offsetSet($offset, $value) : void
+	public function offsetSet($offset, $value): void
 	{
 		if (is_null($offset)) {
 			$this->exceptions[] = $value;
@@ -64,7 +64,7 @@ class FattyExceptionCollection extends FattyException implements \Countable, \Ar
 		}
 	}
 
-	public function offsetUnset($offset) : void
+	public function offsetUnset($offset): void
 	{
 		unset($this->exceptions[$offset]);
 	}
@@ -79,17 +79,17 @@ class FattyExceptionCollection extends FattyException implements \Countable, \Ar
 		++$this->offset;
 	}
 
-	public function key() : int
+	public function key(): int
 	{
 		return $this->offset;
 	}
 
-	public function valid() : bool
+	public function valid(): bool
 	{
 		return isset($this->exceptions[$this->offset]);
 	}
 
-	public function rewind() : void
+	public function rewind(): void
 	{
 		$this->offset = 0;
 	}

@@ -13,12 +13,12 @@ class Amount
 		$this->value = $value;
 	}
 
-	public function __toString() : string
+	public function __toString(): string
 	{
 		return \Katu\Utils\Formatter::getLocalReadableNumber(\Katu\Utils\Formatter::getPreferredLocale(), $this->getValue());
 	}
 
-	public static function createFromString(string $value) : ?Amount
+	public static function createFromString(string $value): ?Amount
 	{
 		try {
 			$value = trim($value);
@@ -34,17 +34,17 @@ class Amount
 		return null;
 	}
 
-	public function getValue() : ?float
+	public function getValue(): ?float
 	{
 		return (float)$this->value;
 	}
 
-	public function getMultiplied(float $value) : Amount
+	public function getMultiplied(float $value): Amount
 	{
 		return new static($this->getValue() * $value);
 	}
 
-	public function getFormatted() : string
+	public function getFormatted(): string
 	{
 		return (string)round($this->getValue(), 1);
 	}

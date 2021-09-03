@@ -12,12 +12,12 @@ abstract class Gender
 	const BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS = 'proportions';
 	const ESSENTIAL_FAT_PERCENTAGE = null;
 
-	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator) : AmountMetric;
-	abstract public function calcBasalMetabolicRate(Calculator $calculator) : Energy;
-	abstract public function getBasalMetabolicRateFormula(Calculator $calculator) : string;
-	abstract public function calcBodyType(Calculator $calculator) : BodyType;
+	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
+	abstract public function calcBasalMetabolicRate(Calculator $calculator): Energy;
+	abstract public function getBasalMetabolicRateFormula(Calculator $calculator): string;
+	abstract public function calcBodyType(Calculator $calculator): BodyType;
 
-	public static function createFromString(string $value) : ?Gender
+	public static function createFromString(string $value): ?Gender
 	{
 		try {
 			$class = 'Fatty\\Genders\\' . ucfirst($value);
@@ -124,7 +124,7 @@ abstract class Gender
 		}
 	}
 
-	public function calcBodyFatPercentage(Calculator $calculator) : AmountMetric
+	public function calcBodyFatPercentage(Calculator $calculator): AmountMetric
 	{
 		$strategy = $this->getBodyFatPercentageStrategy($calculator);
 		if (!$strategy) {
@@ -141,14 +141,14 @@ abstract class Gender
 		}
 	}
 
-	protected function calcBodyFatPercentageByMeasurement(Calculator $calculator) : AmountMetric
+	protected function calcBodyFatPercentageByMeasurement(Calculator $calculator): AmountMetric
 	{
 		return new AmountMetric('bodyFatPercentage', $calculator->getBodyFatPercentage());
 	}
 
-	public function calcEssentialFatPercentage() : Percentage
+	public function calcEssentialFatPercentage(): AmountMetric
 	{
-		return new Percentage((float)static::ESSENTIAL_FAT_PERCENTAGE);
+		return new AmountMetric('essentialFatPercentage', new Percentage((float)static::ESSENTIAL_FAT_PERCENTAGE));
 	}
 
 	/*****************************************************************************

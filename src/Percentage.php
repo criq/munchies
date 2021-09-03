@@ -4,12 +4,12 @@ namespace Fatty;
 
 class Percentage extends Amount
 {
-	public function __toString() : string
+	public function __toString(): string
 	{
 		return \Katu\Utils\Formatter::getLocalPercent(\Katu\Utils\Formatter::getPreferredLocale(), $this->getValue());
 	}
 
-	public static function createFromPercent(string $value) : ?Amount
+	public static function createFromPercent(string $value): ?Amount
 	{
 		try {
 			return new static(parent::createFromString($value)->getValue() * .01);
@@ -18,17 +18,20 @@ class Percentage extends Amount
 		}
 	}
 
-	public function getAsPercentage() : float
+	public function getAsPercentage(): float
 	{
 		return $this->getValue();
 	}
 
-	public function getArray()
+	/**
+	 * @deprecated
+	 */
+	public function getArray(): array
 	{
 		return [];
 	}
 
-	public function getFormatted() : string
+	public function getFormatted(): string
 	{
 		return ($this->getValue() * 100) . " %";
 	}

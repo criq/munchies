@@ -20,11 +20,11 @@ class Male extends \Fatty\Gender
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
 	 */
-	protected function calcBodyFatPercentageByProportions(Calculator $calculator) : AmountMetric
+	protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric
 	{
-		$waist = $calculator->getProportions()->getWaist()->getInCm()->getAmount()->getValue();
-		$neck = $calculator->getProportions()->getNeck()->getInCm()->getAmount()->getValue();
-		$height = $calculator->getProportions()->getHeight()->getInCm()->getAmount()->getValue();
+		$waist = $calculator->getProportions()->getWaist()->getInUnit('cm')->getAmount()->getValue();
+		$neck = $calculator->getProportions()->getNeck()->getInUnit('cm')->getAmount()->getValue();
+		$height = $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue();
 
 		$result = new Percentage(((495 / (1.0324 - (0.19077 * log10($waist - $neck)) + (0.15456 * log10($height)))) - 450) * .01);
 		$formula = '((495 / (1.0324 - (0.19077 * log10(waist[' . $waist . '] - neck[' . $neck . '])) + (0.15456 * log10(height[' . $height . '])))) - 450) * .01';
@@ -35,7 +35,7 @@ class Male extends \Fatty\Gender
 	/*****************************************************************************
 	 * Bazální metabolismus - BMR.
 	 */
-	public function calcBasalMetabolicRate(Calculator $calculator) : Energy
+	public function calcBasalMetabolicRate(Calculator $calculator): Energy
 	{
 		$exceptionCollection = new FattyExceptionCollection;
 
@@ -55,20 +55,20 @@ class Male extends \Fatty\Gender
 			throw $exceptionCollection;
 		}
 
-		$amount = new Amount((10 * $calculator->getWeight()->getInKg()->getAmount()->getValue()) + (6.25 * $calculator->getProportions()->getHeight()->getInCm()->getAmount()->getValue()) - (5 * $calculator->getBirthday()->getAge()) + 5);
+		$amount = new Amount((10 * $calculator->getWeight()->getInUnit('kg')->getAmount()->getValue()) + (6.25 * $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue()) - (5 * $calculator->getBirthday()->getAge()) + 5);
 
 		return new Energy($amount, 'kCal');
 	}
 
-	public function getBasalMetabolicRateFormula(Calculator $calculator) : string
+	public function getBasalMetabolicRateFormula(Calculator $calculator): string
 	{
-		return '(10 * weight[' . $calculator->getWeight()->getInKg()->getAmount() . ']) + (6.25 * height[' . $calculator->getProportions()->getHeight()->getInCm()->getAmount() . ']) - (5 * age[' . $calculator->getBirthday()->getAge() . ']) + 5';
+		return '(10 * weight[' . $calculator->getWeight()->getInUnit('kg')->getAmount() . ']) + (6.25 * height[' . $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount() . ']) - (5 * age[' . $calculator->getBirthday()->getAge() . ']) + 5';
 	}
 
 	/*****************************************************************************
 	 * Typ postavy.
 	 */
-	public function calcBodyType(Calculator $calculator) : BodyType
+	public function calcBodyType(Calculator $calculator): BodyType
 	{
 		$waistHipRatio = $calculator->calcWaistHipRatio();
 

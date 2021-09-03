@@ -31,14 +31,17 @@ abstract class Vector
 		return lcfirst(array_slice(explode('\\', get_called_class()), -1, 1)[0]);
 	}
 
-	public function getTdeeQuotient(Calculator $calculator) : Amount
+	public function getTdeeQuotient(Calculator $calculator): Amount
 	{
 		return new Amount((float)static::TDEE_QUOTIENT);
 	}
 
 	public function getChangePerWeek()
 	{
-		return new Weight(new Amount(static::WEIGHT_CHANGE_PER_WEEK), 'kg');
+		return new Weight(
+			new Amount(static::WEIGHT_CHANGE_PER_WEEK),
+			'kg',
+		);
 	}
 
 	public function calcGoalTdee(Calculator $calculator)

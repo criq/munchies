@@ -14,43 +14,43 @@ class SportDurations
 	private $anaerobic;
 	private $lowFrequency;
 
-	public function setLowFrequency(?LowFrequency $value) : SportDurations
+	public function setLowFrequency(?LowFrequency $value): SportDurations
 	{
 		$this->lowFrequency = $value;
 
 		return $this;
 	}
 
-	public function getLowFrequency() : ?SportDuration
+	public function getLowFrequency(): ?SportDuration
 	{
 		return $this->lowFrequency;
 	}
 
-	public function setAerobic(?Aerobic $value) : SportDurations
+	public function setAerobic(?Aerobic $value): SportDurations
 	{
 		$this->aerobic = $value;
 
 		return $this;
 	}
 
-	public function getAerobic() : ?SportDuration
+	public function getAerobic(): ?SportDuration
 	{
 		return $this->aerobic;
 	}
 
-	public function setAnaerobic(?Anaerobic $value) : SportDurations
+	public function setAnaerobic(?Anaerobic $value): SportDurations
 	{
 		$this->anaerobic = $value;
 
 		return $this;
 	}
 
-	public function getAnaerobic() : ?SportDuration
+	public function getAnaerobic(): ?SportDuration
 	{
 		return $this->anaerobic;
 	}
 
-	public function calcSportActivity() : Activity
+	public function calcSportActivity(): Activity
 	{
 		$amount = 0;
 

@@ -11,14 +11,14 @@ class FattyException extends \Exception
 		return static::class;
 	}
 
-	public function addName(string $name) : FattyException
+	public function addName(string $name): FattyException
 	{
 		return $this->names[] = $name;
 
 		return $this;
 	}
 
-	public function getNames() : array
+	public function getNames(): array
 	{
 		return $this->names;
 	}

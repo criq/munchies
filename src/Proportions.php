@@ -14,19 +14,19 @@ class Proportions
 	/*****************************************************************************
 	 * Výška
 	 */
-	public function setHeight(?Length $length) : Proportions
+	public function setHeight(?Length $length): Proportions
 	{
 		$this->height = $length;
 
 		return $this;
 	}
 
-	public function getHeight() : ?Length
+	public function getHeight(): ?Length
 	{
 		return $this->height;
 	}
 
-	public function calcHeight() : ?AmountWithUnitMetric
+	public function calcHeight(): ?AmountWithUnitMetric
 	{
 		return new AmountWithUnitMetric('proportions_height', $this->getHeight());
 	}
@@ -34,14 +34,14 @@ class Proportions
 	/*****************************************************************************
 	 * Obvod pasu.
 	 */
-	public function setWaist(?Length $length) : Proportions
+	public function setWaist(?Length $length): Proportions
 	{
 		$this->waist = $length;
 
 		return $this;
 	}
 
-	public function getWaist() : ?Length
+	public function getWaist(): ?Length
 	{
 		return $this->waist;
 	}
@@ -49,14 +49,14 @@ class Proportions
 	/*****************************************************************************
 	 * Obvod boků.
 	 */
-	public function setHips(?Length $length) : Proportions
+	public function setHips(?Length $length): Proportions
 	{
 		$this->hips = $length;
 
 		return $this;
 	}
 
-	public function getHips() : ?Length
+	public function getHips(): ?Length
 	{
 		return $this->hips;
 	}
@@ -64,14 +64,14 @@ class Proportions
 	/*****************************************************************************
 	 * Obvod krku.
 	 */
-	public function setNeck(?Length $length) : Proportions
+	public function setNeck(?Length $length): Proportions
 	{
 		$this->neck = $length;
 
 		return $this;
 	}
 
-	public function getNeck() : ?Length
+	public function getNeck(): ?Length
 	{
 		return $this->neck;
 	}

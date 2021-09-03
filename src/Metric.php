@@ -9,14 +9,14 @@ abstract class Metric
 	protected $formula;
 
 	abstract public function getResult();
-	abstract public function getResponse() : array;
+	abstract public function getResponse(): array;
 
-	public function getName() : string
+	public function getName(): string
 	{
 		return $this->name;
 	}
 
-	public function getFormula() : ?string
+	public function getFormula(): ?string
 	{
 		return $this->formula;
 	}

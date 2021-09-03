@@ -14,12 +14,12 @@ class AmountMetric extends Metric
 		$this->formula = $formula;
 	}
 
-	public function getResult() : Amount
+	public function getResult(): Amount
 	{
 		return $this->result;
 	}
 
-	public function getResponse() : array
+	public function getResponse(): array
 	{
 		return [
 			'name' => $this->getName(),

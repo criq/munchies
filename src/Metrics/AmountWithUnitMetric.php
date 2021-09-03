@@ -14,12 +14,12 @@ class AmountWithUnitMetric extends Metric
 		$this->formula = $formula;
 	}
 
-	public function getResult() : AmountWithUnit
+	public function getResult(): AmountWithUnit
 	{
 		return $this->result;
 	}
 
-	public function getResponse() : array
+	public function getResponse(): array
 	{
 		return [
 			'name' => $this->getName(),

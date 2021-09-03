@@ -9,15 +9,27 @@ class Duration extends AmountWithUnit
 		return parent::__construct($amount, $unit);
 	}
 
-	public function getInWeeks()
+	public function getInBaseUnit(): Duration
 	{
 		switch ($this->getUnit()) {
 			case 'days':
-				return new static($this->getAmount()->getMultiplied(1/7), 'weeks');
-			break;
+				return clone $this;
+				break;
 			case 'weeks':
-				return new static($this->getAmount(), 'weeks');
-			break;
+				return new static($this->getAmount()->getMultiplied(7), 'weeks');
+				break;
+		}
+	}
+
+	public function getInUnit(string $unit): AmountWithUnit
+	{
+		switch ($unit) {
+			case 'days':
+				return $this->getInBaseUnit();
+				break;
+			case 'weeks':
+				return new static($this->getAmount()->getMultiplied(1/7), 'weeks');
+				break;
 		}
 	}
 }

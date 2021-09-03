@@ -11,7 +11,7 @@ class Birthday
 		$this->datetime = $datetime;
 	}
 
-	public static function createFromString(string $value) : ?Birthday
+	public static function createFromString(string $value): ?Birthday
 	{
 		try {
 			$datetime = \DateTime::createFromFormat('j.n.Y', $value);
@@ -23,27 +23,27 @@ class Birthday
 		}
 	}
 
-	public function getDatetime() : \DateTime
+	public function getDatetime(): \DateTime
 	{
 		return $this->datetime;
 	}
 
-	public function isInPast() : bool
+	public function isInPast(): bool
 	{
 		return $this->getDatetime()->getTimestamp() <= (new \DateTime)->getTimestamp();
 	}
 
-	public function isInFuture() : bool
+	public function isInFuture(): bool
 	{
 		return $this->getDatetime()->getTimestamp() > (new \DateTime)->getTimestamp();
 	}
 
-	public function getAge() : float
+	public function getAge(): float
 	{
 		return $this->getDatetime()->diff(new \DateTime)->y;
 	}
 
-	public function diff() : ?\DateInterval
+	public function diff(): ?\DateInterval
 	{
 		try {
 			return $this->getDatetime()->diff(...func_get_args());

@@ -11,14 +11,14 @@ class Energy extends AmountWithUnit
 		return parent::__construct($amount, $unit);
 	}
 
-	public function getInUnit($unit) : Energy
+	public function getInUnit($unit): Energy
 	{
 		$function = "getIn" . $unit;
 
 		return $this->$function();
 	}
 
-	public function getInKJ() : Energy
+	public function getInKJ(): Energy
 	{
 		switch ($this->getUnit()) {
 			case 'kJ':
@@ -30,7 +30,7 @@ class Energy extends AmountWithUnit
 		}
 	}
 
-	public function getInKCal() : Energy
+	public function getInKCal(): Energy
 	{
 		switch ($this->getUnit()) {
 			case 'kJ':

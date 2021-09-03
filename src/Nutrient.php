@@ -11,13 +11,13 @@ abstract class Nutrient extends Weight
 		return parent::__construct(new Amount(max($amount->getValue(), 0)), $unit);
 	}
 
-	public static function createFromEnergy(Energy $energy) : Nutrient
+	public static function createFromEnergy(Energy $energy): Nutrient
 	{
 		return new static(new Amount($energy->getInKJ()->getAmount()->getValue() / static::KJ_IN_G), 'g');
 	}
 
-	public function getEnergy() : Energy
+	public function getEnergy(): Energy
 	{
-		return new Energy(new Amount($this->getInG()->getAmount()->getValue() * static::KJ_IN_G), 'kJ');
+		return new Energy(new Amount($this->getInUnit('g')->getAmount()->getValue() * static::KJ_IN_G), 'kJ');
 	}
 }
