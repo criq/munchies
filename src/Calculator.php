@@ -619,12 +619,12 @@ class Calculator
 
 	public function calcWaistHipRatioDeviation(): AmountMetric
 	{
-		$waistHipRatio = $this->calcWaistHipRatio()->getResult()->getValue();
+		$waistHipRatioValue = $this->calcWaistHipRatio()->getResult()->getValue();
 
 		if ($this->getGender() instanceof Genders\Male) {
-			$result = static::getDeviation($waistHipRatio, .8, [.8, .95]);
+			$result = static::getDeviation($waistHipRatioValue, .8, [.8, .95]);
 		} elseif ($this->getGender() instanceof Genders\Female) {
-			$result = static::getDeviation($waistHipRatio, .9, [.9, 1]);
+			$result = static::getDeviation($waistHipRatioValue, .9, [.9, 1]);
 		}
 
 		return new AmountMetric('waistHipRatioDeviation', $result);
@@ -944,7 +944,7 @@ class Calculator
 			return new AmountMetric('bodyFatDeviation', new Amount(0));
 		}
 
-		return $bodyMassIndexDeviation;
+		return new AmountMetric('bodyFatDeviation', $bodyMassIndexDeviation->getResult());
 	}
 
 	/*****************************************************************************
