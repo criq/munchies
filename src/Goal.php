@@ -80,13 +80,13 @@ class Goal
 		}
 	}
 
-	public function calcGoalTdee(Calculator $calculator): AmountWithUnitMetric
+	public function calcGoalTotalDailyEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
 	{
 		$vector = $this->getVector();
 		if (!$vector) {
 			throw new MissingGoalVectorException;
 		}
 
-		return $vector->calcGoalTdee($calculator);
+		return $vector->calcGoalTotalDailyEnergyExpenditure($calculator);
 	}
 }

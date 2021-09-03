@@ -26,9 +26,9 @@ class Proportions
 		return $this->height;
 	}
 
-	public function calcHeight(): ?AmountWithUnitMetric
+	public function calcHeight(): AmountWithUnitMetric
 	{
-		return new AmountWithUnitMetric('proportions_height', $this->getHeight());
+		return new AmountWithUnitMetric('height', $this->getHeight());
 	}
 
 	/*****************************************************************************

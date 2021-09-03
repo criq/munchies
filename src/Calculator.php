@@ -1211,7 +1211,7 @@ class Calculator
 		/***************************************************************************
 		 * Carbs and fats.
 		 */
-		$goalTdee = $this->getGoal()->calcGoalTdee($this);
+		$goalTdee = $this->getGoal()->calcGoalTotalDailyEnergyExpenditure($this);
 		$diet = $this->getDiet();
 		$dietApproach = $this->getDiet()->getApproach();
 		if (!$dietApproach) {
@@ -1594,8 +1594,8 @@ class Calculator
 	// 						'fields' => ['goalWeight'],
 	// 					];
 
-	// 					$slowLooseTdee = (new Vectors\SlowLoose)->calcGoalTdee($this);
-	// 					$looseTdee = (new Vectors\Loose)->calcGoalTdee($this);
+	// 					$slowLooseTdee = (new Vectors\SlowLoose)->calcTotalDailyEnergyExpenditure($this);
+	// 					$looseTdee = (new Vectors\Loose)->calcTotalDailyEnergyExpenditure($this);
 
 	// 					$messages[] = [
 	// 						'message' => strtr(\Katu\Config::get('caloricCalculator', 'messages', 'loosingWeightTdeeRecommendations'), [
@@ -1646,8 +1646,8 @@ class Calculator
 	// 					'fields' => ['goalWeight'],
 	// 				];
 
-	// 				$slowGainTdee = (new Vectors\SlowGain)->calcGoalTdee($this);
-	// 				$gainTdee = (new Vectors\Gain)->calcGoalTdee($this);
+	// 				$slowGainTdee = (new Vectors\SlowGain)->calcTotalDailyEnergyExpenditure($this);
+	// 				$gainTdee = (new Vectors\Gain)->calcTotalDailyEnergyExpenditure($this);
 
 	// 				$messages[] = [
 	// 					'message' => strtr(\Katu\Config::get('caloricCalculator', 'messages', 'gainingWeightTdeeRecommendations'), [
@@ -1811,6 +1811,12 @@ class Calculator
 
 		try {
 			$metricCollection->append($this->calcWeight());
+		} catch (FattyException $e) {
+			$exceptionCollection->add($e);
+		}
+
+		try {
+			$metricCollection->append($this->getProportions()->calcHeight());
 		} catch (FattyException $e) {
 			$exceptionCollection->add($e);
 		}
@@ -1988,15 +1994,11 @@ class Calculator
 		// 	$ec->add($e);
 		// }
 
-		// try {
-		// 	$metric = $this->getGoal()->calcGoalTdee($this)->getInUnit($this->getUnits());
-		// 	if ($metric) {
-		// 		$res['output']['metrics']['goalTdee']['result'] = $metric->getArray();
-		// 		$res['output']['metrics']['goalTdee']['string'] = (string)$metric;
-		// 	}
-		// } catch (FattyException $e) {
-		// 	$exceptionCollection->add($e);
-		// }
+		try {
+			$metricCollection->append($this->getGoal()->calcGoalTotalDailyEnergyExpenditure($this));
+		} catch (FattyException $e) {
+			$exceptionCollection->add($e);
+		}
 
 		// try {
 		// 	$metric = $this->getDiet();

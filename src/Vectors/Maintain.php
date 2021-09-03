@@ -29,7 +29,7 @@ class Maintain extends \Fatty\Vector
 		return new AmountWithUnitMetric('tdeeChangePerDay', new Energy(new Amount(0), Energy::getBaseUnit()));
 	}
 
-	public function calcGoalTdee(Calculator $calculator): AmountWithUnitMetric
+	public function calcTotalDailyEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
 	{
 		return $calculator->calcTotalDailyEnergyExpenditure();
 	}
