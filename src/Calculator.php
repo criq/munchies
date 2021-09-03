@@ -2009,19 +2009,6 @@ class Calculator
 			$exceptionCollection->add($e);
 		}
 
-		// try {
-		// 	$diet = $calculator->getDiet();
-		// 	if ($diet) {
-		// 		$metric = $diet->getCarbs();
-		// 		if ($metric) {
-		// 			$res['output']['metrics']['dietCarbs']['result'] = $metric->getArray();
-		// 			$res['output']['metrics']['dietCarbs']['string'] = (string)$metric . " denně";
-		// 		}
-		// 	}
-		// } catch (FattyException $e) {
-		// 	$ec->add($e);
-		// }
-
 		try {
 			$metricCollection->append($this->getGoal()->calcGoalDuration());
 		} catch (FattyException $e) {
