@@ -230,7 +230,7 @@ class Female extends \Fatty\Gender
 			return new AmountWithUnitMetric('referenceDailyIntakeBonusPregnancy', new Energy(new Amount(0), 'kJ'));
 		}
 
-		if (!($this->getPregnancyChildbirthDate() instanceof \Fatty\Birthday)) {
+		if (!($this->getPregnancyChildbirthDate() instanceof Birthday)) {
 			throw new MissingPregnancyChildbirthDateException;
 		}
 
@@ -254,11 +254,11 @@ class Female extends \Fatty\Gender
 			return new AmountWithUnitMetric('referenceDailyIntakeBonusBreastfeeding', new Energy(new Amount(0), 'kJ'));
 		}
 
-		if (!($this->getBreastfeedingChildbirthDate() instanceof \Fatty\Birthday)) {
+		if (!($this->getBreastfeedingChildbirthDate() instanceof Birthday)) {
 			$exceptionCollection->add(new MissingBreastfeedingChildbirthDateException);
 		}
 
-		if (!($this->getBreastfeedingMode() instanceof \Fatty\BreastfeedingMode)) {
+		if (!($this->getBreastfeedingMode() instanceof BreastfeedingMode)) {
 			$exceptionCollection->add(new MissingBreastfeedingModeException);
 		}
 
