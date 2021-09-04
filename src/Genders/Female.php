@@ -81,12 +81,12 @@ class Female extends \Fatty\Gender
 		$heightValue = $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue();
 		$age = $calculator->getBirthday()->getAge();
 
-		$result = new Energy(
+		$result = (new Energy(
 			new Amount(
 				(10 * $weightValue) + (6.25 * $heightValue) - (5 * $age) - 161
 			),
 			'kCal',
-		);
+		))->getInUnit('kJ');
 
 		$formula = "(10 * weight[{$weightValue}]) + (6.25 * height[{$heightValue}]) - (5 * age[{$age}]) - 161";
 
@@ -194,18 +194,18 @@ class Female extends \Fatty\Gender
 	/*****************************************************************************
 	 * Doporučený denní příjem - bonusy.
 	 */
-	public function calcReferenceDailyIntakeBonus()
+	public function calcReferenceDailyIntakeBonus(): AmountWithUnitMetric
 	{
 		$exceptionCollection = new FattyExceptionCollection;
 
 		try {
-			$referenceDailyIntakeBonusPregnancy = $this->getReferenceDailyIntakeBonusPregnancy();
+			$referenceDailyIntakeBonusPregnancy = $this->calcReferenceDailyIntakeBonusPregnancy();
 		} catch (\Throwable $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
-			$referenceDailyIntakeBonusBreastfeeding = $this->getReferenceDailyIntakeBonusBreastfeeding();
+			$referenceDailyIntakeBonusBreastfeeding = $this->calcReferenceDailyIntakeBonusBreastfeeding();
 		} catch (\Throwable $e) {
 			$exceptionCollection->add($e);
 		}
@@ -214,13 +214,20 @@ class Female extends \Fatty\Gender
 			throw $exceptionCollection;
 		}
 
-		return new Energy(new Amount($referenceDailyIntakeBonusPregnancy->getAmount()->getValue() + $referenceDailyIntakeBonusBreastfeeding->getAmount()->getValue()), 'kCal');
+		$result = new Energy(
+			new Amount(
+				$referenceDailyIntakeBonusPregnancy->getResult()->getInUnit('kCal')->getAmount()->getValue() + $referenceDailyIntakeBonusBreastfeeding->getResult()->getInUnit('kCal')->getAmount()->getValue()
+			),
+			'kCal',
+		);
+
+		return new AmountWithUnitMetric('referenceDailyIntakeBonus', $result);
 	}
 
-	public function getReferenceDailyIntakeBonusPregnancy()
+	public function calcReferenceDailyIntakeBonusPregnancy(): AmountWithUnitMetric
 	{
 		if (!$this->isPregnant()) {
-			return new Energy(new Amount(0), 'kJ');
+			return new AmountWithUnitMetric('referenceDailyIntakeBonusPregnancy', new Energy(new Amount(0), 'kJ'));
 		}
 
 		if (!($this->getPregnancyChildbirthDate() instanceof \Fatty\Birthday)) {
@@ -236,15 +243,15 @@ class Female extends \Fatty\Gender
 			$change = 475;
 		}
 
-		return new Energy(new Amount($change), 'kCal');
+		return new AmountWithUnitMetric('referenceDailyIntakeBonusPregnancy', new Energy(new Amount($change), 'kCal'));
 	}
 
-	public function getReferenceDailyIntakeBonusBreastfeeding()
+	public function calcReferenceDailyIntakeBonusBreastfeeding(): AmountWithUnitMetric
 	{
 		$exceptionCollection = new FattyExceptionCollection;
 
 		if (!$this->isBreastfeeding()) {
-			return new Energy(new Amount(0), 'kJ');
+			return new AmountWithUnitMetric('referenceDailyIntakeBonusBreastfeeding', new Energy(new Amount(0), 'kJ'));
 		}
 
 		if (!($this->getBreastfeedingChildbirthDate() instanceof \Fatty\Birthday)) {
@@ -278,7 +285,7 @@ class Female extends \Fatty\Gender
 			$change = 100;
 		}
 
-		return new Energy(new Amount($change), 'kCal');
+		return new AmountWithUnitMetric('referenceDailyIntakeBonusBreastfeeding', new Energy(new Amount($change), 'kCal'));
 	}
 
 	/*****************************************************************************

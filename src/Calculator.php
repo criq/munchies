@@ -1015,7 +1015,7 @@ class Calculator
 	 */
 	public function calcTotalEnergyExpenditure(): AmountWithUnitMetric
 	{
-		$basalMetabolicRate = $this->calcBasalMetabolicRate()->getResult()->getAmount()->getValue();
+		$basalMetabolicRate = $this->calcBasalMetabolicRate()->getResult()->getInUnit('kCal')->getAmount()->getValue();
 		$physicalActivityLevel = $this->calcPhysicalActivityLevel()->getResult()->getValue();
 
 		$result = new Energy(
@@ -1089,7 +1089,7 @@ class Calculator
 			$formula = $result->getAmount()->getValue();
 		} else {
 			$totalDailyEnergyExpenditureValue = $totalDailyEnergyExpenditure->getResult()->getAmount()->getValue();
-			$referenceDailyIntakeBonusValue = $referenceDailyIntakeBonus->getAmount()->getValue();
+			$referenceDailyIntakeBonusValue = $referenceDailyIntakeBonus->getResult()->getInUnit('kCal')->getAmount()->getValue();
 
 			$result = new Energy(
 				new Amount($totalDailyEnergyExpenditureValue + $referenceDailyIntakeBonusValue),

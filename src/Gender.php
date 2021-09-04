@@ -155,8 +155,8 @@ abstract class Gender
 	/*****************************************************************************
 	 * Doporučený denní příjem - bonusy.
 	 */
-	public function calcReferenceDailyIntakeBonus()
+	public function calcReferenceDailyIntakeBonus(): AmountWithUnitMetric
 	{
-		return new Energy(new Amount(0), 'kJ');
+		return new AmountWithUnitMetric('referenceDailyIntakeBonus', new Energy(new Amount(0), 'kJ'));
 	}
 }

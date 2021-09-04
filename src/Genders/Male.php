@@ -64,12 +64,12 @@ class Male extends \Fatty\Gender
 		$heightValue = $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue();
 		$age = $calculator->getBirthday()->getAge();
 
-		$result = new Energy(
+		$result = (new Energy(
 			new Amount(
 				(10 * $weightValue) + (6.25 * $heightValue) - (5 * $age) + 5
 			),
 			'kCal',
-		);
+		))->getInUnit('kJ');
 
 		$formula = "(10 * weight[{$weightValue}]) + (6.25 * height[{$heightValue}]) - (5 * age[{$age}]) + 5";
 
