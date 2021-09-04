@@ -2045,7 +2045,7 @@ class Calculator
 		}
 
 		$locale = new Locale('cs_CZ');
-		$res['output']['metrics'] = $metricCollection->getResponse($locale);
+		$res['output']['metrics'] = $metricCollection->getSorted()->getResponse($locale);
 
 		return $res;
 	}

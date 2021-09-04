@@ -20,6 +20,16 @@ class MetricCollection extends \ArrayObject
 		})));
 	}
 
+	public function getSorted(): MetricCollection
+	{
+		$array = $this->getArrayCopy();
+		usort($array, function ($a, $b) {
+			return $a->getName() > $b->getName() ? 1 : -1;
+		});
+
+		return new static($array);
+	}
+
 	public function getResponse(?Locale $locale = null): array
 	{
 		return array_map(function ($metric) use ($locale) {
