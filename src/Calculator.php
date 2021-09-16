@@ -1018,10 +1018,10 @@ class Calculator
 		$basalMetabolicRate = $this->calcBasalMetabolicRate()->getResult()->getInUnit('kCal')->getAmount()->getValue();
 		$physicalActivityLevel = $this->calcPhysicalActivityLevel()->getResult()->getValue();
 
-		$result = new Energy(
+		$result = (new Energy(
 			new Amount($basalMetabolicRate * $physicalActivityLevel),
 			'kCal',
-		);
+		))->getInUnit($this->getUnits());
 
 		$formula = 'basalMetabolicRate[' . $basalMetabolicRate . '] * physicalActivityLevel[' . $physicalActivityLevel . '] = ' . $result->getAmount()->getValue();
 
@@ -1037,13 +1037,14 @@ class Calculator
 			throw new MissingGoalVectorException;
 		}
 
-		$totalEnergyExpenditureValue = $this->calcTotalEnergyExpenditure()->getResult()->getAmount()->getValue();
+		$totalEnergyExpenditure = $this->calcTotalEnergyExpenditure();
+		$totalEnergyExpenditureValue = $totalEnergyExpenditure->getResult()->getAmount()->getValue();
 		$tdeeQuotientValue = $this->getGoal()->getVector()->calcTdeeQuotient($this)->getResult()->getValue();
 
-		$result = new Energy(
+		$result = (new Energy(
 			new Amount($totalEnergyExpenditureValue * $tdeeQuotientValue),
-			'kCal',
-		);
+			$totalEnergyExpenditure->getResult()->getUnit(),
+		))->getInUnit($this->getUnits());
 
 		$formula = 'totalEnergyExpenditure[' . $totalEnergyExpenditureValue . '] * weightGoalQuotient[' . $tdeeQuotientValue . '] = ' . $result->getAmount()->getValue();
 
@@ -1088,13 +1089,13 @@ class Calculator
 
 			$formula = $result->getAmount()->getValue();
 		} else {
-			$totalDailyEnergyExpenditureValue = $totalDailyEnergyExpenditure->getResult()->getAmount()->getValue();
+			$totalDailyEnergyExpenditureValue = $totalDailyEnergyExpenditure->getResult()->getInUnit('kCal')->getAmount()->getValue();
 			$referenceDailyIntakeBonusValue = $referenceDailyIntakeBonus->getResult()->getInUnit('kCal')->getAmount()->getValue();
 
-			$result = new Energy(
+			$result = (new Energy(
 				new Amount($totalDailyEnergyExpenditureValue + $referenceDailyIntakeBonusValue),
 				'kCal',
-			);
+			))->getInUnit($this->getUnits());
 
 			$formula = 'totalDailyEnergyExpenditure[' . $totalDailyEnergyExpenditureValue . '] + referenceDailyIntakeBonus[' . $referenceDailyIntakeBonusValue . '] = ' . $result->getAmount()->getValue();
 		}

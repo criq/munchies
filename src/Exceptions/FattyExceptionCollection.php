@@ -37,6 +37,16 @@ class FattyExceptionCollection extends FattyException implements \Countable, \Ar
 		return new static(array_values(array_unique($this->getExceptions())));
 	}
 
+	public function getNames(): array
+	{
+		$res = [];
+		foreach ($this as $exception) {
+			$res = array_merge($res, $exception->getNames());
+		}
+
+		return array_values(array_unique($res));
+	}
+
 	/****************************************************************************
 	 * Interfaces.
 	 */
