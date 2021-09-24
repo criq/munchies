@@ -258,7 +258,7 @@ class Calculator
 
 		if ($goalWeightString) {
 			try {
-				$value = Weight::createFromString(($params['goal_weight'] ?? null) ?: ($params["goal_weight_{$params['goal_vector']}"] ?? null), 'kg');
+				$value = Weight::createFromString($goalWeightString, 'kg');
 				if (!$value) {
 					throw new InvalidGoalWeightException;
 				}
@@ -282,17 +282,17 @@ class Calculator
 			}
 		}
 
-		// if (trim($params['diet_carbs'] ?? null)) {
-		// 	$dietCarbsString =  =
-		// }
+		try {
+			$dietCarbsString = trim($params['diet_carbs']);
+		} catch (\Throwable $e) {
+			$dietCarbsString = trim($params['diet_carbs_' . $params['diet_approach']]);
+		} catch (\Throwable) {
+			$dietCarbsString = null;
+		}
 
-
-		// || trim($params["diet_carbs_{$params['diet_approach']}"] ?? null)) {
-
-
-		if (trim($params['diet_carbs'] ?? null) || trim($params["diet_carbs_{$params['diet_approach']}"] ?? null)) {
+		if ($dietCarbsString) {
 			try {
-				$value = Carbs::createFromString(($params['diet_carbs'] ?? null) ?: ($params["diet_carbs_{$params['diet_approach']}"] ?? null), 'g');
+				$value = Carbs::createFromString($dietCarbsString, 'g');
 				if (!$value) {
 					throw new InvalidDietCarbsException;
 				}
