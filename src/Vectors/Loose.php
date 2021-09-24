@@ -20,7 +20,7 @@ class Loose extends \Fatty\Vector
 
 		$result = new Energy(
 			new Amount(
-				$totalDailyEnergyExpenditureValue - ($basalMetabolicRateValue + 50) * -1
+				($totalDailyEnergyExpenditureValue - ($basalMetabolicRateValue + 50)) * -1
 			),
 			'kCal',
 		);

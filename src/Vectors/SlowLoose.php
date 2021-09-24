@@ -17,7 +17,9 @@ class SlowLoose extends Loose
 		$basalMetabolicRateValue = $calculator->calcBasalMetabolicRate()->getResult()->getInUnit('kCal')->getAmount()->getValue();
 
 		$result = new \Fatty\Energy(
-			new Amount(($totalDailyEnergyExpenditureValue - $basalMetabolicRateValue) * -.35),
+			new Amount(
+				($totalDailyEnergyExpenditureValue - $basalMetabolicRateValue) * -.35
+			),
 			'kCal',
 		);
 
