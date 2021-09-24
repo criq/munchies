@@ -248,7 +248,7 @@ class Calculator
 			}
 		}
 
-		if (trim($params['goal_weight'] ?? null) || ($params["goal_weight_{$params['goal_vector']}"] ?? null)) {
+		if (trim($params['goal_weight'] ?? null) || trim($params["goal_weight_{$params['goal_vector']}"] ?? null)) {
 			try {
 				$value = Weight::createFromString(($params['goal_weight'] ?? null) ?: ($params["goal_weight_{$params['goal_vector']}"] ?? null), 'kg');
 				if (!$value) {
@@ -274,10 +274,9 @@ class Calculator
 			}
 		}
 
-		$params['diet_carbs'] = 80;
-		if (trim($params['diet_carbs'] ?? null)) {
+		if (trim($params['diet_carbs'] ?? null) || trim($params["diet_carbs_{$params['diet_approach']}"] ?? null)) {
 			try {
-				$value = Carbs::createFromString($params['diet_carbs'], 'g');
+				$value = Carbs::createFromString(($params['diet_carbs'] ?? null) ?: ($params["diet_carbs_{$params['diet_approach']}"] ?? null), 'g');
 				if (!$value) {
 					throw new InvalidDietCarbsException;
 				}
