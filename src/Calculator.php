@@ -256,7 +256,7 @@ class Calculator
 			} catch (\Throwable $e) {
 				$goalWeightString = null;
 			}
-		} catch (\Throwable) {
+		} catch (\Throwable $e) {
 			$goalWeightString = null;
 		}
 
@@ -294,7 +294,7 @@ class Calculator
 			} catch (\Throwable $e) {
 				$dietCarbsString = null;
 			}
-		} catch (\Throwable) {
+		} catch (\Throwable $e) {
 			$dietCarbsString = null;
 		}
 
