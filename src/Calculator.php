@@ -251,7 +251,11 @@ class Calculator
 		try {
 			$goalWeightString = trim($params['goal_weight']);
 		} catch (\Throwable $e) {
-			$goalWeightString = trim($params['goal_weight_' . $params['goal_vector']]);
+			try {
+				$goalWeightString = trim($params['goal_weight_' . $params['goal_vector']]);
+			} catch (\Throwable $e) {
+				$goalWeightString = null;
+			}
 		} catch (\Throwable) {
 			$goalWeightString = null;
 		}
@@ -285,7 +289,11 @@ class Calculator
 		try {
 			$dietCarbsString = trim($params['diet_carbs']);
 		} catch (\Throwable $e) {
-			$dietCarbsString = trim($params['diet_carbs_' . $params['diet_approach']]);
+			try {
+				$dietCarbsString = trim($params['diet_carbs_' . $params['diet_approach']]);
+			} catch (\Throwable $e) {
+				$dietCarbsString = null;
+			}
 		} catch (\Throwable) {
 			$dietCarbsString = null;
 		}
