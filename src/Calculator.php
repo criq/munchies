@@ -1831,7 +1831,12 @@ class Calculator
 		$res['input']['goal_vector'] = $this->getGoal()->getVector() ? $this->getGoal()->getVector()->getCode() : null;
 		$res['input']['goal_weight'] = $this->getGoal()->getWeight() ? $this->getGoal()->getWeight()->getAmount()->getValue() : null;
 		$res['input']['diet_approach'] = $this->getDiet()->getApproach() ? $this->getDiet()->getApproach()->getCode() : null;
-		$res['input']['diet_carbs'] = $this->getDiet()->getCarbs() ? $this->getDiet()->getCarbs()->getAmount()->getValue() : null;
+
+		try {
+			$res['input']['diet_carbs'] = $this->getDiet()->getCarbs() ? $this->getDiet()->getCarbs()->getAmount()->getValue() : null;
+		} catch (\Throwable $e) {
+			// Nevermind.
+		}
 
 		// $res['input']['pregnancyIsPregnant'] =
 		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
