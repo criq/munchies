@@ -47,6 +47,15 @@ class Diet
 
 	public function getCarbs(): Carbs
 	{
-		return $this->carbs ?: $this->getApproach()->getCarbsDefault();
+		if ($this->carbs) {
+			return $this->carbs;
+		}
+
+		$approach = $this->getApproach();
+		if (!$approach) {
+			throw new MissingDietApproachException;
+		}
+
+		return $this->getApproach()->getCarbsDefault();
 	}
 }
