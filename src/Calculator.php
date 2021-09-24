@@ -248,9 +248,9 @@ class Calculator
 			}
 		}
 
-		if (trim($params['goal_weight'] ?? null)) {
+		if (trim($params['goal_weight'] ?? null) || ($params["goal_weight_{$params['goal_vector']}"] ?? null)) {
 			try {
-				$value = Weight::createFromString($params['goal_weight'], 'kg');
+				$value = Weight::createFromString(($params['goal_weight'] ?? null) ?: ($params["goal_weight_{$params['goal_vector']}"] ?? null), 'kg');
 				if (!$value) {
 					throw new InvalidGoalWeightException;
 				}
@@ -2005,11 +2005,11 @@ class Calculator
 			$exceptionCollection->add($e);
 		}
 
-		// try {
-		// 	$metricCollection->append($this->getGoal()->calcGoalWeight());
-		// } catch (FattyException $e) {
-		// 	$exceptionCollection->add($e);
-		// }
+		try {
+			$metricCollection->append($this->getGoal()->calcGoalWeight());
+		} catch (FattyException $e) {
+			$exceptionCollection->add($e);
+		}
 
 		try {
 			$metricCollection->append($this->getGoal()->calcGoalTotalDailyEnergyExpenditure($this));
