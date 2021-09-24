@@ -290,7 +290,7 @@ class Calculator
 			$dietCarbsString = trim($params['diet_carbs']);
 		} catch (\Throwable $e) {
 			try {
-				$dietCarbsString = trim($params['diet_carbs_' . $params['diet_approach']]);
+				$dietCarbsString = trim($params['diet_approach_' . $params['diet_approach'] . '_carbs']);
 			} catch (\Throwable $e) {
 				$dietCarbsString = null;
 			}
