@@ -11,6 +11,7 @@ use Fatty\Exceptions\FattyExceptionCollection;
 use Fatty\Exceptions\InvalidActivityException;
 use Fatty\Exceptions\InvalidBirthdayException;
 use Fatty\Exceptions\InvalidBodyFatPercentageException;
+use Fatty\Exceptions\InvalidBreastfeedingChildbirthDateException;
 use Fatty\Exceptions\InvalidDietApproachException;
 use Fatty\Exceptions\InvalidDietCarbsException;
 use Fatty\Exceptions\InvalidGenderException;
@@ -26,6 +27,7 @@ use Fatty\Exceptions\InvalidUnitsException;
 use Fatty\Exceptions\InvalidWaistException;
 use Fatty\Exceptions\InvalidWeightException;
 use Fatty\Exceptions\MissingActivityException;
+use Fatty\Exceptions\MissingBirthdayException;
 use Fatty\Exceptions\MissingDietApproachException;
 use Fatty\Exceptions\MissingGenderException;
 use Fatty\Exceptions\MissingGoalVectorException;
@@ -787,11 +789,14 @@ class Calculator
 
 	public function calcOptimalFatPercentage(): MetricCollection
 	{
-		if (!$this->getBirthday()) {
-			throw new InvalidBirthdayException;
+		$gender = $this->getGender();
+		if (!$gender) {
+			throw new MissingGenderException;
 		}
 
-		$gender = $this->getGender();
+		if (!$this->getBirthday()) {
+			throw new MissingBirthdayException;
+		}
 		$age = $this->getBirthday()->getAge();
 
 		if ($gender instanceof Genders\Male) {
