@@ -15,16 +15,16 @@ class Loose extends \Fatty\Vector
 
 	public function calcTdeeChangePerDay(Calculator $calculator): AmountWithUnitMetric
 	{
-		$totalDailyEnergyExpenditureValue = $calculator->calcTotalDailyEnergyExpenditure()->getResult()->getInUnit('kCal')->getAmount()->getValue();
-		$basalMetabolicRateValue = $calculator->calcBasalMetabolicRate()->getResult()->getInUnit('kCal')->getAmount()->getValue();
+		$totalDailyEnergyExpenditureValue = $calculator->calcTotalDailyEnergyExpenditure()->getResult()->getInUnit("kCal")->getAmount()->getValue();
+		$basalMetabolicRateValue = $calculator->calcBasalMetabolicRate()->getResult()->getInUnit("kCal")->getAmount()->getValue();
 
 		$result = new Energy(
 			new Amount(
 				($totalDailyEnergyExpenditureValue - ($basalMetabolicRateValue + 50)) * -1
 			),
-			'kCal',
+			"kCal",
 		);
 
-		return new AmountWithUnitMetric('tdeeChangePerDay', $result);
+		return new AmountWithUnitMetric("tdeeChangePerDay", $result);
 	}
 }

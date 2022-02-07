@@ -4,5 +4,6 @@ namespace Fatty\Approaches;
 
 class Med extends Standard
 {
-	const LABEL_DECLINATED = 'středomořskou dietu';
+	const CODE = "MED";
+	const LABEL_DECLINATED = "středomořskou dietu";
 }

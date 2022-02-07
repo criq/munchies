@@ -13,16 +13,16 @@ class SlowLoose extends Loose
 
 	public function calcTdeeChangePerDay(Calculator $calculator): AmountWithUnitMetric
 	{
-		$totalDailyEnergyExpenditureValue = $calculator->calcTotalDailyEnergyExpenditure()->getResult()->getInUnit('kCal')->getAmount()->getValue();
-		$basalMetabolicRateValue = $calculator->calcBasalMetabolicRate()->getResult()->getInUnit('kCal')->getAmount()->getValue();
+		$totalDailyEnergyExpenditureValue = $calculator->calcTotalDailyEnergyExpenditure()->getResult()->getInUnit("kCal")->getAmount()->getValue();
+		$basalMetabolicRateValue = $calculator->calcBasalMetabolicRate()->getResult()->getInUnit("kCal")->getAmount()->getValue();
 
 		$result = new \Fatty\Energy(
 			new Amount(
 				($totalDailyEnergyExpenditureValue - $basalMetabolicRateValue) * -.35
 			),
-			'kCal',
+			"kCal",
 		);
 
-		return new AmountWithUnitMetric('tdeeChangePerDay', $result);
+		return new AmountWithUnitMetric("tdeeChangePerDay", $result);
 	}
 }

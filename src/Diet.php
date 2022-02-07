@@ -31,12 +31,12 @@ class Diet
 			throw new MissingDietApproachException;
 		}
 
-		return new StringMetric('dietApproach', $approach->getCode(), $approach->getLabelDeclinated());
+		return new StringMetric('dietApproach', $approach->getCode(), $approach->getDeclinatedLabel());
 	}
 
 	public function setCarbs(Carbs $carbs): Diet
 	{
-		if ($this->getApproach() && $this->getApproach()->getCarbsMin() && $this->getApproach()->getCarbsMax() && ($carbs->getAmount() < $this->getApproach()->getCarbsMin() || $carbs->getAmount() > $this->getApproach()->getCarbsMax())) {
+		if ($this->getApproach() && $this->getApproach()->getMinCarbs() && $this->getApproach()->getMaxCarbs() && ($carbs->getAmount() < $this->getApproach()->getMinCarbs() || $carbs->getAmount() > $this->getApproach()->getMaxCarbs())) {
 			throw new InvalidDietCarbsException;
 		}
 
@@ -56,6 +56,6 @@ class Diet
 			throw new MissingDietApproachException;
 		}
 
-		return $this->getApproach()->getCarbsDefault();
+		return $this->getApproach()->getDefaultCarbs();
 	}
 }

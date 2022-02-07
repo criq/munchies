@@ -277,7 +277,7 @@ class Calculator
 
 		if (trim($params['diet_approach'] ?? null)) {
 			try {
-				$value = Approach::createFromString($params['diet_approach']);
+				$value = Approach::createFromCode($params['diet_approach']);
 				if (!$value) {
 					throw new InvalidDietApproachException;
 				}
@@ -1461,9 +1461,9 @@ class Calculator
 			}
 		// NED diet.
 		} elseif ($dietApproach instanceof Ned) {
-			$nutrients->setCarbs((new Ned)->getCarbsDefault());
-			$nutrients->setFats((new Ned)->getFatsDefault());
-			$nutrients->setProteins((new Ned)->getProteinsDefault());
+			$nutrients->setCarbs((new Ned)->getDefaultCarbs());
+			$nutrients->setFats((new Ned)->getDefaultFats());
+			$nutrients->setProteins((new Ned)->getDefaultProteins());
 		}
 
 		return new MetricCollection([

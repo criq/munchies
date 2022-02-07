@@ -21,12 +21,12 @@ class Maintain extends \Fatty\Vector
 			$calculator->calcPhysicalActivityLevel()->getResult()->getValue() >= 2 ? static::TDEE_QUOTIENT__LARGE : static::TDEE_QUOTIENT
 		);
 
-		return new AmountMetric('tdeeQuotient', $result);
+		return new AmountMetric("tdeeQuotient", $result);
 	}
 
 	public function calcTdeeChangePerDay(Calculator $calculator): AmountWithUnitMetric
 	{
-		return new AmountWithUnitMetric('tdeeChangePerDay', new Energy(new Amount(0), Energy::getBaseUnit()));
+		return new AmountWithUnitMetric("tdeeChangePerDay", new Energy(new Amount(0), Energy::getBaseUnit()));
 	}
 
 	public function calcTotalDailyEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
