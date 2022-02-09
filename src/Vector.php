@@ -47,19 +47,19 @@ abstract class Vector
 		);
 	}
 
-	public function calcGoalTotalDailyEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
+	public function calcGoalWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
 	{
-		$totalDailyEnergyExpenditureValue = $calculator->calcTotalDailyEnergyExpenditure()->getResult()->getInBaseUnit()->getAmount()->getValue();
+		$weightGoalEnergyExpenditureValue = $calculator->calcWeightGoalEnergyExpenditure()->getResult()->getInBaseUnit()->getAmount()->getValue();
 		$tdeeChangePerDayValue = $this->calcTdeeChangePerDay($calculator)->getResult()->getInBaseUnit()->getAmount()->getValue();
 
 		$result = new Energy(
 			new Amount(
-				$totalDailyEnergyExpenditureValue + $tdeeChangePerDayValue
+				$weightGoalEnergyExpenditureValue + $tdeeChangePerDayValue
 			),
 			Energy::getBaseUnit(),
 		);
 
-		return new AmountWithUnitMetric('goalTotalDailyEnergyExpenditure', $result);
+		return new AmountWithUnitMetric('goalWeightGoalEnergyExpenditure', $result);
 	}
 
 	public function getLabelInfinitive()

@@ -11,7 +11,6 @@ use Fatty\Exceptions\FattyExceptionCollection;
 use Fatty\Exceptions\InvalidActivityException;
 use Fatty\Exceptions\InvalidBirthdayException;
 use Fatty\Exceptions\InvalidBodyFatPercentageException;
-use Fatty\Exceptions\InvalidBreastfeedingChildbirthDateException;
 use Fatty\Exceptions\InvalidDietApproachException;
 use Fatty\Exceptions\InvalidDietCarbsException;
 use Fatty\Exceptions\InvalidGenderException;
@@ -57,7 +56,7 @@ class Calculator
 	protected $params;
 	protected $proportions;
 	protected $sportDurations;
-	protected $units = 'kJ';
+	protected $units = "kJ";
 	protected $weight;
 
 	public function __construct(?array $params = [])
@@ -79,9 +78,9 @@ class Calculator
 
 		$exceptionCollection = new FattyExceptionCollection;
 
-		if (trim($params['gender'] ?? null)) {
+		if (trim($params["gender"] ?? null)) {
 			try {
-				$value = \Fatty\Gender::createFromString($params['gender']);
+				$value = \Fatty\Gender::createFromString($params["gender"]);
 				if (!$value) {
 					throw new InvalidGenderException;
 				}
@@ -92,9 +91,9 @@ class Calculator
 			}
 		}
 
-		if (trim($params['birthday'] ?? null)) {
+		if (trim($params["birthday"] ?? null)) {
 			try {
-				$value = \Fatty\Birthday::createFromString($params['birthday']);
+				$value = \Fatty\Birthday::createFromString($params["birthday"]);
 				if (!$value) {
 					throw new InvalidBirthdayException;
 				}
@@ -105,9 +104,9 @@ class Calculator
 			}
 		}
 
-		if (trim($params['weight'] ?? null)) {
+		if (trim($params["weight"] ?? null)) {
 			try {
-				$value = Weight::createFromString($params['weight'], 'kg');
+				$value = Weight::createFromString($params["weight"], "kg");
 				if (!$value) {
 					throw new InvalidWeightException;
 				}
@@ -118,9 +117,9 @@ class Calculator
 			}
 		}
 
-		if (trim($params['proportions_height'] ?? null)) {
+		if (trim($params["proportions_height"] ?? null)) {
 			try {
-				$value = Length::createFromString($params['proportions_height'], 'cm');
+				$value = Length::createFromString($params["proportions_height"], "cm");
 				if (!$value) {
 					throw new InvalidHeightException;
 				}
@@ -131,9 +130,9 @@ class Calculator
 			}
 		}
 
-		if (trim($params['proportions_waist'] ?? null)) {
+		if (trim($params["proportions_waist"] ?? null)) {
 			try {
-				$value = Length::createFromString($params['proportions_waist'], 'cm');
+				$value = Length::createFromString($params["proportions_waist"], "cm");
 				if (!$value) {
 					throw new InvalidWaistException;
 				}
@@ -144,9 +143,9 @@ class Calculator
 			}
 		}
 
-		if (trim($params['proportions_hips'] ?? null)) {
+		if (trim($params["proportions_hips"] ?? null)) {
 			try {
-				$value = Length::createFromString($params['proportions_hips'], 'cm');
+				$value = Length::createFromString($params["proportions_hips"], "cm");
 				if (!$value) {
 					throw new InvalidHipsException;
 				}
@@ -157,9 +156,9 @@ class Calculator
 			}
 		}
 
-		if (trim($params['proportions_neck'] ?? null)) {
+		if (trim($params["proportions_neck"] ?? null)) {
 			try {
-				$value = Length::createFromString($params['proportions_neck'], 'cm');
+				$value = Length::createFromString($params["proportions_neck"], "cm");
 				if (!$value) {
 					throw new InvalidNeckException;
 				}
@@ -170,9 +169,9 @@ class Calculator
 			}
 		}
 
-		if (trim($params['bodyFatPercentage'] ?? null)) {
+		if (trim($params["bodyFatPercentage"] ?? null)) {
 			try {
-				$value = Percentage::createFromPercent($params['bodyFatPercentage']);
+				$value = Percentage::createFromPercent($params["bodyFatPercentage"]);
 				if (!$value) {
 					throw new InvalidBodyFatPercentageException;
 				}
@@ -183,9 +182,9 @@ class Calculator
 			}
 		}
 
-		if (trim($params['activity'] ?? null)) {
+		if (trim($params["activity"] ?? null)) {
 			try {
-				$value = Activity::createFromString($params['activity']);
+				$value = Activity::createFromString($params["activity"]);
 				if (!$value) {
 					throw new InvalidActivityException;
 				}
@@ -196,9 +195,9 @@ class Calculator
 			}
 		}
 
-		if (trim($params['sportDurations_lowFrequency'] ?? null)) {
+		if (trim($params["sportDurations_lowFrequency"] ?? null)) {
 			try {
-				$value = LowFrequency::createFromString($params['sportDurations_lowFrequency'], 'minutesPerWeek');
+				$value = LowFrequency::createFromString($params["sportDurations_lowFrequency"], "minutesPerWeek");
 				if (!$value) {
 					throw new InvalidSportDurationsLowFrequencyException;
 				}
@@ -209,9 +208,9 @@ class Calculator
 			}
 		}
 
-		if (trim($params['sportDurations_aerobic'] ?? null)) {
+		if (trim($params["sportDurations_aerobic"] ?? null)) {
 			try {
-				$value = Aerobic::createFromString($params['sportDurations_aerobic'], 'minutesPerWeek');
+				$value = Aerobic::createFromString($params["sportDurations_aerobic"], "minutesPerWeek");
 				if (!$value) {
 					throw new InvalidSportDurationsAerobicException;
 				}
@@ -222,9 +221,9 @@ class Calculator
 			}
 		}
 
-		if (trim($params['sportDurations_anaerobic'] ?? null)) {
+		if (trim($params["sportDurations_anaerobic"] ?? null)) {
 			try {
-				$value = Anaerobic::createFromString($params['sportDurations_anaerobic'], 'minutesPerWeek');
+				$value = Anaerobic::createFromString($params["sportDurations_anaerobic"], "minutesPerWeek");
 				if (!$value) {
 					throw new InvalidSportDurationsAnaerobicException;
 				}
@@ -235,11 +234,11 @@ class Calculator
 			}
 		}
 
-		$this->getGoal()->setDuration(new Duration(new Amount(12), 'weeks'));
+		$this->getGoal()->setDuration(new Duration(new Amount(12), "weeks"));
 
-		if (trim($params['goal_vector'] ?? null)) {
+		if (trim($params["goal_vector"] ?? null)) {
 			try {
-				$value = Vector::createFromString($params['goal_vector']);
+				$value = Vector::createFromString($params["goal_vector"]);
 				if (!$value) {
 					throw new InvalidGoalVectorException;
 				}
@@ -251,10 +250,10 @@ class Calculator
 		}
 
 		try {
-			$goalWeightString = trim($params['goal_weight']);
+			$goalWeightString = trim($params["goal_weight"]);
 		} catch (\Throwable $e) {
 			try {
-				$goalWeightString = trim($params['goal_weight_' . $params['goal_vector']]);
+				$goalWeightString = trim($params["goal_weight_" . $params["goal_vector"]]);
 			} catch (\Throwable $e) {
 				$goalWeightString = null;
 			}
@@ -264,7 +263,7 @@ class Calculator
 
 		if ($goalWeightString) {
 			try {
-				$value = Weight::createFromString($goalWeightString, 'kg');
+				$value = Weight::createFromString($goalWeightString, "kg");
 				if (!$value) {
 					throw new InvalidGoalWeightException;
 				}
@@ -275,9 +274,9 @@ class Calculator
 			}
 		}
 
-		if (trim($params['diet_approach'] ?? null)) {
+		if (trim($params["diet_approach"] ?? null)) {
 			try {
-				$value = Approach::createFromCode($params['diet_approach']);
+				$value = Approach::createFromCode($params["diet_approach"]);
 				if (!$value) {
 					throw new InvalidDietApproachException;
 				}
@@ -289,10 +288,10 @@ class Calculator
 		}
 
 		try {
-			$dietCarbsString = trim($params['diet_carbs']);
+			$dietCarbsString = trim($params["diet_carbs"]);
 		} catch (\Throwable $e) {
 			try {
-				$dietCarbsString = trim($params['diet_carbs_' . $params['diet_approach']]);
+				$dietCarbsString = trim($params["diet_carbs_" . $params["diet_approach"]]);
 			} catch (\Throwable $e) {
 				$dietCarbsString = null;
 			}
@@ -302,7 +301,7 @@ class Calculator
 
 		if ($dietCarbsString) {
 			try {
-				$value = Carbs::createFromString($dietCarbsString, 'g');
+				$value = Carbs::createFromString($dietCarbsString, "g");
 				if (!$value) {
 					throw new InvalidDietCarbsException;
 				}
@@ -314,32 +313,32 @@ class Calculator
 		}
 
 		// if ($this->getGender() instanceof \App\Classes\Profile\Genders\Female) {
-		// 	if (isset($params['pregnancyIsPregnant']) && $params['pregnancyIsPregnant']) {
+		// 	if (isset($params["pregnancyIsPregnant"]) && $params["pregnancyIsPregnant"]) {
 		// 		$this->getGender()->setIsPregnant(true);
 
-		// 		if (isset($params['pregnancyChildbirthDate'])) {
+		// 		if (isset($params["pregnancyChildbirthDate"])) {
 		// 			try {
-		// 				$this->getGender()->setPregnancyChildbirthDate($params['pregnancyChildbirthDate']);
+		// 				$this->getGender()->setPregnancyChildbirthDate($params["pregnancyChildbirthDate"]);
 		// 			} catch (FattyException $e) {
 		// 				$exceptionCollection->add($e);
 		// 			}
 		// 		}
 		// 	}
 
-		// 	if (isset($params['breastfeedingIsBreastfeeding']) && $params['breastfeedingIsBreastfeeding']) {
+		// 	if (isset($params["breastfeedingIsBreastfeeding"]) && $params["breastfeedingIsBreastfeeding"]) {
 		// 		$this->getGender()->setIsBreastfeeding(true);
 
-		// 		if (isset($params['breastfeeding']['childbirthDate'])) {
+		// 		if (isset($params["breastfeeding"]["childbirthDate"])) {
 		// 			try {
-		// 				$this->getGender()->setBreastfeedingChildbirthDate($params['breastfeeding']['childbirthDate']);
+		// 				$this->getGender()->setBreastfeedingChildbirthDate($params["breastfeeding"]["childbirthDate"]);
 		// 			} catch (FattyException $e) {
 		// 				$exceptionCollection->add($e);
 		// 			}
 		// 		}
 
-		// 		if (isset($params['breastfeedingMode'])) {
+		// 		if (isset($params["breastfeedingMode"])) {
 		// 			try {
-		// 				$this->getGender()->setBreastfeedingMode($params['breastfeedingMode']);
+		// 				$this->getGender()->setBreastfeedingMode($params["breastfeedingMode"]);
 		// 			} catch (FattyException $e) {
 		// 				$exceptions->add($e);
 		// 			}
@@ -347,9 +346,9 @@ class Calculator
 		// 	}
 		// }
 
-		if (trim($params['units'] ?? null)) {
+		if (trim($params["units"] ?? null)) {
 			try {
-				$this->setUnits($params['units']);
+				$this->setUnits($params["units"]);
 			} catch (FattyException $e) {
 				$exceptionCollection->add($e);
 			}
@@ -389,7 +388,7 @@ class Calculator
 
 	public function getIsOverweight(): bool
 	{
-		return (bool)$this->calcFatOverOptimalWeight()->filterByName('fatOverOptimalWeightMax')[0]->getResult()->getAmount()->getValue();
+		return (bool)$this->calcFatOverOptimalWeight()->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getAmount()->getValue();
 	}
 
 	/*****************************************************************************
@@ -397,7 +396,7 @@ class Calculator
 	 */
 	public function setUnits(string $value): Calculator
 	{
-		if (!in_array($value, ['kJ', 'kcal'])) {
+		if (!in_array($value, ["kJ", "kcal"])) {
 			throw new InvalidUnitsException;
 		}
 
@@ -467,7 +466,7 @@ class Calculator
 
 		$formula = "weight[{$weightValue}] = {$weightValue}";
 
-		return new AmountWithUnitMetric('weight', $weight, $formula);
+		return new AmountWithUnitMetric("weight", $weight, $formula);
 	}
 
 	/*****************************************************************************
@@ -527,7 +526,7 @@ class Calculator
 			throw new MissingActivityException;
 		}
 
-		return new AmountMetric('activity', $activity);
+		return new AmountMetric("activity", $activity);
 	}
 
 	public function getSportDurations(): SportDurations
@@ -569,9 +568,9 @@ class Calculator
 		$sportActivityValue = $sportActivity->getResult()->getValue();
 
 		$result = new Activity($activityValue + $sportActivityValue);
-		$formula = 'activityPal[' . $activityValue . '] + sportPal[' . $sportActivityValue . '] = ' . $result->getValue();
+		$formula = "activityPal[" . $activityValue . "] + sportPal[" . $sportActivityValue . "] = " . $result->getValue();
 
-		return new AmountMetric('physicalActivityLevel', $result, $formula);
+		return new AmountMetric("physicalActivityLevel", $result, $formula);
 	}
 
 	/*****************************************************************************
@@ -587,6 +586,13 @@ class Calculator
 	/*****************************************************************************
 	 * Diet.
 	 */
+	public function setDiet(Diet $diet): Calculator
+	{
+		$this->diet = $diet;
+
+		return $this;
+	}
+
 	public function getDiet(): Diet
 	{
 		$this->diet = $this->diet instanceof Diet ? $this->diet : new Diet;
@@ -613,20 +619,20 @@ class Calculator
 			throw $exceptionCollection;
 		}
 
-		$weight = $this->getWeight()->getInUnit('kg')->getAmount()->getValue();
-		$height = $this->getProportions()->getHeight()->getInUnit('m')->getAmount()->getValue();
+		$weight = $this->getWeight()->getInUnit("kg")->getAmount()->getValue();
+		$height = $this->getProportions()->getHeight()->getInUnit("m")->getAmount()->getValue();
 
 		$result = new Amount($weight / pow($height, 2));
-		$formula = 'weight[' . $weight . '] / pow(height[' . $height . '], 2) = ' . $result->getValue();
+		$formula = "weight[" . $weight . "] / pow(height[" . $height . "], 2) = " . $result->getValue();
 
-		return new AmountMetric('bodyMassIndex', $result, $formula);
+		return new AmountMetric("bodyMassIndex", $result, $formula);
 	}
 
 	public function calcBodyMassIndexDeviation(): AmountMetric
 	{
 		$result = static::getDeviation($this->calcBodyMassIndex()->getResult()->getValue(), 22, [17.7, 40]);
 
-		return new AmountMetric('bodyMassIndexDeviation', $result);
+		return new AmountMetric("bodyMassIndexDeviation", $result);
 	}
 
 	/*****************************************************************************
@@ -648,13 +654,13 @@ class Calculator
 			throw $exceptionCollection;
 		}
 
-		$waist = $this->getProportions()->getWaist()->getInUnit('cm')->getAmount()->getValue();
-		$hips = $this->getProportions()->getHips()->getInUnit('cm')->getAmount()->getValue();
+		$waist = $this->getProportions()->getWaist()->getInUnit("cm")->getAmount()->getValue();
+		$hips = $this->getProportions()->getHips()->getInUnit("cm")->getAmount()->getValue();
 
 		$result = new Amount($waist / $hips);
-		$formula = 'waist[' . $waist . '] / hips[' . $hips . '] = ' . $result->getValue();
+		$formula = "waist[" . $waist . "] / hips[" . $hips . "] = " . $result->getValue();
 
-		return new AmountMetric('waistHipRatio', $result, $formula);
+		return new AmountMetric("waistHipRatio", $result, $formula);
 	}
 
 	public function calcWaistHipRatioDeviation(): AmountMetric
@@ -672,7 +678,7 @@ class Calculator
 			$result = new Amount(static::getDeviation($waistHipRatioValue, .9, [.9, 1])->getValue() - 1);
 		}
 
-		return new AmountMetric('waistHipRatioDeviation', $result);
+		return new AmountMetric("waistHipRatioDeviation", $result);
 	}
 
 	/*****************************************************************************
@@ -722,14 +728,14 @@ class Calculator
 		}
 
 		$matrix = [
-			'A' => [1 => -1, -.5,   0,   0,   0,   0,   0],
-			'B' => [1 =>  1,  .5,  .5,  .5,   1,   1,   1],
-			'C' => [1 =>  1,   1,  .5,  .5,  .5,  .5,  .5],
-			'D' => [1 =>  1,   1,  .5,  .5,   1,   1,   1],
-			'E' => [1 =>  1,   1,  .5,   1,   1,   1,   1],
+			"A" => [1 => -1, -.5,   0,   0,   0,   0,   0],
+			"B" => [1 =>  1,  .5,  .5,  .5,   1,   1,   1],
+			"C" => [1 =>  1,   1,  .5,  .5,  .5,  .5,  .5],
+			"D" => [1 =>  1,   1,  .5,  .5,   1,   1,   1],
+			"E" => [1 =>  1,   1,  .5,   1,   1,   1,   1],
 		];
 
-		return new AmountMetric('riskDeviation', new Amount($matrix[$column][$row]));
+		return new AmountMetric("riskDeviation", new Amount($matrix[$column][$row]));
 	}
 
 	/*****************************************************************************
@@ -747,17 +753,17 @@ class Calculator
 			throw new MissingGenderException;
 		}
 
-		$weightValue = $weight->getInUnit('kg')->getAmount()->getValue();
+		$weightValue = $weight->getInUnit("kg")->getAmount()->getValue();
 		$bodyFatPercentageValue = $gender->calcBodyFatPercentage($this)->getResult()->getValue();
 
 		$result = new Weight(
 			new Amount($weightValue * $bodyFatPercentageValue),
-			'kg',
+			"kg",
 		);
 
 		$formula = "weight[{$weightValue}] * bodyFatPercentageValue[{$bodyFatPercentageValue}] = {$result->getAmount()->getValue()}";
 
-		return new AmountWithUnitMetric('bodyFatWeight', $result, $formula);
+		return new AmountWithUnitMetric("bodyFatWeight", $result, $formula);
 	}
 
 	public function calcActiveBodyMassPercentage(): AmountMetric
@@ -767,7 +773,7 @@ class Calculator
 		$result = new Percentage(1 - $bodyFatPercentageValue);
 		$formula = "1 - bodyFatPercentage[$bodyFatPercentageValue] = {$result->getValue()}";
 
-		return new AmountMetric('activeBodyMassPercentage', $result, $formula);
+		return new AmountMetric("activeBodyMassPercentage", $result, $formula);
 	}
 
 	public function calcActiveBodyMassWeight(): AmountWithUnitMetric
@@ -779,12 +785,12 @@ class Calculator
 
 		$result = new Weight(
 			new Amount(
-				$weight->getInUnit('kg')->getAmount()->getValue() * $this->calcActiveBodyMassPercentage()->getResult()->getValue()
+				$weight->getInUnit("kg")->getAmount()->getValue() * $this->calcActiveBodyMassPercentage()->getResult()->getValue()
 			),
-			'kg',
+			"kg",
 		);
 
-		return new AmountWithUnitMetric('activeBodyMassWeight', $result);
+		return new AmountWithUnitMetric("activeBodyMassWeight", $result);
 	}
 
 	public function calcOptimalFatPercentage(): MetricCollection
@@ -822,8 +828,8 @@ class Calculator
 		}
 
 		return new MetricCollection([
-			new AmountMetric('optimalFatPercentageMin', $result->getMin()),
-			new AmountMetric('optimalFatPercentageMax', $result->getMax()),
+			new AmountMetric("optimalFatPercentageMin", $result->getMin()),
+			new AmountMetric("optimalFatPercentageMax", $result->getMax()),
 		]);
 	}
 
@@ -841,21 +847,21 @@ class Calculator
 
 		return new MetricCollection([
 			new AmountWithUnitMetric(
-				'optimalFatWeightMin',
+				"optimalFatWeightMin",
 				new Weight(
 					new Amount(
-						$weight->getInUnit('kg')->getAmount()->getValue() * $this->calcOptimalFatPercentage()->filterByName('optimalFatPercentageMin')[0]->getResult()->getValue()
+						$weight->getInUnit("kg")->getAmount()->getValue() * $this->calcOptimalFatPercentage()->filterByName("optimalFatPercentageMin")[0]->getResult()->getValue()
 					),
-					'kg',
+					"kg",
 				)
 			),
 			new AmountWithUnitMetric(
-				'optimalFatWeightMax',
+				"optimalFatWeightMax",
 				new Weight(
 					new Amount(
-						$weight->getInUnit('kg')->getAmount()->getValue() * $this->calcOptimalFatPercentage()->filterByName('optimalFatPercentageMax')[0]->getResult()->getValue()
+						$weight->getInUnit("kg")->getAmount()->getValue() * $this->calcOptimalFatPercentage()->filterByName("optimalFatPercentageMax")[0]->getResult()->getValue()
 					),
-					'kg',
+					"kg",
 				)
 			),
 		]);
@@ -863,19 +869,19 @@ class Calculator
 
 	public function getOptimalWeight(): Interval
 	{
-		$activeBodyMassWeightValue = $this->calcActiveBodyMassWeight()->getResult()->getInUnit('kg')->getAmount()->getValue();
+		$activeBodyMassWeightValue = $this->calcActiveBodyMassWeight()->getResult()->getInUnit("kg")->getAmount()->getValue();
 		$optimalFatWeight = $this->calcOptimalFatWeight();
-		$optimalFatWeightMinValue = $optimalFatWeight->filterByName('optimalFatWeightMin')[0]->getResult()->getInUnit('kg')->getAmount()->getValue();
-		$optimalFatWeightMaxValue = $optimalFatWeight->filterByName('optimalFatWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()->getValue();
+		$optimalFatWeightMinValue = $optimalFatWeight->filterByName("optimalFatWeightMin")[0]->getResult()->getInUnit("kg")->getAmount()->getValue();
+		$optimalFatWeightMaxValue = $optimalFatWeight->filterByName("optimalFatWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()->getValue();
 
 		return new Interval(
 			new Weight(
 				new Amount($activeBodyMassWeightValue + $optimalFatWeightMinValue),
-				'kg',
+				"kg",
 			),
 			new Weight(
 				new Amount($activeBodyMassWeightValue + $optimalFatWeightMaxValue),
-				'kg',
+				"kg",
 			),
 		);
 	}
@@ -903,12 +909,12 @@ class Calculator
 		}
 
 		return new AmountWithUnitMetric(
-			'essentialFatWeight',
+			"essentialFatWeight",
 			new Weight(
 				new Amount(
-					$weight->getInUnit('kg')->getAmount()->getValue() * $essentialFatPercentage->getResult()->getValue()
+					$weight->getInUnit("kg")->getAmount()->getValue() * $essentialFatPercentage->getResult()->getValue()
 				),
-				'kg',
+				"kg",
 			)
 		);
 	}
@@ -918,12 +924,12 @@ class Calculator
 		$optimalFatWeight = $this->calcOptimalFatWeight();
 		$bodyFatWeight = $this->calcBodyFatWeight();
 
-		$min = $optimalFatWeight->filterByName('optimalFatWeightMin')[0]->getResult()->getInUnit('kg')->getAmount()->getValue() / $bodyFatWeight->getResult()->getInUnit('kg')->getAmount()->getValue();
-		$max = $optimalFatWeight->filterByName('optimalFatWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()->getValue() / $bodyFatWeight->getResult()->getInUnit('kg')->getAmount()->getValue();
+		$min = $optimalFatWeight->filterByName("optimalFatWeightMin")[0]->getResult()->getInUnit("kg")->getAmount()->getValue() / $bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue();
+		$max = $optimalFatWeight->filterByName("optimalFatWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()->getValue() / $bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue();
 
 		return new MetricCollection([
-			new AmountMetric('fatWithinOptimalPercentageMin', new Percentage($min <= 1 ? $min : 1)),
-			new AmountMetric('fatWithinOptimalPercentageMax', new Percentage($max <= 1 ? $max : 1)),
+			new AmountMetric("fatWithinOptimalPercentageMin", new Percentage($min <= 1 ? $min : 1)),
+			new AmountMetric("fatWithinOptimalPercentageMax", new Percentage($max <= 1 ? $max : 1)),
 		]);
 	}
 
@@ -932,21 +938,21 @@ class Calculator
 		$bodyFatWeight = $this->calcBodyFatWeight();
 		$optimalFatWeight = $this->calcOptimalFatWeight();
 
-		$min = $bodyFatWeight->getResult()->getInUnit('kg')->getAmount()->getValue() - $optimalFatWeight->filterByName('optimalFatWeightMin')[0]->getResult()->getInUnit('kg')->getAmount()->getValue();
-		$max = $bodyFatWeight->getResult()->getInUnit('kg')->getAmount()->getValue() - $optimalFatWeight->filterByName('optimalFatWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()->getValue();
+		$min = $bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue() - $optimalFatWeight->filterByName("optimalFatWeightMin")[0]->getResult()->getInUnit("kg")->getAmount()->getValue();
+		$max = $bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue() - $optimalFatWeight->filterByName("optimalFatWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()->getValue();
 
 		return new MetricCollection([
-			new AmountWithUnitMetric('fatWithinOptimalWeightMin', new Weight(
+			new AmountWithUnitMetric("fatWithinOptimalWeightMin", new Weight(
 				new Amount(
-					$bodyFatWeight->getResult()->getInUnit('kg')->getAmount()->getValue() - ($min >= 0 ? $min : 0)
+					$bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue() - ($min >= 0 ? $min : 0)
 				),
-				'kg',
+				"kg",
 			)),
-			new AmountWithUnitMetric('fatWithinOptimalWeightMax', new Weight(
+			new AmountWithUnitMetric("fatWithinOptimalWeightMax", new Weight(
 				new Amount(
-					$bodyFatWeight->getResult()->getInUnit('kg')->getAmount()->getValue() - ($max >= 0 ? $max : 0)
+					$bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue() - ($max >= 0 ? $max : 0)
 				),
-				'kg',
+				"kg",
 			)),
 		]);
 	}
@@ -956,21 +962,21 @@ class Calculator
 		$bodyFatWeight = $this->calcBodyFatWeight();
 		$optimalFatWeight = $this->calcOptimalFatWeight();
 
-		$min = $bodyFatWeight->getResult()->getInUnit('kg')->getAmount()->getValue() - $optimalFatWeight->filterByName('optimalFatWeightMin')[0]->getResult()->getInUnit('kg')->getAmount()->getValue();
-		$max = $bodyFatWeight->getResult()->getInUnit('kg')->getAmount()->getValue() - $optimalFatWeight->filterByName('optimalFatWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()->getValue();
+		$min = $bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue() - $optimalFatWeight->filterByName("optimalFatWeightMin")[0]->getResult()->getInUnit("kg")->getAmount()->getValue();
+		$max = $bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue() - $optimalFatWeight->filterByName("optimalFatWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()->getValue();
 
 		return new MetricCollection([
-			new AmountWithUnitMetric('fatOverOptimalWeightMin', new Weight(
+			new AmountWithUnitMetric("fatOverOptimalWeightMin", new Weight(
 				new Amount(
 					$min >= 0 ? $min : 0
 				),
-				'kg',
+				"kg",
 			)),
-			new AmountWithUnitMetric('fatOverOptimalWeightMax', new Weight(
+			new AmountWithUnitMetric("fatOverOptimalWeightMax", new Weight(
 				new Amount(
 					$max >= 0 ? $max : 0
 				),
-				'kg',
+				"kg",
 			)),
 		]);
 	}
@@ -980,12 +986,12 @@ class Calculator
 		$fatOverOptimalWeight = $this->calcFatOverOptimalWeight();
 		$bodyFatWeight = $this->calcBodyFatWeight();
 
-		$min = $fatOverOptimalWeight->filterByName('fatOverOptimalWeightMin')[0]->getResult()->getInUnit('kg')->getAmount()->getValue() / $bodyFatWeight->getResult()->getInUnit('kg')->getAmount()->getValue();
-		$max = $fatOverOptimalWeight->filterByName('fatOverOptimalWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()->getValue() / $bodyFatWeight->getResult()->getInUnit('kg')->getAmount()->getValue();
+		$min = $fatOverOptimalWeight->filterByName("fatOverOptimalWeightMin")[0]->getResult()->getInUnit("kg")->getAmount()->getValue() / $bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue();
+		$max = $fatOverOptimalWeight->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()->getValue() / $bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue();
 
 		return new MetricCollection([
-			new AmountMetric('fatOverOptimalPercentageMin', new Percentage($min)),
-			new AmountMetric('fatOverOptimalPercentageMax', new Percentage($max)),
+			new AmountMetric("fatOverOptimalPercentageMin", new Percentage($min)),
+			new AmountMetric("fatOverOptimalPercentageMax", new Percentage($max)),
 		]);
 	}
 
@@ -997,10 +1003,10 @@ class Calculator
 		$isOverweight = $this->getIsOverweight();
 
 		if ($gender instanceof Genders\Male && $bodyMassIndex->getResult()->getValue() >= .95 && !$isOverweight) {
-			return new AmountMetric('bodyFatDeviation', new Amount(0));
+			return new AmountMetric("bodyFatDeviation", new Amount(0));
 		}
 
-		return new AmountMetric('bodyFatDeviation', $bodyMassIndexDeviation->getResult());
+		return new AmountMetric("bodyFatDeviation", $bodyMassIndexDeviation->getResult());
 	}
 
 	/*****************************************************************************
@@ -1013,17 +1019,17 @@ class Calculator
 			throw new MissingWeightException;
 		}
 
-		$weightValue = $weight->getInUnit('kg')->getAmount()->getValue();
+		$weightValue = $weight->getInUnit("kg")->getAmount()->getValue();
 		$bodyFatPercentageValue = $this->calcBodyFatPercentage()->getResult()->getValue();
 
 		$result = new Weight(
 			new Amount($weightValue - ($bodyFatPercentageValue * $weightValue)),
-			'kg',
+			"kg",
 		);
 
-		$formula = 'weight[' . $weightValue . '] - (bodyFatPercentage[' . $bodyFatPercentageValue . '] * weight[' . $weightValue . ']) = ' . $result->getAmount()->getValue();
+		$formula = "weight[" . $weightValue . "] - (bodyFatPercentage[" . $bodyFatPercentageValue . "] * weight[" . $weightValue . "]) = " . $result->getAmount()->getValue();
 
-		return new AmountWithUnitMetric('fatFreeMass', $result, $formula);
+		return new AmountWithUnitMetric("fatFreeMass", $result, $formula);
 	}
 
 	/*****************************************************************************
@@ -1041,42 +1047,43 @@ class Calculator
 	/*****************************************************************************
 	 * Total Energy Expenditure - Termický efekt pohybu - TEE.
 	 */
-	public function calcTotalEnergyExpenditure(): AmountWithUnitMetric
+	public function calcTotalDailyEnergyExpenditure(): AmountWithUnitMetric
 	{
-		$basalMetabolicRate = $this->calcBasalMetabolicRate()->getResult()->getInUnit('kCal')->getAmount()->getValue();
+		$basalMetabolicRate = $this->calcBasalMetabolicRate()->getResult();
+		$basalMetabolicRateValue = $basalMetabolicRate->getInUnit("kCal")->getAmount()->getValue();
 		$physicalActivityLevel = $this->calcPhysicalActivityLevel()->getResult()->getValue();
 
 		$result = (new Energy(
-			new Amount($basalMetabolicRate * $physicalActivityLevel),
-			'kCal',
+			new Amount($basalMetabolicRateValue * $physicalActivityLevel),
+			"kCal",
 		))->getInUnit($this->getUnits());
 
-		$formula = 'basalMetabolicRate[' . $basalMetabolicRate . '] * physicalActivityLevel[' . $physicalActivityLevel . '] = ' . $result->getAmount()->getValue();
+		$formula = "basalMetabolicRate[" . $basalMetabolicRate . "] * physicalActivityLevel[" . $physicalActivityLevel . "] = " . $result;
 
-		return new AmountWithUnitMetric('totalEnergyExpenditure', $result, $formula);
+		return new AmountWithUnitMetric("totalDailyEnergyExpenditure", $result, $formula);
 	}
 
 	/*****************************************************************************
 	 * Total Daily Energy Expenditure - Celkový doporučený denní příjem - TDEE.
 	 */
-	public function calcTotalDailyEnergyExpenditure(): AmountWithUnitMetric
+	public function calcWeightGoalEnergyExpenditure(): AmountWithUnitMetric
 	{
 		if (!$this->getGoal()->getVector()) {
 			throw new MissingGoalVectorException;
 		}
 
-		$totalEnergyExpenditure = $this->calcTotalEnergyExpenditure();
-		$totalEnergyExpenditureValue = $totalEnergyExpenditure->getResult()->getAmount()->getValue();
+		$totalDailyEnergyExpenditure = $this->calcTotalDailyEnergyExpenditure()->getResult();
+		$totalDailyEnergyExpenditureValue = $totalDailyEnergyExpenditure->getAmount()->getValue();
 		$tdeeQuotientValue = $this->getGoal()->getVector()->calcTdeeQuotient($this)->getResult()->getValue();
 
 		$result = (new Energy(
-			new Amount($totalEnergyExpenditureValue * $tdeeQuotientValue),
-			$totalEnergyExpenditure->getResult()->getUnit(),
+			new Amount($totalDailyEnergyExpenditureValue * $tdeeQuotientValue),
+			$totalDailyEnergyExpenditure->getUnit(),
 		))->getInUnit($this->getUnits());
 
-		$formula = 'totalEnergyExpenditure[' . $totalEnergyExpenditureValue . '] * weightGoalQuotient[' . $tdeeQuotientValue . '] = ' . $result->getAmount()->getValue();
+		$formula = "totalDailyEnergyExpenditure[" . $totalDailyEnergyExpenditure . "] * weightGoalQuotient[" . $tdeeQuotientValue . "] = " . $result;
 
-		return new AmountWithUnitMetric('totalDailyEnergyExpenditure', $result, $formula);
+		return new AmountWithUnitMetric("weightGoalEnergyExpenditure", $result, $formula);
 	}
 
 	/*****************************************************************************
@@ -1087,7 +1094,7 @@ class Calculator
 		$exceptionCollection = new FattyExceptionCollection;
 
 		try {
-			$totalDailyEnergyExpenditure = $this->calcTotalDailyEnergyExpenditure();
+			$weightGoalEnergyExpenditure = $this->calcWeightGoalEnergyExpenditure()->getResult();
 		} catch (FattyException $e) {
 			$exceptionCollection->add($e);
 		}
@@ -1112,23 +1119,24 @@ class Calculator
 				new Amount(
 					(float)Ned::ENERGY_DEFAULT
 				),
-				'kCal',
+				"kCal",
 			);
 
 			$formula = $result->getAmount()->getValue();
 		} else {
-			$totalDailyEnergyExpenditureValue = $totalDailyEnergyExpenditure->getResult()->getInUnit('kCal')->getAmount()->getValue();
-			$referenceDailyIntakeBonusValue = $referenceDailyIntakeBonus->getResult()->getInUnit('kCal')->getAmount()->getValue();
+			$weightGoalEnergyExpenditureValue = $weightGoalEnergyExpenditure->getInUnit("kCal")->getAmount()->getValue();
+			$referenceDailyIntakeBonus = $referenceDailyIntakeBonus->getResult();
+			$referenceDailyIntakeBonusValue = $referenceDailyIntakeBonus->getInUnit("kCal")->getAmount()->getValue();
 
 			$result = (new Energy(
-				new Amount($totalDailyEnergyExpenditureValue + $referenceDailyIntakeBonusValue),
-				'kCal',
+				new Amount($weightGoalEnergyExpenditureValue + $referenceDailyIntakeBonusValue),
+				"kCal",
 			))->getInUnit($this->getUnits());
 
-			$formula = 'totalDailyEnergyExpenditure[' . $totalDailyEnergyExpenditureValue . '] + referenceDailyIntakeBonus[' . $referenceDailyIntakeBonusValue . '] = ' . $result->getAmount()->getValue();
+			$formula = "weightGoalEnergyExpenditure[" . $weightGoalEnergyExpenditure . "] + referenceDailyIntakeBonus[" . $referenceDailyIntakeBonus . "] = " . $result;
 		}
 
-		return new AmountWithUnitMetric('referenceDailyIntake', $result, $formula);
+		return new AmountWithUnitMetric("referenceDailyIntake", $result, $formula);
 	}
 
 	/*****************************************************************************
@@ -1159,7 +1167,7 @@ class Calculator
 			// 13
 			if ($this->getGender() instanceof Genders\Male) {
 				// 14
-				if ($this->calcFatOverOptimalWeight()->filterByName('fatOverOptimalWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()) {
+				if ($this->calcFatOverOptimalWeight()->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()) {
 					$optimalWeight = $this->getOptimalWeight()->getMax();
 
 				// 15
@@ -1168,10 +1176,10 @@ class Calculator
 				}
 
 				$matrix = [
-					'fit'   => [1.5, 2.2, 1.8],
-					'unfit' => [1.5, 2,   1.7],
+					"fit"   => [1.5, 2.2, 1.8],
+					"unfit" => [1.5, 2,   1.7],
 				];
-				$matrixSet = ($this->calcBodyFatPercentage()->getResult()->getValue() > .19 || $this->calcBodyMassIndex()->getResult()->getValue() > 25) ? 'unfit' : 'fit';
+				$matrixSet = ($this->calcBodyFatPercentage()->getResult()->getValue() > .19 || $this->calcBodyMassIndex()->getResult()->getValue() > 25) ? "unfit" : "fit";
 
 				$optimalNutrients = [];
 				foreach ($this->getSportDurations()->getMaxDurations() as $sportDuration) {
@@ -1188,7 +1196,7 @@ class Calculator
 					$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][1];
 				}
 
-				$nutrients->setProteins(new Nutrients\Proteins(new Amount(max($optimalNutrients)), 'g'));
+				$nutrients->setProteins(new Nutrients\Proteins(new Amount(max($optimalNutrients)), "g"));
 
 			// 12
 			} elseif ($this->getGender() instanceof Genders\Female) {
@@ -1199,7 +1207,7 @@ class Calculator
 				// 16
 				} else {
 					// 17
-					if ($this->calcFatOverOptimalWeight()->filterByName('fatOverOptimalWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()) {
+					if ($this->calcFatOverOptimalWeight()->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()) {
 						$optimalWeight = $this->getOptimalWeight()->getMax();
 
 					// 18
@@ -1208,10 +1216,10 @@ class Calculator
 					}
 
 					$matrix = [
-						'fit'   => [1.4, 1.8, 1.6],
-						'unfit' => [1.5, 1.8, 1.8],
+						"fit"   => [1.4, 1.8, 1.6],
+						"unfit" => [1.5, 1.8, 1.8],
 					];
-					$matrixSet = ($this->calcBodyFatPercentage()->getResult()->getValue() > .25 || $this->calcBodyMassIndex()->getResult()->getValue() > 25) ? 'unfit' : 'fit';
+					$matrixSet = ($this->calcBodyFatPercentage()->getResult()->getValue() > .25 || $this->calcBodyMassIndex()->getResult()->getValue() > 25) ? "unfit" : "fit";
 
 					$optimalNutrients = [];
 					foreach ($this->getSportDurations()->getMaxDurations() as $sportDuration) {
@@ -1228,11 +1236,11 @@ class Calculator
 						$optimalNutrients[] = $optimalWeight->getAmount()->getValue() * $matrix[$matrixSet][1];
 					}
 
-					$nutrients->setProteins(new Nutrients\Proteins(new Amount(max($optimalNutrients)), 'g'));
+					$nutrients->setProteins(new Nutrients\Proteins(new Amount(max($optimalNutrients)), "g"));
 
 					// 19
 					if ($this->getGender()->isPregnant() || $this->getGender()->isBreastfeeding()) {
-						$nutrients->setProteins(new Nutrients\Proteins($nutrients->getProteins()->getInUnit('g')->getAmount() + 20, 'g'));
+						$nutrients->setProteins(new Nutrients\Proteins($nutrients->getProteins()->getInUnit("g")->getAmount() + 20, "g"));
 					}
 				}
 			}
@@ -1242,29 +1250,29 @@ class Calculator
 			// 3
 			if ($this->getGender() instanceof Genders\Female && ($this->getGender()->isPregnant() || $this->getGender()->isBreastfeeding())) {
 				// 11
-				$nutrients->setProteins(new Nutrients\Proteins(min(($this->getWeight()->getInUnit('kg')->getAmount()->getValue() * 1.4) + 20, 90), 'g'));
+				$nutrients->setProteins(new Nutrients\Proteins(min(($this->getWeight()->getInUnit("kg")->getAmount()->getValue() * 1.4) + 20, 90), "g"));
 
 			// 4
 			} else {
 				// 5
 				if ($this->getGender() instanceof Genders\Male) {
 					// 7
-					if ($this->calcFatOverOptimalWeight()->filterByName('fatOverOptimalWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()) {
-						$nutrients->setProteins(new Nutrients\Proteins(new Amount($this->getOptimalWeight()->getMax()->getInUnit('kg')->getAmount()->getValue() * 1.5), 'g'));
+					if ($this->calcFatOverOptimalWeight()->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()) {
+						$nutrients->setProteins(new Nutrients\Proteins(new Amount($this->getOptimalWeight()->getMax()->getInUnit("kg")->getAmount()->getValue() * 1.5), "g"));
 
 					// 8
 					} else {
-						$nutrients->setProteins(new Nutrients\Proteins(new Amount($this->getWeight()->getInUnit('kg')->getAmount()->getValue() * 1.5), 'g'));
+						$nutrients->setProteins(new Nutrients\Proteins(new Amount($this->getWeight()->getInUnit("kg")->getAmount()->getValue() * 1.5), "g"));
 					}
 				// 6
 				} elseif ($this->getGender() instanceof Genders\Female) {
 					// 9
-					if ($this->calcFatOverOptimalWeight()->filterByName('fatOverOptimalWeightMax')[0]->getResult()->getInUnit('kg')->getAmount()) {
-						$nutrients->setProteins(new Nutrients\Proteins(new Amount($this->getOptimalWeight()->getMax()->getInUnit('kg')->getAmount()->getValue() * 1.4), 'g'));
+					if ($this->calcFatOverOptimalWeight()->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()) {
+						$nutrients->setProteins(new Nutrients\Proteins(new Amount($this->getOptimalWeight()->getMax()->getInUnit("kg")->getAmount()->getValue() * 1.4), "g"));
 
 					// 10
 					} else {
-						$nutrients->setProteins(new Nutrients\Proteins(new Amount($this->getWeight()->getInUnit('kg')->getAmount()->getValue() * 1.4), 'g'));
+						$nutrients->setProteins(new Nutrients\Proteins(new Amount($this->getWeight()->getInUnit("kg")->getAmount()->getValue() * 1.4), "g"));
 					}
 				}
 			}
@@ -1273,7 +1281,7 @@ class Calculator
 		/***************************************************************************
 		 * Carbs and fats.
 		 */
-		$goalTdee = $this->getGoal()->calcGoalTotalDailyEnergyExpenditure($this);
+		$goalTdee = $this->getGoal()->calcGoalWeightGoalEnergyExpenditure($this);
 		$diet = $this->getDiet();
 		$dietApproach = $this->getDiet()->getApproach();
 		if (!$dietApproach) {
@@ -1287,8 +1295,8 @@ class Calculator
 				$nutrients->setCarbs(
 					Carbs::createFromEnergy(
 						new Energy(
-							new Amount($goalTdee->getResult()->getInUnit('kJ')->getAmount()->getValue() * .58),
-							'kJ',
+							new Amount($goalTdee->getResult()->getInUnit("kJ")->getAmount()->getValue() * .58),
+							"kJ",
 						),
 					),
 				);
@@ -1467,9 +1475,9 @@ class Calculator
 		}
 
 		return new MetricCollection([
-			new AmountWithUnitMetric('goalNutrientsCarbs', $nutrients->getCarbs()),
-			new AmountWithUnitMetric('goalNutrientsFats', $nutrients->getFats()),
-			new AmountWithUnitMetric('goalNutrientsProteins', $nutrients->getProteins()),
+			new AmountWithUnitMetric("goalNutrientsCarbs", $nutrients->getCarbs()),
+			new AmountWithUnitMetric("goalNutrientsFats", $nutrients->getFats()),
+			new AmountWithUnitMetric("goalNutrientsProteins", $nutrients->getProteins()),
 		]);
 	}
 
@@ -1483,8 +1491,8 @@ class Calculator
 	// 	// High sport physical activity level (>= 2).
 	// 	if ($this->calcPhysicalActivityLevel()->getValue() >= 2 && ($this->getSportDurations()->getAerobic()->getAmount() || $this->getSportDurations()->getAnaerobic()->getAmount())) {
 	// 		$messages[] = [
-	// 			'message' => \Katu\Config::get('caloricCalculator', 'messages', 'highSportPhysicalActivityLevel'),
-	// 			'fields' => ['sportDurations[aerobic]', 'sportDurations[anaerobic]'],
+	// 			"message" => \Katu\Config::get("caloricCalculator", "messages", "highSportPhysicalActivityLevel"),
+	// 			"fields" => ["sportDurations[aerobic]", "sportDurations[anaerobic]"],
 	// 		];
 	// 	}
 
@@ -1508,70 +1516,70 @@ class Calculator
 	// 			if ($bodyFatPercentageAmount < .19) {
 	// 				if ($bodyMassIndexAmount <= 18.5) {
 	// 					if ($bodyMassIndexAmount < 17) {
-	// 						$messages[]['message'] = "Těžká podvýživa, poruchy příjmu potravy!";
+	// 						$messages[]["message"] = "Těžká podvýživa, poruchy příjmu potravy!";
 	// 					} else {
-	// 						$messages[]['message'] = "Pozor, BMI není v normě, podváha!";
+	// 						$messages[]["message"] = "Pozor, BMI není v normě, podváha!";
 	// 					}
 
 	// 					if ($bodyFatPercentageAmount <= .05) {
-	// 						$messages[]['message'] = "Pozor, množství esenciálního tuku u mužů je 3-5 %. Jsi na hraně!";
+	// 						$messages[]["message"] = "Pozor, množství esenciálního tuku u mužů je 3-5 %. Jsi na hraně!";
 	// 					}
 	// 				} else {
-	// 					$messages[]['message'] = "Super, BMI i podíl tělesného tuku je jak má být.";
+	// 					$messages[]["message"] = "Super, BMI i podíl tělesného tuku je jak má být.";
 	// 				}
 	// 			} else {
-	// 				$messages[]['message'] = "BMI je v pořádku, ale máte více tělesného tuku, než by mělo být.";
+	// 				$messages[]["message"] = "BMI je v pořádku, ale máte více tělesného tuku, než by mělo být.";
 	// 			}
 	// 		} elseif ($gender instanceof Genders\Female) {
 	// 			if ($bodyFatPercentageAmount < .25) {
 	// 				if ($bodyMassIndexAmount <= 18.5) {
 	// 					if ($bodyMassIndexAmount < 17) {
-	// 						$messages[]['message'] = "Těžká podvýživa, poruchy příjmu potravy!";
+	// 						$messages[]["message"] = "Těžká podvýživa, poruchy příjmu potravy!";
 	// 					} else {
-	// 						$messages[]['message'] = "Pozor, BMI není v normě, podváha!";
+	// 						$messages[]["message"] = "Pozor, BMI není v normě, podváha!";
 	// 					}
 
 	// 					if ($bodyFatPercentageAmount <= .13) {
-	// 						$messages[]['message'] = "Pozor, množství esenciálního tuku u žen je 11-13 %. Jsi na hraně!";
+	// 						$messages[]["message"] = "Pozor, množství esenciálního tuku u žen je 11-13 %. Jsi na hraně!";
 	// 					}
 	// 				} else {
-	// 					$messages[]['message'] = "Super, BMI i podíl tělesného tuku je jak má být.";
+	// 					$messages[]["message"] = "Super, BMI i podíl tělesného tuku je jak má být.";
 	// 				}
 	// 			} else {
-	// 				$messages[]['message'] = "BMI je v pořádku, ale máte více tělesného tuku, než by mělo být.";
+	// 				$messages[]["message"] = "BMI je v pořádku, ale máte více tělesného tuku, než by mělo být.";
 	// 			}
 	// 		}
 	// 	} else {
 	// 		if ($gender instanceof Genders\Male) {
 	// 			if ($bodyFatPercentageAmount < .19) {
-	// 				$messages[]['message'] = "BMI sice v normě není, ale vše v pořádku, ty asi hodně cvičíš, takže na to nekoukej.";
+	// 				$messages[]["message"] = "BMI sice v normě není, ale vše v pořádku, ty asi hodně cvičíš, takže na to nekoukej.";
 	// 			} else {
 	// 				if ($bodyMassIndexAmount < 25) {
-	// 					$messages[]['message'] = "BMI je v pořádku, ale máte více tělesného tuku, než by mělo být.";
+	// 					$messages[]["message"] = "BMI je v pořádku, ale máte více tělesného tuku, než by mělo být.";
 	// 				} elseif ($bodyMassIndexAmount < 30) {
-	// 					$messages[]['message'] = "Pozor, máš nadváhu.";
+	// 					$messages[]["message"] = "Pozor, máš nadváhu.";
 	// 				} elseif ($bodyMassIndexAmount < 35) {
-	// 					$messages[]['message'] = "Obezita 1. stupně, pozor, hrozí riziko vzniku chorob.";
+	// 					$messages[]["message"] = "Obezita 1. stupně, pozor, hrozí riziko vzniku chorob.";
 	// 				} elseif ($bodyMassIndexAmount < 40) {
-	// 					$messages[]['message'] = "Obezita 2. stupně, vysoké riziko vzniku chorob.";
+	// 					$messages[]["message"] = "Obezita 2. stupně, vysoké riziko vzniku chorob.";
 	// 				} else {
-	// 					$messages[]['message'] = "Obezita 3. stupně, morbidní obezita.";
+	// 					$messages[]["message"] = "Obezita 3. stupně, morbidní obezita.";
 	// 				}
 	// 			}
 	// 		} elseif ($gender instanceof Genders\Female) {
 	// 			if ($bodyFatPercentageAmount < .25) {
-	// 				$messages[]['message'] = "BMI sice v normě není, ale vše v pořádku, ty asi hodně cvičíš, takže na to nekoukej.";
+	// 				$messages[]["message"] = "BMI sice v normě není, ale vše v pořádku, ty asi hodně cvičíš, takže na to nekoukej.";
 	// 			} else {
 	// 				if ($bodyMassIndexAmount < 25) {
-	// 					$messages[]['message'] = "BMI je v pořádku, ale máte více tělesného tuku, než by mělo být.";
+	// 					$messages[]["message"] = "BMI je v pořádku, ale máte více tělesného tuku, než by mělo být.";
 	// 				} elseif ($bodyMassIndexAmount < 30) {
-	// 					$messages[]['message'] = "Pozor, máš nadváhu.";
+	// 					$messages[]["message"] = "Pozor, máš nadváhu.";
 	// 				} elseif ($bodyMassIndexAmount < 35) {
-	// 					$messages[]['message'] = "Obezita 1. stupně, pozor, hrozí riziko vzniku chorob.";
+	// 					$messages[]["message"] = "Obezita 1. stupně, pozor, hrozí riziko vzniku chorob.";
 	// 				} elseif ($bodyMassIndexAmount < 40) {
-	// 					$messages[]['message'] = "Obezita 2. stupně, vysoké riziko vzniku chorob.";
+	// 					$messages[]["message"] = "Obezita 2. stupně, vysoké riziko vzniku chorob.";
 	// 				} else {
-	// 					$messages[]['message'] = "Obezita 3. stupně, morbidní obezita.";
+	// 					$messages[]["message"] = "Obezita 3. stupně, morbidní obezita.";
 	// 				}
 	// 			}
 	// 		}
@@ -1589,16 +1597,16 @@ class Calculator
 	// 	// Is pregnant.
 	// 	if ($this->getGender() instanceof Genders\Female && $this->getGender()->isPregnant()) {
 	// 		$messages[] = [
-	// 			'message' => \Katu\Config::get('caloricCalculator', 'messages', 'isPregnant'),
-	// 			'fields' => ['pregnancy[isPregnant]'],
+	// 			"message" => \Katu\Config::get("caloricCalculator", "messages", "isPregnant"),
+	// 			"fields" => ["pregnancy[isPregnant]"],
 	// 		];
 	// 	}
 
 	// 	// Is breastfeeding.
 	// 	if ($this->getGender() instanceof Genders\Female && $this->getGender()->isBreastfeeding()) {
 	// 		$messages[] = [
-	// 			'message' => \Katu\Config::get('caloricCalculator', 'messages', 'isBreastfeeding'),
-	// 			'fields' => ['pregnancy[isBreastfeeding]'],
+	// 			"message" => \Katu\Config::get("caloricCalculator", "messages", "isBreastfeeding"),
+	// 			"fields" => ["pregnancy[isBreastfeeding]"],
 	// 		];
 	// 	}
 
@@ -1607,28 +1615,28 @@ class Calculator
 	// 		// Is loosing weight while pregnant.
 	// 		if ($this->getGender() instanceof Genders\Female && $this->getGender()->isPregnant()) {
 	// 			$messages[] = [
-	// 				'message' => \Katu\Config::get('caloricCalculator', 'messages', 'isPregnantAndLoosingWeight'),
-	// 				'fields' => ['pregnancy[isPregnant]', 'goalTrend', 'goalWeight'],
+	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "isPregnantAndLoosingWeight"),
+	// 				"fields" => ["pregnancy[isPregnant]", "goalTrend", "goalWeight"],
 	// 			];
 
 	// 		// Is loosing weight while breastfeeding.
 	// 		} elseif ($this->getGender() instanceof Genders\Female && $this->getGender()->isBreastfeeding()) {
 	// 			$messages[] = [
-	// 				'message' => \Katu\Config::get('caloricCalculator', 'messages', 'isBreastfeedingAndLoosingWeight'),
-	// 				'fields' => ['pregnancy[isBreastfeeding]', 'goalTrend', 'goalWeight'],
+	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "isBreastfeedingAndLoosingWeight"),
+	// 				"fields" => ["pregnancy[isBreastfeeding]", "goalTrend", "goalWeight"],
 	// 			];
 	// 		} else {
 	// 			if (!($this->getWeight() instanceof Weight)) {
 	// 				$ec->add(
 	// 					(new FattyException("Missing weight."))
-	// 						->setAbbr('missingWeight')
+	// 						->setAbbr("missingWeight")
 	// 				);
 	// 			}
 
 	// 			if (!($this->getGoal()->getWeight() instanceof Weight)) {
 	// 				$ec->add(
 	// 					(new FattyException("Missing weight target."))
-	// 						->setAbbr('missingGoalWeight')
+	// 						->setAbbr("missingGoalWeight")
 	// 				);
 	// 			}
 
@@ -1639,32 +1647,32 @@ class Calculator
 	// 					$realisticGoalWeight = $this->getGoal()->getFinal($this);
 
 	// 					$messages[] = [
-	// 						'message' => strtr(\Katu\Config::get('caloricCalculator', 'messages', 'loosingWeightUnrealistic'), [
-	// 							'%realisticGoalWeight%' => $realisticGoalWeight,
+	// 						"message" => strtr(\Katu\Config::get("caloricCalculator", "messages", "loosingWeightUnrealistic"), [
+	// 							"%realisticGoalWeight%" => $realisticGoalWeight,
 	// 						]),
-	// 						'fields' => ['goalWeight'],
+	// 						"fields" => ["goalWeight"],
 	// 					];
 
 	// 				// Realistic loosing.
 	// 				} else {
-	// 					$weightChange = new Weight($this->getWeight()->getInUnit('kg')->getAmount() - $this->getGoal()->getWeight()->getInUnit('kg')->getAmount());
+	// 					$weightChange = new Weight($this->getWeight()->getInUnit("kg")->getAmount() - $this->getGoal()->getWeight()->getInUnit("kg")->getAmount());
 
 	// 					$messages[] = [
-	// 						'message' => strtr(\Katu\Config::get('caloricCalculator', 'messages', 'loosingWeightRealistic'), [
-	// 							'%weightChange%' => $weightChange,
+	// 						"message" => strtr(\Katu\Config::get("caloricCalculator", "messages", "loosingWeightRealistic"), [
+	// 							"%weightChange%" => $weightChange,
 	// 						]),
-	// 						'fields' => ['goalWeight'],
+	// 						"fields" => ["goalWeight"],
 	// 					];
 
-	// 					$slowLooseTdee = (new Vectors\SlowLoose)->calcTotalDailyEnergyExpenditure($this);
-	// 					$looseTdee = (new Vectors\Loose)->calcTotalDailyEnergyExpenditure($this);
+	// 					$slowLooseTdee = (new Vectors\SlowLoose)->calcWeightGoalEnergyExpenditure($this);
+	// 					$looseTdee = (new Vectors\Loose)->calcWeightGoalEnergyExpenditure($this);
 
 	// 					$messages[] = [
-	// 						'message' => strtr(\Katu\Config::get('caloricCalculator', 'messages', 'loosingWeightTdeeRecommendations'), [
-	// 							'%slowLooseTdee%' => $slowLooseTdee,
-	// 							'%looseTdee%' => $looseTdee,
+	// 						"message" => strtr(\Katu\Config::get("caloricCalculator", "messages", "loosingWeightTdeeRecommendations"), [
+	// 							"%slowLooseTdee%" => $slowLooseTdee,
+	// 							"%looseTdee%" => $looseTdee,
 	// 						]),
-	// 						'fields' => ['goalWeight'],
+	// 						"fields" => ["goalWeight"],
 	// 					];
 	// 				}
 	// 			}
@@ -1673,14 +1681,14 @@ class Calculator
 	// 		if (!($this->getWeight() instanceof Weight)) {
 	// 			$ec->add(
 	// 				(new FattyException("Missing weight."))
-	// 					->setAbbr('missingWeight')
+	// 					->setAbbr("missingWeight")
 	// 			);
 	// 		}
 
 	// 		if (!($this->getGoal()->getWeight() instanceof Weight)) {
 	// 			$ec->add(
 	// 				(new FattyException("Missing weight target."))
-	// 					->setAbbr('missingGoalWeight')
+	// 					->setAbbr("missingGoalWeight")
 	// 			);
 	// 		}
 
@@ -1691,38 +1699,38 @@ class Calculator
 	// 				$realisticGoalWeight = $this->getGoal()->getFinal($this);
 
 	// 				$messages[] = [
-	// 					'message' => strtr(\Katu\Config::get('caloricCalculator', 'messages', 'gainingWeightUnrealistic'), [
-	// 						'%realisticGoalWeight%' => $realisticGoalWeight,
+	// 					"message" => strtr(\Katu\Config::get("caloricCalculator", "messages", "gainingWeightUnrealistic"), [
+	// 						"%realisticGoalWeight%" => $realisticGoalWeight,
 	// 					]),
-	// 					'fields' => ['goalWeight'],
+	// 					"fields" => ["goalWeight"],
 	// 				];
 
 	// 			// Realistic gaining.
 	// 			} else {
-	// 				$weightChange = new Weight($this->getGoal()->getWeight()->getInUnit('kg')->getAmount() - $this->getWeight()->getInUnit('kg')->getAmount());
+	// 				$weightChange = new Weight($this->getGoal()->getWeight()->getInUnit("kg")->getAmount() - $this->getWeight()->getInUnit("kg")->getAmount());
 
 	// 				$messages[] = [
-	// 					'message' => strtr(\Katu\Config::get('caloricCalculator', 'messages', 'gainingWeightRealistic'), [
-	// 						'%weightChange%' => $weightChange,
+	// 					"message" => strtr(\Katu\Config::get("caloricCalculator", "messages", "gainingWeightRealistic"), [
+	// 						"%weightChange%" => $weightChange,
 	// 					]),
-	// 					'fields' => ['goalWeight'],
+	// 					"fields" => ["goalWeight"],
 	// 				];
 
-	// 				$slowGainTdee = (new Vectors\SlowGain)->calcTotalDailyEnergyExpenditure($this);
-	// 				$gainTdee = (new Vectors\Gain)->calcTotalDailyEnergyExpenditure($this);
+	// 				$slowGainTdee = (new Vectors\SlowGain)->calcWeightGoalEnergyExpenditure($this);
+	// 				$gainTdee = (new Vectors\Gain)->calcWeightGoalEnergyExpenditure($this);
 
 	// 				$messages[] = [
-	// 					'message' => strtr(\Katu\Config::get('caloricCalculator', 'messages', 'gainingWeightTdeeRecommendations'), [
-	// 						'%slowGainTdee%' => $slowGainTdee,
-	// 						'%gainTdee%' => $gainTdee,
+	// 					"message" => strtr(\Katu\Config::get("caloricCalculator", "messages", "gainingWeightTdeeRecommendations"), [
+	// 						"%slowGainTdee%" => $slowGainTdee,
+	// 						"%gainTdee%" => $gainTdee,
 	// 					]),
-	// 					'fields' => ['goalWeight'],
+	// 					"fields" => ["goalWeight"],
 	// 				];
 	// 			}
 
 	// 			$messages[] = [
-	// 				'message' => \Katu\Config::get('caloricCalculator', 'messages', 'gainingRecommendations'),
-	// 				'fields' => ['goalWeight'],
+	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "gainingRecommendations"),
+	// 				"fields" => ["goalWeight"],
 	// 			];
 	// 		}
 	// 	}
@@ -1742,15 +1750,15 @@ class Calculator
 	// 		// 7
 	// 		if ($this->getGender() instanceof Genders\Female && $this->getGender()->isPregnant()) {
 	// 			$messages[] = [
-	// 				'message' => \Katu\Config::get('caloricCalculator', 'messages', 'lowCarbButPregnant'),
-	// 				'fields' => ['diet'],
+	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "lowCarbButPregnant"),
+	// 				"fields" => ["diet"],
 	// 			];
 
 	// 		// 8
 	// 		} elseif ($this->getGender() instanceof Genders\Female && $this->getGender()->isBreastfeeding()) {
 	// 			$messages[] = [
-	// 				'message' => \Katu\Config::get('caloricCalculator', 'messages', 'lowCarbButBreastfeeding'),
-	// 				'fields' => ['diet'],
+	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "lowCarbButBreastfeeding"),
+	// 				"fields" => ["diet"],
 	// 			];
 	// 		}
 
@@ -1759,15 +1767,15 @@ class Calculator
 	// 		// 7
 	// 		if ($this->getGender() instanceof Genders\Female && $this->getGender()->isPregnant()) {
 	// 			$messages[] = [
-	// 				'message' => \Katu\Config::get('caloricCalculator', 'messages', 'ketoButPregnant'),
-	// 				'fields' => ['diet'],
+	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "ketoButPregnant"),
+	// 				"fields" => ["diet"],
 	// 			];
 
 	// 		// 8
 	// 		} elseif ($this->getGender() instanceof Genders\Female && $this->getGender()->isBreastfeeding()) {
 	// 			$messages[] = [
-	// 				'message' => \Katu\Config::get('caloricCalculator', 'messages', 'ketoButBreastfeeding'),
-	// 				'fields' => ['diet'],
+	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "ketoButBreastfeeding"),
+	// 				"fields" => ["diet"],
 	// 			];
 	// 		}
 	// 	}
@@ -1821,51 +1829,51 @@ class Calculator
 		/**************************************************************************
 		 * Input.
 		 */
-		$res['input']['gender'] = $this->getGender() ? $this->getGender()->getCode() : null;
-		$res['input']['birthday'] = $this->getBirthday() ? $this->getBirthday()->getDatetime()->format('Y-m-d') : null;
-		$res['input']['weight'] = $this->getWeight() ? $this->getWeight()->getAmount()->getValue() : null;
-		$res['input']['proportions_height'] = $this->getProportions()->getHeight() ? $this->getProportions()->getHeight()->getAmount()->getValue() : null;
-		$res['input']['proportions_waist'] = $this->getProportions()->getWaist() ? $this->getProportions()->getWaist()->getAmount()->getValue() : null;
-		$res['input']['proportions_hips'] = $this->getProportions()->getHips() ? $this->getProportions()->getHips()->getAmount()->getValue() : null;
-		$res['input']['proportions_neck'] = $this->getProportions()->getNeck() ? $this->getProportions()->getNeck()->getAmount()->getValue() : null;
-		$res['input']['bodyFatPercentage'] = $this->getBodyFatPercentage() ? $this->getBodyFatPercentage()->getValue() : null;
-		$res['input']['activity'] = $this->getActivity() ? $this->getActivity()->getValue() : null;
-		$res['input']['sportDurations_lowFrequency'] = $this->getSportDurations()->getLowFrequency() ? $this->getSportDurations()->getLowFrequency()->getAmount()->getValue() : null;
-		$res['input']['sportDurations_aerobic'] = $this->getSportDurations()->getAerobic() ? $this->getSportDurations()->getAerobic()->getAmount()->getValue() : null;
-		$res['input']['sportDurations_anaerobic'] = $this->getSportDurations()->getAnaerobic() ? $this->getSportDurations()->getAnaerobic()->getAmount()->getValue() : null;
-		$res['input']['goal_vector'] = $this->getGoal()->getVector() ? $this->getGoal()->getVector()->getCode() : null;
-		$res['input']['goal_weight'] = $this->getGoal()->getWeight() ? $this->getGoal()->getWeight()->getAmount()->getValue() : null;
-		$res['input']['diet_approach'] = $this->getDiet()->getApproach() ? $this->getDiet()->getApproach()->getCode() : null;
+		$res["input"]["gender"] = $this->getGender() ? $this->getGender()->getCode() : null;
+		$res["input"]["birthday"] = $this->getBirthday() ? $this->getBirthday()->getDatetime()->format("Y-m-d") : null;
+		$res["input"]["weight"] = $this->getWeight() ? $this->getWeight()->getAmount()->getValue() : null;
+		$res["input"]["proportions_height"] = $this->getProportions()->getHeight() ? $this->getProportions()->getHeight()->getAmount()->getValue() : null;
+		$res["input"]["proportions_waist"] = $this->getProportions()->getWaist() ? $this->getProportions()->getWaist()->getAmount()->getValue() : null;
+		$res["input"]["proportions_hips"] = $this->getProportions()->getHips() ? $this->getProportions()->getHips()->getAmount()->getValue() : null;
+		$res["input"]["proportions_neck"] = $this->getProportions()->getNeck() ? $this->getProportions()->getNeck()->getAmount()->getValue() : null;
+		$res["input"]["bodyFatPercentage"] = $this->getBodyFatPercentage() ? $this->getBodyFatPercentage()->getValue() : null;
+		$res["input"]["activity"] = $this->getActivity() ? $this->getActivity()->getValue() : null;
+		$res["input"]["sportDurations_lowFrequency"] = $this->getSportDurations()->getLowFrequency() ? $this->getSportDurations()->getLowFrequency()->getAmount()->getValue() : null;
+		$res["input"]["sportDurations_aerobic"] = $this->getSportDurations()->getAerobic() ? $this->getSportDurations()->getAerobic()->getAmount()->getValue() : null;
+		$res["input"]["sportDurations_anaerobic"] = $this->getSportDurations()->getAnaerobic() ? $this->getSportDurations()->getAnaerobic()->getAmount()->getValue() : null;
+		$res["input"]["goal_vector"] = $this->getGoal()->getVector() ? $this->getGoal()->getVector()->getCode() : null;
+		$res["input"]["goal_weight"] = $this->getGoal()->getWeight() ? $this->getGoal()->getWeight()->getAmount()->getValue() : null;
+		$res["input"]["diet_approach"] = $this->getDiet()->getApproach() ? $this->getDiet()->getApproach()->getCode() : null;
 
 		try {
-			$res['input']['diet_carbs'] = $this->getDiet()->getCarbs() ? $this->getDiet()->getCarbs()->getAmount()->getValue() : null;
+			$res["input"]["diet_carbs"] = $this->getDiet()->getCarbs() ? $this->getDiet()->getCarbs()->getAmount()->getValue() : null;
 		} catch (\Throwable $e) {
 			// Nevermind.
 		}
 
-		// $res['input']['pregnancyIsPregnant'] =
+		// $res["input"]["pregnancyIsPregnant"] =
 		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
 		// 	&& $this->getGender()->isPregnant()
 		// 		? true : false;
 
-		// $res['input']['pregnancyChildbirthDate'] =
+		// $res["input"]["pregnancyChildbirthDate"] =
 		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
 		// 	&& $this->getGender()->isPregnant()
 		// 	&& $this->getGender()->getPregnancyChildbirthDate() instanceof \App\Classes\Profile\Birthday
-		// 		? $this->getGender()->getPregnancyChildbirthDate()->getBirthday()->format('Y-m-d') : null;
+		// 		? $this->getGender()->getPregnancyChildbirthDate()->getBirthday()->format("Y-m-d") : null;
 
-		// $res['input']['breastfeedingIsBreastfeeding'] =
+		// $res["input"]["breastfeedingIsBreastfeeding"] =
 		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
 		// 	&& $this->getGender()->isBreastfeeding()
 		// 		? true : false;
 
-		// $res['input']['breastfeeding']['childbirthDate'] =
+		// $res["input"]["breastfeeding"]["childbirthDate"] =
 		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
 		// 	&& $this->getGender()->isBreastfeeding()
 		// 	&& $this->getGender()->getBreastfeedingChildbirthDate() instanceof \App\Classes\Profile\Birthday
-		// 		? $this->getGender()->getBreastfeedingChildbirthDate()->getBirthday()->format('Y-m-d') : null;
+		// 		? $this->getGender()->getBreastfeedingChildbirthDate()->getBirthday()->format("Y-m-d") : null;
 
-		// $res['input']['breastfeedingMode'] =
+		// $res["input"]["breastfeedingMode"] =
 		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
 		// 	&& $this->getGender()->isBreastfeeding()
 		// 	&& $this->getGender()->getBreastfeedingMode() instanceof \App\Classes\Profile\BreastfeedingMode
@@ -2015,13 +2023,13 @@ class Calculator
 		}
 
 		try {
-			$metricCollection->append($this->calcTotalEnergyExpenditure());
+			$metricCollection->append($this->calcTotalDailyEnergyExpenditure());
 		} catch (FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
-			$metricCollection->append($this->calcTotalDailyEnergyExpenditure());
+			$metricCollection->append($this->calcWeightGoalEnergyExpenditure());
 		} catch (FattyException $e) {
 			$exceptionCollection->add($e);
 		}
@@ -2045,7 +2053,7 @@ class Calculator
 		}
 
 		try {
-			$metricCollection->append($this->getGoal()->calcGoalTotalDailyEnergyExpenditure($this));
+			$metricCollection->append($this->getGoal()->calcGoalWeightGoalEnergyExpenditure($this));
 		} catch (FattyException $e) {
 			$exceptionCollection->add($e);
 		}
@@ -2078,8 +2086,8 @@ class Calculator
 			throw $exceptionCollection;
 		}
 
-		$locale = new Locale('cs_CZ');
-		$res['output']['metrics'] = $metricCollection->getSorted()->getResponse($locale);
+		$locale = new Locale("cs_CZ");
+		$res["output"]["metrics"] = $metricCollection->getSorted()->getResponse($locale);
 
 		return $res;
 	}
