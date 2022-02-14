@@ -10,8 +10,8 @@ use Fatty\Metrics\StringMetric;
 
 abstract class Gender
 {
-	const BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT = 'measurement';
-	const BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS = 'proportions';
+	const BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT = "measurement";
+	const BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS = "proportions";
 	const ESSENTIAL_FAT_PERCENTAGE = null;
 
 	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
@@ -21,7 +21,8 @@ abstract class Gender
 	public static function createFromString(string $value): ?Gender
 	{
 		try {
-			$class = 'Fatty\\Genders\\' . ucfirst($value);
+			$value = ucfirst($value);
+			$class = "Fatty\\Genders\\{$value}";
 
 			return new $class;
 		} catch (\Throwable $e) {
@@ -31,7 +32,7 @@ abstract class Gender
 
 	public function getCode()
 	{
-		return lcfirst(array_slice(explode('\\', get_called_class()), -1, 1)[0]);
+		return lcfirst(array_slice(explode("\\", get_called_class()), -1, 1)[0]);
 	}
 
 	/****************************************************************************
@@ -42,7 +43,7 @@ abstract class Gender
 		return false;
 	}
 
-	public function setIsPregnant($isPregnant)
+	public function setIsPregnant(bool $isPregnant)
 	{
 		return false;
 	}
@@ -144,12 +145,12 @@ abstract class Gender
 
 	protected function calcBodyFatPercentageByMeasurement(Calculator $calculator): AmountMetric
 	{
-		return new AmountMetric('bodyFatPercentage', $calculator->getBodyFatPercentage());
+		return new AmountMetric("bodyFatPercentage", $calculator->getBodyFatPercentage());
 	}
 
 	public function calcEssentialFatPercentage(): AmountMetric
 	{
-		return new AmountMetric('essentialFatPercentage', new Percentage((float)static::ESSENTIAL_FAT_PERCENTAGE));
+		return new AmountMetric("essentialFatPercentage", new Percentage((float)static::ESSENTIAL_FAT_PERCENTAGE));
 	}
 
 	/*****************************************************************************
@@ -157,6 +158,6 @@ abstract class Gender
 	 */
 	public function calcReferenceDailyIntakeBonus(): AmountWithUnitMetric
 	{
-		return new AmountWithUnitMetric('referenceDailyIntakeBonus', new Energy(new Amount(0), 'kJ'));
+		return new AmountWithUnitMetric("referenceDailyIntakeBonus", new Energy(new Amount(0), "kJ"));
 	}
 }

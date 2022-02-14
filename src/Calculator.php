@@ -4,38 +4,8 @@ namespace Fatty;
 
 use Fatty\Approaches\Keto;
 use Fatty\Approaches\LowCarb;
-use Fatty\Approaches\Ned;
+use Fatty\Approaches\LowEnergy;
 use Fatty\Approaches\Standard;
-use Fatty\Exceptions\FattyException;
-use Fatty\Exceptions\FattyExceptionCollection;
-use Fatty\Exceptions\InvalidActivityException;
-use Fatty\Exceptions\InvalidBirthdayException;
-use Fatty\Exceptions\InvalidBodyFatPercentageException;
-use Fatty\Exceptions\InvalidDietApproachException;
-use Fatty\Exceptions\InvalidDietCarbsException;
-use Fatty\Exceptions\InvalidGenderException;
-use Fatty\Exceptions\InvalidGoalVectorException;
-use Fatty\Exceptions\InvalidGoalWeightException;
-use Fatty\Exceptions\InvalidHeightException;
-use Fatty\Exceptions\InvalidHipsException;
-use Fatty\Exceptions\InvalidNeckException;
-use Fatty\Exceptions\InvalidSportDurationsAerobicException;
-use Fatty\Exceptions\InvalidSportDurationsAnaerobicException;
-use Fatty\Exceptions\InvalidSportDurationsLowFrequencyException;
-use Fatty\Exceptions\InvalidUnitsException;
-use Fatty\Exceptions\InvalidWaistException;
-use Fatty\Exceptions\InvalidWeightException;
-use Fatty\Exceptions\MissingActivityException;
-use Fatty\Exceptions\MissingBirthdayException;
-use Fatty\Exceptions\MissingDietApproachException;
-use Fatty\Exceptions\MissingGenderException;
-use Fatty\Exceptions\MissingGoalVectorException;
-use Fatty\Exceptions\MissingHeightException;
-use Fatty\Exceptions\MissingHipsException;
-use Fatty\Exceptions\MissingWaistException;
-use Fatty\Exceptions\MissingWeightException;
-use Fatty\Exceptions\UnableToCalcEssentialFatPercentageException;
-use Fatty\Exceptions\UnableToCalcOptimalFatPercentageException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\AmountWithUnitMetric;
 use Fatty\Metrics\StringMetric;
@@ -76,17 +46,17 @@ class Calculator
 	{
 		$this->params = $params;
 
-		$exceptionCollection = new FattyExceptionCollection;
+		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		if (trim($params["gender"] ?? null)) {
 			try {
 				$value = \Fatty\Gender::createFromString($params["gender"]);
 				if (!$value) {
-					throw new InvalidGenderException;
+					throw new \Fatty\Exceptions\InvalidGenderException;
 				}
 
 				$this->setGender($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -95,11 +65,11 @@ class Calculator
 			try {
 				$value = \Fatty\Birthday::createFromString($params["birthday"]);
 				if (!$value) {
-					throw new InvalidBirthdayException;
+					throw new \Fatty\Exceptions\InvalidBirthdayException;
 				}
 
 				$this->setBirthday($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -108,11 +78,11 @@ class Calculator
 			try {
 				$value = Weight::createFromString($params["weight"], "kg");
 				if (!$value) {
-					throw new InvalidWeightException;
+					throw new \Fatty\Exceptions\InvalidWeightException;
 				}
 
 				$this->setWeight($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -121,11 +91,11 @@ class Calculator
 			try {
 				$value = Length::createFromString($params["proportions_height"], "cm");
 				if (!$value) {
-					throw new InvalidHeightException;
+					throw new \Fatty\Exceptions\InvalidHeightException;
 				}
 
 				$this->getProportions()->setHeight($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -134,11 +104,11 @@ class Calculator
 			try {
 				$value = Length::createFromString($params["proportions_waist"], "cm");
 				if (!$value) {
-					throw new InvalidWaistException;
+					throw new \Fatty\Exceptions\InvalidWaistException;
 				}
 
 				$this->getProportions()->setWaist($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -147,11 +117,11 @@ class Calculator
 			try {
 				$value = Length::createFromString($params["proportions_hips"], "cm");
 				if (!$value) {
-					throw new InvalidHipsException;
+					throw new \Fatty\Exceptions\InvalidHipsException;
 				}
 
 				$this->getProportions()->setHips($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -160,11 +130,11 @@ class Calculator
 			try {
 				$value = Length::createFromString($params["proportions_neck"], "cm");
 				if (!$value) {
-					throw new InvalidNeckException;
+					throw new \Fatty\Exceptions\InvalidNeckException;
 				}
 
 				$this->getProportions()->setNeck($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -173,11 +143,11 @@ class Calculator
 			try {
 				$value = Percentage::createFromPercent($params["bodyFatPercentage"]);
 				if (!$value) {
-					throw new InvalidBodyFatPercentageException;
+					throw new \Fatty\Exceptions\InvalidBodyFatPercentageException;
 				}
 
 				$this->setBodyFatPercentage($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -186,11 +156,11 @@ class Calculator
 			try {
 				$value = Activity::createFromString($params["activity"]);
 				if (!$value) {
-					throw new InvalidActivityException;
+					throw new \Fatty\Exceptions\InvalidActivityException;
 				}
 
 				$this->setActivity($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -199,11 +169,11 @@ class Calculator
 			try {
 				$value = LowFrequency::createFromString($params["sportDurations_lowFrequency"], "minutesPerWeek");
 				if (!$value) {
-					throw new InvalidSportDurationsLowFrequencyException;
+					throw new \Fatty\Exceptions\InvalidSportDurationsLowFrequencyException;
 				}
 
 				$this->getSportDurations()->setLowFrequency($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -212,11 +182,11 @@ class Calculator
 			try {
 				$value = Aerobic::createFromString($params["sportDurations_aerobic"], "minutesPerWeek");
 				if (!$value) {
-					throw new InvalidSportDurationsAerobicException;
+					throw new \Fatty\Exceptions\InvalidSportDurationsAerobicException;
 				}
 
 				$this->getSportDurations()->setAerobic($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -225,11 +195,11 @@ class Calculator
 			try {
 				$value = Anaerobic::createFromString($params["sportDurations_anaerobic"], "minutesPerWeek");
 				if (!$value) {
-					throw new InvalidSportDurationsAnaerobicException;
+					throw new \Fatty\Exceptions\InvalidSportDurationsAnaerobicException;
 				}
 
 				$this->getSportDurations()->setAnaerobic($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -240,11 +210,11 @@ class Calculator
 			try {
 				$value = Vector::createFromString($params["goal_vector"]);
 				if (!$value) {
-					throw new InvalidGoalVectorException;
+					throw new \Fatty\Exceptions\InvalidGoalVectorException;
 				}
 
 				$this->getGoal()->setVector($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -265,11 +235,11 @@ class Calculator
 			try {
 				$value = Weight::createFromString($goalWeightString, "kg");
 				if (!$value) {
-					throw new InvalidGoalWeightException;
+					throw new \Fatty\Exceptions\InvalidGoalWeightException;
 				}
 
 				$this->getGoal()->setWeight($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -278,11 +248,11 @@ class Calculator
 			try {
 				$value = Approach::createFromCode($params["diet_approach"]);
 				if (!$value) {
-					throw new InvalidDietApproachException;
+					throw new \Fatty\Exceptions\InvalidDietApproachException;
 				}
 
 				$this->getDiet()->setApproach($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -303,11 +273,11 @@ class Calculator
 			try {
 				$value = Carbs::createFromString($dietCarbsString, "g");
 				if (!$value) {
-					throw new InvalidDietCarbsException;
+					throw new \Fatty\Exceptions\InvalidDietCarbsException;
 				}
 
 				$this->getDiet()->setCarbs($value);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -319,7 +289,7 @@ class Calculator
 		// 		if (isset($params["pregnancyChildbirthDate"])) {
 		// 			try {
 		// 				$this->getGender()->setPregnancyChildbirthDate($params["pregnancyChildbirthDate"]);
-		// 			} catch (FattyException $e) {
+		// 			} catch (\Fatty\Exceptions\FattyException $e) {
 		// 				$exceptionCollection->add($e);
 		// 			}
 		// 		}
@@ -331,7 +301,7 @@ class Calculator
 		// 		if (isset($params["breastfeeding"]["childbirthDate"])) {
 		// 			try {
 		// 				$this->getGender()->setBreastfeedingChildbirthDate($params["breastfeeding"]["childbirthDate"]);
-		// 			} catch (FattyException $e) {
+		// 			} catch (\Fatty\Exceptions\FattyException $e) {
 		// 				$exceptionCollection->add($e);
 		// 			}
 		// 		}
@@ -339,7 +309,7 @@ class Calculator
 		// 		if (isset($params["breastfeedingMode"])) {
 		// 			try {
 		// 				$this->getGender()->setBreastfeedingMode($params["breastfeedingMode"]);
-		// 			} catch (FattyException $e) {
+		// 			} catch (\Fatty\Exceptions\FattyException $e) {
 		// 				$exceptions->add($e);
 		// 			}
 		// 		}
@@ -349,7 +319,7 @@ class Calculator
 		if (trim($params["units"] ?? null)) {
 			try {
 				$this->setUnits($params["units"]);
-			} catch (FattyException $e) {
+			} catch (\Fatty\Exceptions\FattyException $e) {
 				$exceptionCollection->add($e);
 			}
 		}
@@ -381,7 +351,7 @@ class Calculator
 			}
 
 			return new Amount($res);
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			return new Amount(0);
 		}
 	}
@@ -397,7 +367,7 @@ class Calculator
 	public function setUnits(string $value): Calculator
 	{
 		if (!in_array($value, ["kJ", "kcal"])) {
-			throw new InvalidUnitsException;
+			throw new \Fatty\Exceptions\InvalidUnitsException;
 		}
 
 		$this->units = $value;
@@ -459,7 +429,7 @@ class Calculator
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
-			throw new MissingWeightException;
+			throw new \Fatty\Exceptions\MissingWeightException;
 		}
 
 		$weightValue = $weight->getAmount()->getValue();
@@ -498,7 +468,7 @@ class Calculator
 	{
 		$gender = $this->getGender();
 		if (!$gender) {
-			throw new MissingGenderException;
+			throw new \Fatty\Exceptions\MissingGenderException;
 		}
 
 		return $this->getGender()->calcBodyFatPercentage($this);
@@ -523,7 +493,7 @@ class Calculator
 	{
 		$activity = $this->activity;
 		if (!$activity) {
-			throw new MissingActivityException;
+			throw new \Fatty\Exceptions\MissingActivityException;
 		}
 
 		return new AmountMetric("activity", $activity);
@@ -546,17 +516,17 @@ class Calculator
 	 */
 	public function calcPhysicalActivityLevel(): AmountMetric
 	{
-		$exceptionCollection = new FattyExceptionCollection;
+		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		try {
 			$activity = $this->calcActivity();
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$sportActivity = $this->calcSportActivity();
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
@@ -605,14 +575,14 @@ class Calculator
 	 */
 	public function calcBodyMassIndex(): AmountMetric
 	{
-		$exceptionCollection = new FattyExceptionCollection;
+		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		if (!($this->getWeight() instanceof Weight)) {
-			$exceptionCollection->add(new MissingWeightException);
+			$exceptionCollection->add(new \Fatty\Exceptions\MissingWeightException);
 		}
 
 		if (!($this->getProportions()->getHeight() instanceof Length)) {
-			$exceptionCollection->add(new MissingHeightException);
+			$exceptionCollection->add(new \Fatty\Exceptions\MissingHeightException);
 		}
 
 		if (count($exceptionCollection)) {
@@ -640,14 +610,14 @@ class Calculator
 	 */
 	public function calcWaistHipRatio(): AmountMetric
 	{
-		$exceptionCollection = new FattyExceptionCollection;
+		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		if (!($this->getProportions()->getWaist() instanceof Length)) {
-			$exceptionCollection->add(new MissingWaistException);
+			$exceptionCollection->add(new \Fatty\Exceptions\MissingWaistException);
 		}
 
 		if (!($this->getProportions()->getHips() instanceof Length)) {
-			$exceptionCollection->add(new MissingHipsException);
+			$exceptionCollection->add(new \Fatty\Exceptions\MissingHipsException);
 		}
 
 		if (count($exceptionCollection)) {
@@ -667,7 +637,7 @@ class Calculator
 	{
 		$gender = $this->getGender();
 		if (!$gender) {
-			throw new MissingGenderException;
+			throw new \Fatty\Exceptions\MissingGenderException;
 		}
 
 		$waistHipRatioValue = $this->calcWaistHipRatio()->getResult()->getValue();
@@ -745,12 +715,12 @@ class Calculator
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
-			throw new MissingWeightException;
+			throw new \Fatty\Exceptions\MissingWeightException;
 		}
 
 		$gender = $this->getGender();
 		if (!$gender) {
-			throw new MissingGenderException;
+			throw new \Fatty\Exceptions\MissingGenderException;
 		}
 
 		$weightValue = $weight->getInUnit("kg")->getAmount()->getValue();
@@ -780,7 +750,7 @@ class Calculator
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
-			throw new MissingWeightException;
+			throw new \Fatty\Exceptions\MissingWeightException;
 		}
 
 		$result = new Weight(
@@ -797,11 +767,11 @@ class Calculator
 	{
 		$gender = $this->getGender();
 		if (!$gender) {
-			throw new MissingGenderException;
+			throw new \Fatty\Exceptions\MissingGenderException;
 		}
 
 		if (!$this->getBirthday()) {
-			throw new MissingBirthdayException;
+			throw new \Fatty\Exceptions\MissingBirthdayException;
 		}
 		$age = $this->getBirthday()->getAge();
 
@@ -837,12 +807,12 @@ class Calculator
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
-			throw new MissingWeightException;
+			throw new \Fatty\Exceptions\MissingWeightException;
 		}
 
 		$optimalFatPercentage = $this->calcOptimalFatPercentage();
 		if (!$optimalFatPercentage) {
-			throw new UnableToCalcOptimalFatPercentageException;
+			throw new \Fatty\Exceptions\UnableToCalcOptimalFatPercentageException;
 		}
 
 		return new MetricCollection([
@@ -890,7 +860,7 @@ class Calculator
 	{
 		$gender = $this->getGender();
 		if (!$gender) {
-			throw new MissingGenderException;
+			throw new \Fatty\Exceptions\MissingGenderException;
 		}
 
 		return $this->getGender()->calcEssentialFatPercentage();
@@ -900,12 +870,12 @@ class Calculator
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
-			throw new MissingWeightException;
+			throw new \Fatty\Exceptions\MissingWeightException;
 		}
 
 		$essentialFatPercentage = $this->calcEssentialFatPercentage();
 		if (!$essentialFatPercentage) {
-			throw new UnableToCalcEssentialFatPercentageException;
+			throw new \Fatty\Exceptions\UnableToCalcEssentialFatPercentageException;
 		}
 
 		return new AmountWithUnitMetric(
@@ -1016,7 +986,7 @@ class Calculator
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
-			throw new MissingWeightException;
+			throw new \Fatty\Exceptions\MissingWeightException;
 		}
 
 		$weightValue = $weight->getInUnit("kg")->getAmount()->getValue();
@@ -1038,7 +1008,7 @@ class Calculator
 	public function calcBasalMetabolicRate(): AmountWithUnitMetric
 	{
 		if (!$this->getGender()) {
-			throw new MissingGenderException;
+			throw new \Fatty\Exceptions\MissingGenderException;
 		}
 
 		return $this->getGender()->calcBasalMetabolicRate($this);
@@ -1068,22 +1038,11 @@ class Calculator
 	 */
 	public function calcWeightGoalEnergyExpenditure(): AmountWithUnitMetric
 	{
-		if (!$this->getGoal()->getVector()) {
-			throw new MissingGoalVectorException;
+		if (!$this->getDiet()->getApproach()) {
+			throw new \Fatty\Exceptions\MissingDietApproachException;
 		}
 
-		$totalDailyEnergyExpenditure = $this->calcTotalDailyEnergyExpenditure()->getResult();
-		$totalDailyEnergyExpenditureValue = $totalDailyEnergyExpenditure->getAmount()->getValue();
-		$tdeeQuotientValue = $this->getGoal()->getVector()->calcTdeeQuotient($this)->getResult()->getValue();
-
-		$result = (new Energy(
-			new Amount($totalDailyEnergyExpenditureValue * $tdeeQuotientValue),
-			$totalDailyEnergyExpenditure->getUnit(),
-		))->getInUnit($this->getUnits());
-
-		$formula = "totalDailyEnergyExpenditure[" . $totalDailyEnergyExpenditure . "] * weightGoalQuotient[" . $tdeeQuotientValue . "] = " . $result;
-
-		return new AmountWithUnitMetric("weightGoalEnergyExpenditure", $result, $formula);
+		return $this->getDiet()->getApproach()->calcWeightGoalEnergyExpenditure($this);
 	}
 
 	/*****************************************************************************
@@ -1091,22 +1050,22 @@ class Calculator
 	 */
 	public function calcReferenceDailyIntake(): AmountWithUnitMetric
 	{
-		$exceptionCollection = new FattyExceptionCollection;
+		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		try {
 			$weightGoalEnergyExpenditure = $this->calcWeightGoalEnergyExpenditure()->getResult();
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$gender = $this->getGender();
 			if (!$gender) {
-				throw new MissingGenderException;
+				throw new \Fatty\Exceptions\MissingGenderException;
 			}
 
 			$referenceDailyIntakeBonus = $gender->calcReferenceDailyIntakeBonus();
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
@@ -1114,10 +1073,10 @@ class Calculator
 			throw $exceptionCollection;
 		}
 
-		if ($this->getDiet() instanceof Ned) {
+		if ($this->getDiet() instanceof LowEnergy) {
 			$result = new Energy(
 				new Amount(
-					(float)Ned::ENERGY_DEFAULT
+					(float)LowEnergy::ENERGY_DEFAULT
 				),
 				"kcal",
 			);
@@ -1146,7 +1105,7 @@ class Calculator
 	{
 		$gender = $this->getGender();
 		if (!$gender) {
-			throw new MissingGenderException;
+			throw new \Fatty\Exceptions\MissingGenderException;
 		}
 
 		return $gender->calcBodyType($this);
@@ -1285,7 +1244,7 @@ class Calculator
 		$diet = $this->getDiet();
 		$dietApproach = $this->getDiet()->getApproach();
 		if (!$dietApproach) {
-			throw new MissingDietApproachException;
+			throw new \Fatty\Exceptions\MissingDietApproachException;
 		}
 
 		// 1
@@ -1468,10 +1427,10 @@ class Calculator
 				);
 			}
 		// NED diet.
-		} elseif ($dietApproach instanceof Ned) {
-			$nutrients->setCarbs((new Ned)->getDefaultCarbs());
-			$nutrients->setFats((new Ned)->getDefaultFats());
-			$nutrients->setProteins((new Ned)->getDefaultProteins());
+		} elseif ($dietApproach instanceof LowEnergy) {
+			$nutrients->setCarbs((new LowEnergy)->getDefaultCarbs());
+			$nutrients->setFats((new LowEnergy)->getDefaultFats());
+			$nutrients->setProteins((new LowEnergy)->getDefaultProteins());
 		}
 
 		return new MetricCollection([
@@ -1481,348 +1440,9 @@ class Calculator
 		]);
 	}
 
-	/*****************************************************************************
-	 * Messages.
-	 */
-	// public function getBodyFatMessages()
-	// {
-	// 	$messages = [];
-
-	// 	// High sport physical activity level (>= 2).
-	// 	if ($this->calcPhysicalActivityLevel()->getValue() >= 2 && ($this->getSportDurations()->getAerobic()->getAmount() || $this->getSportDurations()->getAnaerobic()->getAmount())) {
-	// 		$messages[] = [
-	// 			"message" => \Katu\Config::get("caloricCalculator", "messages", "highSportPhysicalActivityLevel"),
-	// 			"fields" => ["sportDurations[aerobic]", "sportDurations[anaerobic]"],
-	// 		];
-	// 	}
-
-	// 	return $messages;
-	// }
-
-	// public function getBodyMassIndexMessages()
-	// {
-	// 	$messages = [];
-
-	// 	$gender = $this->getGender();
-	// 	$bodyMassIndexAmount = $this->calcBodyMassIndex()->getValue();
-	// 	$bodyFatPercentageAmount = $this->calcBodyFatPercentage()->getAmount();
-
-	// 	$bodyMassIndexAmount = 28;
-	// 	$gender = new Genders\Male;
-	// 	$bodyFatPercentageAmount = .18;
-
-	// 	if ($bodyMassIndexAmount <= 25) {
-	// 		if ($gender instanceof Genders\Male) {
-	// 			if ($bodyFatPercentageAmount < .19) {
-	// 				if ($bodyMassIndexAmount <= 18.5) {
-	// 					if ($bodyMassIndexAmount < 17) {
-	// 						$messages[]["message"] = "Těžká podvýživa, poruchy příjmu potravy!";
-	// 					} else {
-	// 						$messages[]["message"] = "Pozor, BMI není v normě, podváha!";
-	// 					}
-
-	// 					if ($bodyFatPercentageAmount <= .05) {
-	// 						$messages[]["message"] = "Pozor, množství esenciálního tuku u mužů je 3-5 %. Jsi na hraně!";
-	// 					}
-	// 				} else {
-	// 					$messages[]["message"] = "Super, BMI i podíl tělesného tuku je jak má být.";
-	// 				}
-	// 			} else {
-	// 				$messages[]["message"] = "BMI je v pořádku, ale máte více tělesného tuku, než by mělo být.";
-	// 			}
-	// 		} elseif ($gender instanceof Genders\Female) {
-	// 			if ($bodyFatPercentageAmount < .25) {
-	// 				if ($bodyMassIndexAmount <= 18.5) {
-	// 					if ($bodyMassIndexAmount < 17) {
-	// 						$messages[]["message"] = "Těžká podvýživa, poruchy příjmu potravy!";
-	// 					} else {
-	// 						$messages[]["message"] = "Pozor, BMI není v normě, podváha!";
-	// 					}
-
-	// 					if ($bodyFatPercentageAmount <= .13) {
-	// 						$messages[]["message"] = "Pozor, množství esenciálního tuku u žen je 11-13 %. Jsi na hraně!";
-	// 					}
-	// 				} else {
-	// 					$messages[]["message"] = "Super, BMI i podíl tělesného tuku je jak má být.";
-	// 				}
-	// 			} else {
-	// 				$messages[]["message"] = "BMI je v pořádku, ale máte více tělesného tuku, než by mělo být.";
-	// 			}
-	// 		}
-	// 	} else {
-	// 		if ($gender instanceof Genders\Male) {
-	// 			if ($bodyFatPercentageAmount < .19) {
-	// 				$messages[]["message"] = "BMI sice v normě není, ale vše v pořádku, ty asi hodně cvičíš, takže na to nekoukej.";
-	// 			} else {
-	// 				if ($bodyMassIndexAmount < 25) {
-	// 					$messages[]["message"] = "BMI je v pořádku, ale máte více tělesného tuku, než by mělo být.";
-	// 				} elseif ($bodyMassIndexAmount < 30) {
-	// 					$messages[]["message"] = "Pozor, máš nadváhu.";
-	// 				} elseif ($bodyMassIndexAmount < 35) {
-	// 					$messages[]["message"] = "Obezita 1. stupně, pozor, hrozí riziko vzniku chorob.";
-	// 				} elseif ($bodyMassIndexAmount < 40) {
-	// 					$messages[]["message"] = "Obezita 2. stupně, vysoké riziko vzniku chorob.";
-	// 				} else {
-	// 					$messages[]["message"] = "Obezita 3. stupně, morbidní obezita.";
-	// 				}
-	// 			}
-	// 		} elseif ($gender instanceof Genders\Female) {
-	// 			if ($bodyFatPercentageAmount < .25) {
-	// 				$messages[]["message"] = "BMI sice v normě není, ale vše v pořádku, ty asi hodně cvičíš, takže na to nekoukej.";
-	// 			} else {
-	// 				if ($bodyMassIndexAmount < 25) {
-	// 					$messages[]["message"] = "BMI je v pořádku, ale máte více tělesného tuku, než by mělo být.";
-	// 				} elseif ($bodyMassIndexAmount < 30) {
-	// 					$messages[]["message"] = "Pozor, máš nadváhu.";
-	// 				} elseif ($bodyMassIndexAmount < 35) {
-	// 					$messages[]["message"] = "Obezita 1. stupně, pozor, hrozí riziko vzniku chorob.";
-	// 				} elseif ($bodyMassIndexAmount < 40) {
-	// 					$messages[]["message"] = "Obezita 2. stupně, vysoké riziko vzniku chorob.";
-	// 				} else {
-	// 					$messages[]["message"] = "Obezita 3. stupně, morbidní obezita.";
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-
-	// 	return $messages;
-	// }
-
-	// public function getGoalMessages()
-	// {
-	// 	$exceptionCollection = new FattyExceptionCollection;
-
-	// 	$messages = [];
-
-	// 	// Is pregnant.
-	// 	if ($this->getGender() instanceof Genders\Female && $this->getGender()->isPregnant()) {
-	// 		$messages[] = [
-	// 			"message" => \Katu\Config::get("caloricCalculator", "messages", "isPregnant"),
-	// 			"fields" => ["pregnancy[isPregnant]"],
-	// 		];
-	// 	}
-
-	// 	// Is breastfeeding.
-	// 	if ($this->getGender() instanceof Genders\Female && $this->getGender()->isBreastfeeding()) {
-	// 		$messages[] = [
-	// 			"message" => \Katu\Config::get("caloricCalculator", "messages", "isBreastfeeding"),
-	// 			"fields" => ["pregnancy[isBreastfeeding]"],
-	// 		];
-	// 	}
-
-	// 	// Is loosing weight.
-	// 	if ($this->getGoal()->getVector() instanceof Vectors\Loose) {
-	// 		// Is loosing weight while pregnant.
-	// 		if ($this->getGender() instanceof Genders\Female && $this->getGender()->isPregnant()) {
-	// 			$messages[] = [
-	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "isPregnantAndLoosingWeight"),
-	// 				"fields" => ["pregnancy[isPregnant]", "goalTrend", "goalWeight"],
-	// 			];
-
-	// 		// Is loosing weight while breastfeeding.
-	// 		} elseif ($this->getGender() instanceof Genders\Female && $this->getGender()->isBreastfeeding()) {
-	// 			$messages[] = [
-	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "isBreastfeedingAndLoosingWeight"),
-	// 				"fields" => ["pregnancy[isBreastfeeding]", "goalTrend", "goalWeight"],
-	// 			];
-	// 		} else {
-	// 			if (!($this->getWeight() instanceof Weight)) {
-	// 				$ec->add(
-	// 					(new FattyException("Missing weight."))
-	// 						->setAbbr("missingWeight")
-	// 				);
-	// 			}
-
-	// 			if (!($this->getGoal()->getWeight() instanceof Weight)) {
-	// 				$ec->add(
-	// 					(new FattyException("Missing weight target."))
-	// 						->setAbbr("missingGoalWeight")
-	// 				);
-	// 			}
-
-	// 			// Is loosing realistic?
-	// 			if (!$ec->has()) {
-	// 				// Unrealistic loosing.
-	// 				if ($this->getGoal()->getDifference($this) > 0) {
-	// 					$realisticGoalWeight = $this->getGoal()->getFinal($this);
-
-	// 					$messages[] = [
-	// 						"message" => strtr(\Katu\Config::get("caloricCalculator", "messages", "loosingWeightUnrealistic"), [
-	// 							"%realisticGoalWeight%" => $realisticGoalWeight,
-	// 						]),
-	// 						"fields" => ["goalWeight"],
-	// 					];
-
-	// 				// Realistic loosing.
-	// 				} else {
-	// 					$weightChange = new Weight($this->getWeight()->getInUnit("kg")->getAmount() - $this->getGoal()->getWeight()->getInUnit("kg")->getAmount());
-
-	// 					$messages[] = [
-	// 						"message" => strtr(\Katu\Config::get("caloricCalculator", "messages", "loosingWeightRealistic"), [
-	// 							"%weightChange%" => $weightChange,
-	// 						]),
-	// 						"fields" => ["goalWeight"],
-	// 					];
-
-	// 					$slowLooseTdee = (new Vectors\SlowLoose)->calcWeightGoalEnergyExpenditure($this);
-	// 					$looseTdee = (new Vectors\Loose)->calcWeightGoalEnergyExpenditure($this);
-
-	// 					$messages[] = [
-	// 						"message" => strtr(\Katu\Config::get("caloricCalculator", "messages", "loosingWeightTdeeRecommendations"), [
-	// 							"%slowLooseTdee%" => $slowLooseTdee,
-	// 							"%looseTdee%" => $looseTdee,
-	// 						]),
-	// 						"fields" => ["goalWeight"],
-	// 					];
-	// 				}
-	// 			}
-	// 		}
-	// 	} elseif ($this->getGoal()->getTrend() instanceof Vectors\Gain) {
-	// 		if (!($this->getWeight() instanceof Weight)) {
-	// 			$ec->add(
-	// 				(new FattyException("Missing weight."))
-	// 					->setAbbr("missingWeight")
-	// 			);
-	// 		}
-
-	// 		if (!($this->getGoal()->getWeight() instanceof Weight)) {
-	// 			$ec->add(
-	// 				(new FattyException("Missing weight target."))
-	// 					->setAbbr("missingGoalWeight")
-	// 			);
-	// 		}
-
-	// 		// Is gaining realistic?
-	// 		if (!$ec->has()) {
-	// 			// Unrealistic gaining.
-	// 			if ($this->getGoal()->getDifference($this) > 0) {
-	// 				$realisticGoalWeight = $this->getGoal()->getFinal($this);
-
-	// 				$messages[] = [
-	// 					"message" => strtr(\Katu\Config::get("caloricCalculator", "messages", "gainingWeightUnrealistic"), [
-	// 						"%realisticGoalWeight%" => $realisticGoalWeight,
-	// 					]),
-	// 					"fields" => ["goalWeight"],
-	// 				];
-
-	// 			// Realistic gaining.
-	// 			} else {
-	// 				$weightChange = new Weight($this->getGoal()->getWeight()->getInUnit("kg")->getAmount() - $this->getWeight()->getInUnit("kg")->getAmount());
-
-	// 				$messages[] = [
-	// 					"message" => strtr(\Katu\Config::get("caloricCalculator", "messages", "gainingWeightRealistic"), [
-	// 						"%weightChange%" => $weightChange,
-	// 					]),
-	// 					"fields" => ["goalWeight"],
-	// 				];
-
-	// 				$slowGainTdee = (new Vectors\SlowGain)->calcWeightGoalEnergyExpenditure($this);
-	// 				$gainTdee = (new Vectors\Gain)->calcWeightGoalEnergyExpenditure($this);
-
-	// 				$messages[] = [
-	// 					"message" => strtr(\Katu\Config::get("caloricCalculator", "messages", "gainingWeightTdeeRecommendations"), [
-	// 						"%slowGainTdee%" => $slowGainTdee,
-	// 						"%gainTdee%" => $gainTdee,
-	// 					]),
-	// 					"fields" => ["goalWeight"],
-	// 				];
-	// 			}
-
-	// 			$messages[] = [
-	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "gainingRecommendations"),
-	// 				"fields" => ["goalWeight"],
-	// 			];
-	// 		}
-	// 	}
-
-	// 	if ($ec->has()) {
-	// 		throw $ec;
-	// 	}
-
-	// 	return $messages;
-	// }
-
-	// public function getGoalNutrientMessages()
-	// {
-	// 	$messages = [];
-
-	// 	if ($this->getDiet() instanceof Approaches\LowCarb) {
-	// 		// 7
-	// 		if ($this->getGender() instanceof Genders\Female && $this->getGender()->isPregnant()) {
-	// 			$messages[] = [
-	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "lowCarbButPregnant"),
-	// 				"fields" => ["diet"],
-	// 			];
-
-	// 		// 8
-	// 		} elseif ($this->getGender() instanceof Genders\Female && $this->getGender()->isBreastfeeding()) {
-	// 			$messages[] = [
-	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "lowCarbButBreastfeeding"),
-	// 				"fields" => ["diet"],
-	// 			];
-	// 		}
-
-	// 	// 3
-	// 	} elseif ($this->getDiet() instanceof Approaches\Keto) {
-	// 		// 7
-	// 		if ($this->getGender() instanceof Genders\Female && $this->getGender()->isPregnant()) {
-	// 			$messages[] = [
-	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "ketoButPregnant"),
-	// 				"fields" => ["diet"],
-	// 			];
-
-	// 		// 8
-	// 		} elseif ($this->getGender() instanceof Genders\Female && $this->getGender()->isBreastfeeding()) {
-	// 			$messages[] = [
-	// 				"message" => \Katu\Config::get("caloricCalculator", "messages", "ketoButBreastfeeding"),
-	// 				"fields" => ["diet"],
-	// 			];
-	// 		}
-	// 	}
-
-	// 	return $messages;
-	// }
-
-	// public function getMessages()
-	// {
-	// 	$exceptionCollection = new FattyExceptionCollection;
-
-	// 	$messages = [];
-
-	// 	try {
-	// 		$messages = array_merge($messages, $this->getBodyFatMessages());
-	// 	} catch (FattyException $e) {
-	// 		$exceptionCollection->add($e);
-	// 	}
-
-	// 	try {
-	// 		$messages = array_merge($messages, $this->getBodyMassIndexMessages());
-	// 	} catch (FattyException $e) {
-	// 		$exceptionCollection->add($e);
-	// 	}
-
-	// 	try {
-	// 		$messages = array_merge($messages, $this->getGoalMessages());
-	// 	} catch (FattyException $e) {
-	// 		$exceptionCollection->add($e);
-	// 	}
-
-	// 	try {
-	// 		$messages = array_merge($messages, $this->getGoalNutrientMessages());
-	// 	} catch (FattyException $e) {
-	// 		$exceptionCollection->add($e);
-	// 	}
-
-	// 	if ($ec->has()) {
-	// 		throw $ec;
-	// 	}
-
-	// 	return $messages;
-	// }
-
 	public function getResponse(): array
 	{
-		$exceptionCollection = new FattyExceptionCollection;
+		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		$res = [];
 
@@ -1886,199 +1506,199 @@ class Calculator
 
 		try {
 			$metricCollection->append($this->calcWeight());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->getProportions()->calcHeight());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBodyMassIndex());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBodyMassIndexDeviation());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcWaistHipRatio());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcWaistHipRatioDeviation());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBodyFatPercentage());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBodyFatWeight());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcActiveBodyMassPercentage());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcOptimalFatPercentage());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcOptimalFatWeight());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcEssentialFatPercentage());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcEssentialFatWeight());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcFatWithinOptimalPercentage());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcFatWithinOptimalWeight());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcFatOverOptimalPercentage());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcFatOverOptimalWeight());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBodyFatDeviation());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcRiskDeviation());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcActiveBodyMassWeight());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcFatFreeMass());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBasalMetabolicRate());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcPhysicalActivityLevel());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcTotalDailyEnergyExpenditure());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcWeightGoalEnergyExpenditure());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcReferenceDailyIntake());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->getGoal()->calcGoalVector());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->getGoal()->calcGoalWeight());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->getGoal()->calcGoalWeightGoalEnergyExpenditure($this));
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->getDiet()->calcDietApproach());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->getGoal()->calcGoalDuration());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBodyType($this));
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcGoalNutrients());
-		} catch (FattyException $e) {
+		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
 

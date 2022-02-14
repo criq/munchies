@@ -12,7 +12,7 @@ class Diet
 	protected $approach;
 	protected $carbs;
 
-	public function __construct(?Approach $approach)
+	public function __construct(?Approach $approach = null)
 	{
 		$this->setApproach($approach);
 	}
@@ -27,16 +27,6 @@ class Diet
 	public function getApproach(): ?Approach
 	{
 		return $this->approach;
-	}
-
-	public function calcDietApproach(): StringMetric
-	{
-		$approach = $this->getApproach();
-		if (!$approach) {
-			throw new MissingDietApproachException;
-		}
-
-		return new StringMetric('dietApproach', $approach->getCode(), $approach->getDeclinatedLabel());
 	}
 
 	public function setCarbs(Carbs $carbs): Diet
@@ -62,5 +52,15 @@ class Diet
 		}
 
 		return $this->getApproach()->getDefaultCarbs();
+	}
+
+	public function calcDietApproach(): StringMetric
+	{
+		$approach = $this->getApproach();
+		if (!$approach) {
+			throw new MissingDietApproachException;
+		}
+
+		return new StringMetric("dietApproach", $approach->getCode(), $approach->getDeclinatedLabel());
 	}
 }

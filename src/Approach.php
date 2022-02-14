@@ -2,6 +2,7 @@
 
 namespace Fatty;
 
+use Fatty\Metrics\AmountWithUnitMetric;
 use Fatty\Nutrients\Carbs;
 use Fatty\Nutrients\Fats;
 use Fatty\Nutrients\Proteins;
@@ -71,5 +72,25 @@ abstract class Approach
 	public function getDefaultProteins(): ?Proteins
 	{
 		return static::PROTEINS_DEFAULT ? new Carbs(new Amount((float)static::PROTEINS_DEFAULT), "g") : null;
+	}
+
+	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): \Fatty\Metrics\AmountWithUnitMetric
+	{
+		if (!$calculator->getGoal()->getVector()) {
+			throw new \Fatty\Exceptions\MissingGoalVectorException;
+		}
+
+		$totalDailyEnergyExpenditure = $calculator->calcTotalDailyEnergyExpenditure()->getResult();
+		$totalDailyEnergyExpenditureValue = $totalDailyEnergyExpenditure->getAmount()->getValue();
+		$tdeeQuotientValue = $calculator->getGoal()->getVector()->calcTdeeQuotient($calculator)->getResult()->getValue();
+
+		$result = (new Energy(
+			new Amount($totalDailyEnergyExpenditureValue * $tdeeQuotientValue),
+			$totalDailyEnergyExpenditure->getUnit(),
+		))->getInUnit($calculator->getUnits());
+
+		$formula = "totalDailyEnergyExpenditure[" . $totalDailyEnergyExpenditure . "] * weightGoalQuotient[" . $tdeeQuotientValue . "] = " . $result;
+
+		return new AmountWithUnitMetric("weightGoalEnergyExpenditure", $result, $formula);
 	}
 }
