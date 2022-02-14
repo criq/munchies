@@ -4,8 +4,8 @@ namespace Fatty;
 
 class Energy extends AmountWithUnit
 {
-	const BASE_UNIT = 'kJ';
-	const KCAL_TO_KJ_RATIO = 4.128;
+	const BASE_UNIT = "J";
+	const CAL_TO_J_RATIO = 4.128;
 
 	public function __construct(Amount $amount, string $unit)
 	{
@@ -14,24 +14,36 @@ class Energy extends AmountWithUnit
 
 	public function getInBaseUnit(): Energy
 	{
-		switch (strtolower($this->getUnit())) {
-			case mb_strtolower(static::getBaseUnit()):
+		switch (mb_strtoupper($this->getUnit())) {
+			case "J":
 				return clone $this;
 				break;
-			case 'kcal':
-				return new static($this->getAmount()->getMultiplied(static::KCAL_TO_KJ_RATIO), static::getBaseUnit());
+			case "KJ":
+				return new static($this->getAmount()->getMultiplied(1000), static::getBaseUnit());
+				break;
+			case "CAL":
+				return new static($this->getAmount()->getMultiplied(static::CAL_TO_J_RATIO), static::getBaseUnit());
+				break;
+			case "KCAL":
+				return new static($this->getAmount()->getMultiplied(static::CAL_TO_J_RATIO * 1000), static::getBaseUnit());
 				break;
 		}
 	}
 
 	public function getInUnit(string $unit): Energy
 	{
-		switch (strtolower($unit)) {
-			case mb_strtolower(static::getBaseUnit()):
+		switch (mb_strtoupper($unit)) {
+			case "J":
 				return $this->getInBaseUnit();
 				break;
-			case 'kcal':
-				return new static($this->getAmount()->getMultiplied(1 / static::KCAL_TO_KJ_RATIO), 'kCal');
+			case "KJ":
+				return new static($this->getInBaseUnit()->getAmount()->getMultiplied(.001), "kJ");
+				break;
+			case "CAL":
+				return new static($this->getInBaseUnit()->getAmount()->getMultiplied(1 / static::CAL_TO_J_RATIO), "cal");
+				break;
+			case "KCAL":
+				return new static($this->getInBaseUnit()->getAmount()->getMultiplied((1 / static::CAL_TO_J_RATIO) * .001), "kcal");
 				break;
 		}
 	}

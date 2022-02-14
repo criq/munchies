@@ -1050,12 +1050,12 @@ class Calculator
 	public function calcTotalDailyEnergyExpenditure(): AmountWithUnitMetric
 	{
 		$basalMetabolicRate = $this->calcBasalMetabolicRate()->getResult();
-		$basalMetabolicRateValue = $basalMetabolicRate->getInUnit("kCal")->getAmount()->getValue();
+		$basalMetabolicRateValue = $basalMetabolicRate->getInUnit("kcal")->getAmount()->getValue();
 		$physicalActivityLevel = $this->calcPhysicalActivityLevel()->getResult()->getValue();
 
 		$result = (new Energy(
 			new Amount($basalMetabolicRateValue * $physicalActivityLevel),
-			"kCal",
+			"kcal",
 		))->getInUnit($this->getUnits());
 
 		$formula = "basalMetabolicRate[" . $basalMetabolicRate . "] * physicalActivityLevel[" . $physicalActivityLevel . "] = " . $result;
@@ -1119,18 +1119,18 @@ class Calculator
 				new Amount(
 					(float)Ned::ENERGY_DEFAULT
 				),
-				"kCal",
+				"kcal",
 			);
 
 			$formula = $result->getAmount()->getValue();
 		} else {
-			$weightGoalEnergyExpenditureValue = $weightGoalEnergyExpenditure->getInUnit("kCal")->getAmount()->getValue();
+			$weightGoalEnergyExpenditureValue = $weightGoalEnergyExpenditure->getInUnit("kcal")->getAmount()->getValue();
 			$referenceDailyIntakeBonus = $referenceDailyIntakeBonus->getResult();
-			$referenceDailyIntakeBonusValue = $referenceDailyIntakeBonus->getInUnit("kCal")->getAmount()->getValue();
+			$referenceDailyIntakeBonusValue = $referenceDailyIntakeBonus->getInUnit("kcal")->getAmount()->getValue();
 
 			$result = (new Energy(
 				new Amount($weightGoalEnergyExpenditureValue + $referenceDailyIntakeBonusValue),
-				"kCal",
+				"kcal",
 			))->getInUnit($this->getUnits());
 
 			$formula = "weightGoalEnergyExpenditure[" . $weightGoalEnergyExpenditure . "] + referenceDailyIntakeBonus[" . $referenceDailyIntakeBonus . "] = " . $result;

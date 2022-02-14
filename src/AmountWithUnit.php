@@ -61,8 +61,8 @@ abstract class AmountWithUnit
 	public function getArray(): array
 	{
 		return [
-			'amount' => $this->getAmount()->getValue(),
-			'unit' => $this->getUnit(),
+			"amount" => $this->getAmount()->getValue(),
+			"unit" => $this->getUnit(),
 		];
 	}
 
@@ -73,7 +73,7 @@ abstract class AmountWithUnit
 		$numberFormatter = new \NumberFormatter($locale, \NumberFormatter::DECIMAL);
 		$numberFormatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 1);
 
-		return implode(' ', [
+		return implode(" ", [
 			$numberFormatter->format($this->getAmount()->getValue()),
 			$this->getUnit(),
 		]);

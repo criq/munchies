@@ -12,6 +12,11 @@ class Diet
 	protected $approach;
 	protected $carbs;
 
+	public function __construct(?Approach $approach)
+	{
+		$this->setApproach($approach);
+	}
+
 	public function setApproach(?Approach $value): Diet
 	{
 		$this->approach = $value;

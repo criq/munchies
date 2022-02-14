@@ -15,12 +15,12 @@ class Gain extends \Fatty\Vector
 
 	public function calcTdeeChangePerDay(Calculator $calculator): AmountWithUnitMetric
 	{
-		$weightGoalEnergyExpenditureValue = $calculator->calcWeightGoalEnergyExpenditure()->getResult()->getInUnit("kCal")->getAmount()->getValue();
+		$weightGoalEnergyExpenditureValue = $calculator->calcWeightGoalEnergyExpenditure()->getResult()->getInUnit("kcal")->getAmount()->getValue();
 		$tdeeQuotientValue = $this->calcTdeeQuotient($calculator)->getResult()->getValue();
 
 		$result = new Energy(
 			new Amount($weightGoalEnergyExpenditureValue * ($tdeeQuotientValue - 1)),
-			"kCal",
+			"kcal",
 		);
 
 		return new AmountWithUnitMetric("", $result);

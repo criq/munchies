@@ -68,7 +68,7 @@ class Male extends \Fatty\Gender
 			new Amount(
 				(10 * $weightValue) + (6.25 * $heightValue) - (5 * $age) + 5
 			),
-			'kCal',
+			'kcal',
 		))->getInUnit('kJ');
 
 		$formula = "(10 * weight[{$weightValue}]) + (6.25 * height[{$heightValue}]) - (5 * age[{$age}]) + 5";

@@ -85,7 +85,7 @@ class Female extends \Fatty\Gender
 			new Amount(
 				(10 * $weightValue) + (6.25 * $heightValue) - (5 * $age) - 161
 			),
-			'kCal',
+			'kcal',
 		))->getInUnit('kJ');
 
 		$formula = "(10 * weight[{$weightValue}]) + (6.25 * height[{$heightValue}]) - (5 * age[{$age}]) - 161";
@@ -216,9 +216,9 @@ class Female extends \Fatty\Gender
 
 		$result = new Energy(
 			new Amount(
-				$referenceDailyIntakeBonusPregnancy->getResult()->getInUnit('kCal')->getAmount()->getValue() + $referenceDailyIntakeBonusBreastfeeding->getResult()->getInUnit('kCal')->getAmount()->getValue()
+				$referenceDailyIntakeBonusPregnancy->getResult()->getInUnit('kcal')->getAmount()->getValue() + $referenceDailyIntakeBonusBreastfeeding->getResult()->getInUnit('kcal')->getAmount()->getValue()
 			),
-			'kCal',
+			'kcal',
 		);
 
 		return new AmountWithUnitMetric('referenceDailyIntakeBonus', $result);
@@ -243,7 +243,7 @@ class Female extends \Fatty\Gender
 			$change = 475;
 		}
 
-		return new AmountWithUnitMetric('referenceDailyIntakeBonusPregnancy', new Energy(new Amount($change), 'kCal'));
+		return new AmountWithUnitMetric('referenceDailyIntakeBonusPregnancy', new Energy(new Amount($change), 'kcal'));
 	}
 
 	public function calcReferenceDailyIntakeBonusBreastfeeding(): AmountWithUnitMetric
@@ -285,7 +285,7 @@ class Female extends \Fatty\Gender
 			$change = 100;
 		}
 
-		return new AmountWithUnitMetric('referenceDailyIntakeBonusBreastfeeding', new Energy(new Amount($change), 'kCal'));
+		return new AmountWithUnitMetric('referenceDailyIntakeBonusBreastfeeding', new Energy(new Amount($change), 'kcal'));
 	}
 
 	/*****************************************************************************
