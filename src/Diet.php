@@ -11,6 +11,8 @@ class Diet
 {
 	protected $approach;
 	protected $carbs;
+	protected $dateTimeStart;
+	protected $weightHistory;
 
 	public function __construct(?Approach $approach = null)
 	{
@@ -62,5 +64,24 @@ class Diet
 		}
 
 		return new StringMetric("dietApproach", $approach->getCode(), $approach->getDeclinatedLabel());
+	}
+
+	public function setDateTimeStart(?\DateTime $value): Diet
+	{
+		$this->dateTimeStart = $value;
+
+		return $this;
+	}
+
+	public function getDateTimeStart(): ?\DateTime
+	{
+		return $this->dateTimeStart;
+	}
+
+	public function setWeightHistory(?WeightHistory $value): Diet
+	{
+		$this->weightHistory = $value;
+
+		return $this;
 	}
 }
