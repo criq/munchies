@@ -47,7 +47,7 @@ abstract class Vector
 		);
 	}
 
-	public function calcGoalWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
+	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
 	{
 		$weightGoalEnergyExpenditureValue = $calculator->calcWeightGoalEnergyExpenditure()->getResult()->getInBaseUnit()->getAmount()->getValue();
 		$tdeeChangePerDayValue = $this->calcTdeeChangePerDay($calculator)->getResult()->getInBaseUnit()->getAmount()->getValue();

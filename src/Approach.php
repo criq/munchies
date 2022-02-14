@@ -66,15 +66,15 @@ abstract class Approach
 
 	public function getDefaultFats(): ?Fats
 	{
-		return static::FATS_DEFAULT ? new Carbs(new Amount((float)static::FATS_DEFAULT), "g") : null;
+		return static::FATS_DEFAULT ? new Fats(new Amount((float)static::FATS_DEFAULT), "g") : null;
 	}
 
 	public function getDefaultProteins(): ?Proteins
 	{
-		return static::PROTEINS_DEFAULT ? new Carbs(new Amount((float)static::PROTEINS_DEFAULT), "g") : null;
+		return static::PROTEINS_DEFAULT ? new Proteins(new Amount((float)static::PROTEINS_DEFAULT), "g") : null;
 	}
 
-	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): \Fatty\Metrics\AmountWithUnitMetric
+	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
 	{
 		if (!$calculator->getGoal()->getVector()) {
 			throw new \Fatty\Exceptions\MissingGoalVectorException;

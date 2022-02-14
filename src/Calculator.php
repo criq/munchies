@@ -475,6 +475,19 @@ class Calculator
 	}
 
 	/*****************************************************************************
+	 * Body type - typ postavy.
+	 */
+	public function calcBodyType(Calculator $calculator): StringMetric
+	{
+		$gender = $this->getGender();
+		if (!$gender) {
+			throw new \Fatty\Exceptions\MissingGenderException;
+		}
+
+		return $gender->calcBodyType($this);
+	}
+
+	/*****************************************************************************
 	 * Activity.
 	 */
 	public function setActivity(?Activity $activity): Calculator
@@ -1099,19 +1112,6 @@ class Calculator
 	}
 
 	/*****************************************************************************
-	 * Body type - typ postavy.
-	 */
-	public function calcBodyType(Calculator $calculator): StringMetric
-	{
-		$gender = $this->getGender();
-		if (!$gender) {
-			throw new \Fatty\Exceptions\MissingGenderException;
-		}
-
-		return $gender->calcBodyType($this);
-	}
-
-	/*****************************************************************************
 	 * Živiny.
 	 */
 	public function calcGoalNutrients(): MetricCollection
@@ -1240,7 +1240,7 @@ class Calculator
 		/***************************************************************************
 		 * Carbs and fats.
 		 */
-		$goalTdee = $this->getGoal()->calcGoalWeightGoalEnergyExpenditure($this);
+		$wgee = $this->getGoal()->calcWeightGoalEnergyExpenditure($this);
 		$diet = $this->getDiet();
 		$dietApproach = $this->getDiet()->getApproach();
 		if (!$dietApproach) {
@@ -1254,7 +1254,7 @@ class Calculator
 				$nutrients->setCarbs(
 					Carbs::createFromEnergy(
 						new Energy(
-							new Amount($goalTdee->getResult()->getInUnit("kJ")->getAmount()->getValue() * .58),
+							new Amount($wgee->getResult()->getInUnit("kJ")->getAmount()->getValue() * .58),
 							"kJ",
 						),
 					),
@@ -1263,7 +1263,7 @@ class Calculator
 					Fats::createFromEnergy(
 						new Energy(
 							new Amount(
-								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue(),
+								$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue(),
 							),
 							Energy::getBaseUnit(),
 						),
@@ -1275,7 +1275,7 @@ class Calculator
 					Fats::createFromEnergy(
 						new Energy(
 							new Amount(
-								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() * .35
+								$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() * .35
 							),
 							Energy::getBaseUnit(),
 						),
@@ -1285,7 +1285,7 @@ class Calculator
 					Carbs::createFromEnergy(
 						new Energy(
 							new Amount(
-								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+								$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 							),
 							Energy::getBaseUnit(),
 						),
@@ -1296,7 +1296,7 @@ class Calculator
 					Carbs::createFromEnergy(
 						new Energy(
 							new Amount(
-								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() * .55
+								$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() * .55
 							),
 							Energy::getBaseUnit(),
 						),
@@ -1306,7 +1306,7 @@ class Calculator
 					Fats::createFromEnergy(
 						new Energy(
 							new Amount(
-								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+								$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 							),
 							Energy::getBaseUnit(),
 						),
@@ -1320,7 +1320,7 @@ class Calculator
 				Fats::createFromEnergy(
 					new Energy(
 						new Amount(
-							$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() * .4
+							$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() * .4
 						),
 						Energy::getBaseUnit(),
 					),
@@ -1330,7 +1330,7 @@ class Calculator
 				Carbs::createFromEnergy(
 					new Energy(
 						new Amount(
-							$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+							$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 						),
 						Energy::getBaseUnit(),
 					),
@@ -1352,7 +1352,7 @@ class Calculator
 					Fats::createFromEnergy(
 						new Energy(
 							new Amount(
-								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+								$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 							),
 							Energy::getBaseUnit(),
 						),
@@ -1370,7 +1370,7 @@ class Calculator
 					Fats::createFromEnergy(
 						new Energy(
 							new Amount(
-								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+								$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 							),
 							Energy::getBaseUnit(),
 						),
@@ -1390,7 +1390,7 @@ class Calculator
 					Fats::createFromEnergy(
 						new Energy(
 							new Amount(
-								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+								$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 							),
 							Energy::getBaseUnit(),
 						),
@@ -1419,7 +1419,7 @@ class Calculator
 					Fats::createFromEnergy(
 						new Energy(
 							new Amount(
-								$goalTdee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+								$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 							),
 							Energy::getBaseUnit(),
 						),
@@ -1673,7 +1673,7 @@ class Calculator
 		}
 
 		try {
-			$metricCollection->append($this->getGoal()->calcGoalWeightGoalEnergyExpenditure($this));
+			$metricCollection->append($this->getGoal()->calcWeightGoalEnergyExpenditure($this));
 		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}

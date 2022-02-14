@@ -113,13 +113,13 @@ class Goal
 		return new AmountWithUnitMetric('goalWeight', $this->getWeight());
 	}
 
-	public function calcGoalWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
+	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
 	{
 		$vector = $this->getVector();
 		if (!$vector) {
 			throw new MissingGoalVectorException;
 		}
 
-		return $vector->calcGoalWeightGoalEnergyExpenditure($calculator);
+		return $vector->calcWeightGoalEnergyExpenditure($calculator);
 	}
 }
