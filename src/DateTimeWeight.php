@@ -12,4 +12,14 @@ class DateTimeWeight
 		$this->dateTime = $dateTime;
 		$this->weight = $weight;
 	}
+
+	public function getDateTime(): \DateTime
+	{
+		return $this->dateTime;
+	}
+
+	public function getWeight(): Weight
+	{
+		return $this->weight;
+	}
 }

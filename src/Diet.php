@@ -84,4 +84,9 @@ class Diet
 
 		return $this;
 	}
+
+	public function getWeightHistory(): WeightHistory
+	{
+		return $this->weightHistory ?: new WeightHistory;
+	}
 }
