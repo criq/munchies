@@ -35,15 +35,6 @@ class LowEnergyTransition extends \Fatty\Approach
 		$collection = new LowEnergyTransitionDayCollection;
 
 		while ($dateTime->format("Ymd") <= $dateTimeEnd->format("Ymd")) {
-			// $daysFromStart = $dateTime->diff($dateTimeStart)->days;
-			// $weeksFromStart = $daysFromStart / 7;
-			// $isChangeDay = is_int($weeksFromStart);
-			// var_dump($isChangeDay);
-
-			// počet dní od změny energie
-			// počet dní od změny hmotnosti
-			// pro každý den nová kalkulace, output předchozího dne jako input k dalšímu dni
-
 			$day = new LowEnergyTransitionDay($dateTime);
 			$day->setWeight($calculator->getDiet()->getWeightHistory()->getForDate($dateTime)->getWeight());
 
@@ -55,6 +46,24 @@ class LowEnergyTransition extends \Fatty\Approach
 				// Other days.
 				$previousDay = $collection->filterByDate((clone $dateTime)->modify("- 1 day"))[0];
 				$previousWeightDay = $collection->getPreviousWeightDay($dateTime, $day->getWeight());
+
+				var_dump($previousDay, $previousWeightDay);
+				die;
+
+				// Je den, kdy se změnila hmotnost?
+				// PreviousDay == PreviousWeightDay => ANO
+
+				// ANO
+
+						// změnila se hmotnost nahoru?
+						// ANO
+
+								// Návrat k poslední energii, po které došlo k polklesu hmotnosti
+								// 2 týdny vydržet
+
+						// NE
+
+				// NE >
 
 				var_dump($previousDay);
 				var_dump($previousWeightDay);

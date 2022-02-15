@@ -13,17 +13,23 @@ class LowEnergyTransitionDayCollection extends \ArrayObject
 		})));
 	}
 
+	public function filterBeforeDate(\DateTime $dateTime): LowEnergyTransitionDayCollection
+	{
+		return new static(array_values(array_filter($this->getArrayCopy(), function (LowEnergyTransitionDay $day) use ($dateTime) {
+			return $day->getDateTime()->format("Ymd") < $dateTime->format("Ymd");
+		})));
+	}
+
+	public function filterDifferentWeight(Weight $weight): ?LowEnergyTransitionDayCollection
+	{
+		return new static(array_values(array_filter($this->getArrayCopy(), function (LowEnergyTransitionDay $day) use ($weight) {
+			return $day->getWeight()->getInUnit("g")->getAmount()->getValue() != $weight->getInUnit("g")->getAmount()->getValue();
+		})));
+	}
+
 	public function getPreviousWeightDay(\DateTime $dateTime, Weight $weight): ?LowEnergyTransitionDay
 	{
-		foreach ($this->sortByNewest() as $lowEnergyTransitionDay) {
-			if ($lowEnergyTransitionDay->getDateTime()->format("Ymd") < $dateTime->format("Ymd")) {
-				if ($lowEnergyTransitionDay->getWeight()->getInUnit("g")->getAmount()->getValue() != $weight->getInUnit("g")->getAmount()->getValue()) {
-					return $lowEnergyTransitionDay;
-				}
-			}
-		}
-
-		return null;
+		return $this->filterBeforeDate($dateTime)->filterDifferentWeight($weight)->sortByNewest()[0] ?? null;
 	}
 
 	public function sortByOldest(): LowEnergyTransitionDayCollection
