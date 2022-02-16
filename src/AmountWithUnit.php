@@ -78,4 +78,9 @@ abstract class AmountWithUnit
 			$this->getUnit(),
 		]);
 	}
+
+	public function modify(AmountWithUnit $modifier): AmountWithUnit
+	{
+		return new static(new Amount($this->getAmount()->getValue() + $modifier->getInUnit($this->getUnit())->getAmount()->getValue()), $this->getUnit());
+	}
 }

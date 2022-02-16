@@ -34,11 +34,16 @@ class LowEnergyTransitionDay
 		return $this->weight;
 	}
 
-	public function setWeightGoalEnergyExpenditure(Energy $value): LowEnergyTransitionDay
+	public function setWeightGoalEnergyExpenditure(?Energy $value): LowEnergyTransitionDay
 	{
 		$this->weightGoalEnergyExpenditure = $value;
 
 		return $this;
+	}
+
+	public function getWeightGoalEnergyExpenditure(): ?Energy
+	{
+		return $this->weightGoalEnergyExpenditure;
 	}
 
 	public function setDaysToIncrease(int $value): LowEnergyTransitionDay
