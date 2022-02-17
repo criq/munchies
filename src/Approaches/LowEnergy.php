@@ -6,6 +6,7 @@ use Fatty\Amount;
 use Fatty\Calculator;
 use Fatty\Energy;
 use Fatty\Metrics\AmountWithUnitMetric;
+use Fatty\Nutrients;
 
 class LowEnergy extends \Fatty\Approach
 {
@@ -31,5 +32,15 @@ class LowEnergy extends \Fatty\Approach
 		))->getInUnit($calculator->getUnits());
 
 		return new AmountWithUnitMetric("weightGoalEnergyExpenditure", $result);
+	}
+
+	public function getGoalNutrients(Calculator $calculator): Nutrients
+	{
+		$nutrients = new Nutrients;
+		$nutrients->setCarbs((new static)->getDefaultCarbs());
+		$nutrients->setFats((new static)->getDefaultFats());
+		$nutrients->setProteins((new static)->getDefaultProteins());
+
+		return $nutrients;
 	}
 }
