@@ -2,15 +2,10 @@
 
 namespace Fatty;
 
-use Fatty\Approaches\Keto;
-use Fatty\Approaches\LowCarb;
-use Fatty\Approaches\LowEnergy;
-use Fatty\Approaches\Standard;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\AmountWithUnitMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Nutrients\Carbs;
-use Fatty\Nutrients\Fats;
 use Fatty\SportDurations\Aerobic;
 use Fatty\SportDurations\Anaerobic;
 use Fatty\SportDurations\LowFrequency;
@@ -1086,27 +1081,16 @@ class Calculator
 			throw $exceptionCollection;
 		}
 
-		if ($this->getDiet() instanceof LowEnergy) {
-			$result = new Energy(
-				new Amount(
-					(float)LowEnergy::ENERGY_DEFAULT
-				),
-				"kcal",
-			);
+		$weightGoalEnergyExpenditureValue = $weightGoalEnergyExpenditure->getInUnit("kcal")->getAmount()->getValue();
+		$referenceDailyIntakeBonus = $referenceDailyIntakeBonus->getResult();
+		$referenceDailyIntakeBonusValue = $referenceDailyIntakeBonus->getInUnit("kcal")->getAmount()->getValue();
 
-			$formula = $result->getAmount()->getValue();
-		} else {
-			$weightGoalEnergyExpenditureValue = $weightGoalEnergyExpenditure->getInUnit("kcal")->getAmount()->getValue();
-			$referenceDailyIntakeBonus = $referenceDailyIntakeBonus->getResult();
-			$referenceDailyIntakeBonusValue = $referenceDailyIntakeBonus->getInUnit("kcal")->getAmount()->getValue();
+		$result = (new Energy(
+			new Amount($weightGoalEnergyExpenditureValue + $referenceDailyIntakeBonusValue),
+			"kcal",
+		))->getInUnit($this->getUnits());
 
-			$result = (new Energy(
-				new Amount($weightGoalEnergyExpenditureValue + $referenceDailyIntakeBonusValue),
-				"kcal",
-			))->getInUnit($this->getUnits());
-
-			$formula = "weightGoalEnergyExpenditure[" . $weightGoalEnergyExpenditure . "] + referenceDailyIntakeBonus[" . $referenceDailyIntakeBonus . "] = " . $result;
-		}
+		$formula = "weightGoalEnergyExpenditure[" . $weightGoalEnergyExpenditure . "] + referenceDailyIntakeBonus[" . $referenceDailyIntakeBonus . "] = " . $result;
 
 		return new AmountWithUnitMetric("referenceDailyIntake", $result, $formula);
 	}
