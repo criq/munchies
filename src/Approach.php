@@ -34,6 +34,18 @@ abstract class Approach
 		}
 	}
 
+	public static function getAvailableClasses(): array
+	{
+		return [
+			new \Fatty\Approaches\Keto,
+			new \Fatty\Approaches\LowCarb,
+			new \Fatty\Approaches\LowEnergy,
+			new \Fatty\Approaches\LowEnergyTransition,
+			new \Fatty\Approaches\Mediterranean,
+			new \Fatty\Approaches\Standard,
+		];
+	}
+
 	public function getCode(): string
 	{
 		return (string)static::CODE;

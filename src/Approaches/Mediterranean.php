@@ -2,8 +2,8 @@
 
 namespace Fatty\Approaches;
 
-class Med extends Standard
+class Mediterranean extends Standard
 {
-	const CODE = "MED";
+	const CODE = "MEDITERRANEAN";
 	const LABEL_DECLINATED = "středomořskou dietu";
 }
