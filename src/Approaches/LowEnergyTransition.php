@@ -33,7 +33,7 @@ class LowEnergyTransition extends \Fatty\Approach
 		$energyStart = new Energy(new Amount(static::ENERGY_START), static::ENERGY_UNIT);
 
 		$dateTimeStart = $calculator->getDiet()->getDateTimeStart();
-		$dateTimeEnd = new \App\Classes\DateTime("+ 90 day");
+		$dateTimeEnd = new \DateTime("+ 90 day");
 		$dateTime = clone $dateTimeStart;
 
 		$collection = new LowEnergyTransitionDayCollection;

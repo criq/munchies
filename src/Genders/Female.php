@@ -113,7 +113,7 @@ class Female extends \Fatty\Gender
 		}
 
 		if (is_string($pregnancyChildbirthDate)) {
-			$pregnancyChildbirthDate = \Katu\Utils\DateTime::createFromFormat('j.n.Y', $pregnancyChildbirthDate);
+			$pregnancyChildbirthDate = \DateTime::createFromFormat('j.n.Y', $pregnancyChildbirthDate);
 		}
 
 		if ($pregnancyChildbirthDate instanceof \DateTime) {
@@ -153,7 +153,7 @@ class Female extends \Fatty\Gender
 		}
 
 		if (is_string($breastfeedingChildbirthDate)) {
-			$breastfeedingChildbirthDate = \Katu\Utils\DateTime::createFromFormat('j.n.Y', $breastfeedingChildbirthDate);
+			$breastfeedingChildbirthDate = \DateTime::createFromFormat('j.n.Y', $breastfeedingChildbirthDate);
 		}
 
 		if ($breastfeedingChildbirthDate instanceof \DateTime) {
@@ -234,7 +234,7 @@ class Female extends \Fatty\Gender
 			throw new MissingPregnancyChildbirthDateException;
 		}
 
-		$diff = $this->getPregnancyChildbirthDate()->diff(new \Katu\Utils\DateTime);
+		$diff = $this->getPregnancyChildbirthDate()->diff(new \DateTime);
 		if ($diff->days <= 90) {
 			$change = 85;
 		} elseif ($diff->days <= 180) {
@@ -266,7 +266,7 @@ class Female extends \Fatty\Gender
 			throw $exceptionCollection;
 		}
 
-		$diff = $this->getBreastfeedingChildbirthDate()->diff(new \Katu\Utils\DateTime);
+		$diff = $this->getBreastfeedingChildbirthDate()->diff(new \DateTime);
 		if ($diff->days <= 365 / 12 * 3) {
 			$change = 650;
 		} elseif ($this->getBreastfeedingMode() instanceof Full && $diff->days <= 365 / 12 * 6) {
