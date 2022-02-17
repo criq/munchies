@@ -94,6 +94,15 @@ class LowEnergyTransition extends \Fatty\Approach
 			$dateTime = (clone $dateTime)->modify("+ 1 day");
 		}
 
+		// foreach ($collection as $day) {
+		// 	echo $day->getDateTime()->format("Y-m-d") . "\t";
+		// 	echo $day->getWeight()->getAmount()->getValue() . "\t";
+		// 	echo $day->getWeightGoalEnergyExpenditure()->getAmount()->getValue() . "\t";
+		// 	echo $day->getDaysToIncrease() . "\t";
+		// 	echo "\n";
+		// }
+		// die;
+
 		return $collection->sortByOldest();
 	}
 }
