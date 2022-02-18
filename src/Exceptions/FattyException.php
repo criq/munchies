@@ -10,7 +10,7 @@ class FattyException extends \Exception
 	{
 		$class = static::class;
 
-		return implode("$class {$this->getMessage()}, file {$this->getFile()}, line {$this->getLine()}");
+		return "$class {$this->getMessage()}, file {$this->getFile()}, line {$this->getLine()}";
 	}
 
 	public function addName(string $name): FattyException
