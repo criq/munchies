@@ -7,6 +7,7 @@ use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDay;
 use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDayCollection;
 use Fatty\Calculator;
 use Fatty\Energy;
+use Fatty\Metrics\AmountWithUnitMetric;
 use Fatty\Nutrients;
 
 class LowEnergyTransition extends \Fatty\Approach
@@ -18,6 +19,18 @@ class LowEnergyTransition extends \Fatty\Approach
 	const ENERGY_START = 800;
 	const ENERGY_UNIT = "kcal";
 
+	public function getWeightGoalEnergyExpenditure(Calculator $calculator): Energy
+	{
+		return $this->calcDays($calculator)->filterByDate($calculator->getReferenceDate())[0]->getWeightGoalEnergyExpenditure();
+	}
+
+	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
+	{
+		$result = $this->getWeightGoalEnergyExpenditure($calculator)->getInUnit($calculator->getUnits());
+
+		return new AmountWithUnitMetric("weightGoalEnergyExpenditure", $result);
+	}
+
 	public function getGoalNutrients(Calculator $calculator): Nutrients
 	{
 		$nutrients = new Nutrients;
@@ -25,13 +38,6 @@ class LowEnergyTransition extends \Fatty\Approach
 		return $nutrients;
 	}
 
-	/****************************************************************************
-	 * Počítat energetický příjem pro jednotlivé dny.
-	 * Potřebujeme k tomu:
-	 * - datum začátku diety resp. historii WGEE
-	 * - ukládat TDEE, WGEE, RDI namísto pouze energy (energy == RDI)
-	 * - historii hmotnosti
-	 */
 	public function calcDays(Calculator $calculator)
 	{
 		$energyDecrement = new Energy(new Amount(static::ENERGY_DECREMENT), static::ENERGY_UNIT);
@@ -40,19 +46,14 @@ class LowEnergyTransition extends \Fatty\Approach
 		$energyStart = new Energy(new Amount(static::ENERGY_START), static::ENERGY_UNIT);
 
 		$dateTimeStart = $calculator->getDiet()->getDateTimeStart();
-		$dateTimeEnd = new \DateTime("+ 90 day");
+		$dateTimeEnd = $calculator->getReferenceDate();
 		$dateTime = clone $dateTimeStart;
 
 		$collection = new LowEnergyTransitionDayCollection;
 
 		while ($dateTime->format("Ymd") <= $dateTimeEnd->format("Ymd")) {
-			// Keto je max.
-			// $ketoCalculator = clone $calculator;
-			// $ketoCalculator->setDiet(new Diet(new Keto));
-			// var_dump($ketoCalculator->calcWeightGoalEnergyExpenditure()->getResult()->getInUnit("kcal")); die;
-
 			$day = new LowEnergyTransitionDay($dateTime);
-			$day->setWeight($calculator->getDiet()->getWeightHistory()->getForDate($dateTime)->getWeight());
+			$day->setWeight($calculator->getWeightHistory()->getForDate($dateTime)->getWeight());
 
 			if ($dateTimeStart->format("Ymd") == $dateTime->format("Ymd")) {
 				// First day.
@@ -100,15 +101,6 @@ class LowEnergyTransition extends \Fatty\Approach
 
 			$dateTime = (clone $dateTime)->modify("+ 1 day");
 		}
-
-		// foreach ($collection as $day) {
-		// 	echo $day->getDateTime()->format("Y-m-d") . "\t";
-		// 	echo $day->getWeight()->getAmount()->getValue() . "\t";
-		// 	echo $day->getWeightGoalEnergyExpenditure()->getAmount()->getValue() . "\t";
-		// 	echo $day->getDaysToIncrease() . "\t";
-		// 	echo "\n";
-		// }
-		// die;
 
 		return $collection->sortByOldest();
 	}

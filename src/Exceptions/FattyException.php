@@ -6,11 +6,6 @@ class FattyException extends \Exception
 {
 	protected $names = [];
 
-	// public function __toString()
-	// {
-	// 	return implode("; ");
-	// }
-
 	public function addName(string $name): FattyException
 	{
 		return $this->names[] = $name;

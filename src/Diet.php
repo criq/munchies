@@ -12,7 +12,6 @@ class Diet
 	protected $approach;
 	protected $carbs;
 	protected $dateTimeStart;
-	protected $weightHistory;
 
 	public function __construct(?Approach $approach = null)
 	{
@@ -78,15 +77,17 @@ class Diet
 		return $this->dateTimeStart;
 	}
 
-	public function setWeightHistory(?WeightHistory $value): Diet
+	public function getDayIndex(Calculator $calculator): ?int
 	{
-		$this->weightHistory = $value;
+		try {
+			$diff = $calculator->getDiet()->getDateTimeStart()->diff($calculator->getReferenceDate());
+			if ($diff->invert) {
+				return null;
+			}
 
-		return $this;
-	}
-
-	public function getWeightHistory(): WeightHistory
-	{
-		return $this->weightHistory ?: new WeightHistory;
+			return $diff->days + 1;
+		} catch (\Throwable $e) {
+			return null;
+		}
 	}
 }

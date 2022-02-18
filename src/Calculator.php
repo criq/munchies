@@ -24,6 +24,7 @@ class Calculator
 	protected $sportDurations;
 	protected $units = "kJ";
 	protected $weight;
+	protected $weightHistory;
 
 	public function __construct(?array $params = [])
 	{
@@ -448,6 +449,18 @@ class Calculator
 		$formula = "weight[{$weightValue}] = {$weightValue}";
 
 		return new AmountWithUnitMetric("weight", $weight, $formula);
+	}
+
+	public function setWeightHistory(?WeightHistory $value): Calculator
+	{
+		$this->weightHistory = $value;
+
+		return $this;
+	}
+
+	public function getWeightHistory(): WeightHistory
+	{
+		return $this->weightHistory ?: new WeightHistory;
 	}
 
 	/*****************************************************************************
