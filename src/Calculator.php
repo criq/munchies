@@ -1094,7 +1094,6 @@ class Calculator
 		}
 
 		if (count($exceptionCollection)) {
-			return null; // TMP
 			throw $exceptionCollection;
 		}
 
