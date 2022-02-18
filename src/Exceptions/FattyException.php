@@ -8,7 +8,7 @@ class FattyException extends \Exception
 
 	public function __toString()
 	{
-		return static::class;
+		return implode(static::class . " {$this->getMessage()}");
 	}
 
 	public function addName(string $name): FattyException
