@@ -20,6 +20,7 @@ class Calculator
 	protected $goal;
 	protected $params;
 	protected $proportions;
+	protected $referenceDate;
 	protected $sportDurations;
 	protected $units = "kJ";
 	protected $weight;
@@ -354,6 +355,21 @@ class Calculator
 	public function getIsOverweight(): bool
 	{
 		return (bool)$this->calcFatOverOptimalWeight()->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getAmount()->getValue();
+	}
+
+	/****************************************************************************
+	 * Reference date.
+	 */
+	public function setReferenceDate(?\DateTime $value): Calculator
+	{
+		$this->referenceDate = $value;
+
+		return $this;
+	}
+
+	public function getReferenceDate(): \DateTime
+	{
+		return $this->referenceDate ?: new \DateTime;
 	}
 
 	/*****************************************************************************

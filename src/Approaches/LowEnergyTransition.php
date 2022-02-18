@@ -6,8 +6,8 @@ use Fatty\Amount;
 use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDay;
 use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDayCollection;
 use Fatty\Calculator;
-use Fatty\Diet;
 use Fatty\Energy;
+use Fatty\Nutrients;
 
 class LowEnergyTransition extends \Fatty\Approach
 {
@@ -17,6 +17,13 @@ class LowEnergyTransition extends \Fatty\Approach
 	const ENERGY_MIN = 800;
 	const ENERGY_START = 800;
 	const ENERGY_UNIT = "kcal";
+
+	public function getGoalNutrients(Calculator $calculator): Nutrients
+	{
+		$nutrients = new Nutrients;
+
+		return $nutrients;
+	}
 
 	/****************************************************************************
 	 * Počítat energetický příjem pro jednotlivé dny.
