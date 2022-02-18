@@ -30,24 +30,18 @@ abstract class Approach
 
 	public static function createFromCode(string $value): ?Approach
 	{
-		try {
-			$class = "Fatty\\Approaches\\" . ucfirst($value);
-
-			return new $class;
-		} catch (\Throwable $e) {
-			return null;
-		}
+		return static::getAvailableClasses()[$value] ?? null;
 	}
 
 	public static function getAvailableClasses(): array
 	{
 		return [
-			new \Fatty\Approaches\Keto,
-			new \Fatty\Approaches\LowCarb,
-			new \Fatty\Approaches\LowEnergy,
-			new \Fatty\Approaches\LowEnergyTransition,
-			new \Fatty\Approaches\Mediterranean,
-			new \Fatty\Approaches\Standard,
+			\Fatty\Approaches\Keto::CODE => new \Fatty\Approaches\Keto,
+			\Fatty\Approaches\LowCarb::CODE => new \Fatty\Approaches\LowCarb,
+			\Fatty\Approaches\LowEnergy::CODE => new \Fatty\Approaches\LowEnergy,
+			\Fatty\Approaches\LowEnergyTransition::CODE => new \Fatty\Approaches\LowEnergyTransition,
+			\Fatty\Approaches\Mediterranean::CODE => new \Fatty\Approaches\Mediterranean,
+			\Fatty\Approaches\Standard::CODE => new \Fatty\Approaches\Standard,
 		];
 	}
 
