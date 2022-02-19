@@ -7,36 +7,22 @@ use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDay;
 use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDayCollection;
 use Fatty\Calculator;
 use Fatty\Energy;
+use Fatty\Genders\Female;
 use Fatty\Metrics\AmountWithUnitMetric;
 use Fatty\Nutrients;
+use Fatty\Nutrients\Fats;
 
 class LowEnergyTransition extends \Fatty\Approach
 {
+	const CARBS_DEFAULT = 40;
+	const CARBS_MAX = 50;
+	const CARBS_MIN = 0;
 	const CODE = "LOW_ENERGY_TRANSITION";
 	const ENERGY_DECREMENT = -150;
 	const ENERGY_INCREMENT = 150;
 	const ENERGY_MIN = 800;
 	const ENERGY_START = 800;
 	const ENERGY_UNIT = "kcal";
-
-	public function getWeightGoalEnergyExpenditure(Calculator $calculator): Energy
-	{
-		return $this->calcDays($calculator)->filterByDate($calculator->getReferenceDate())[0]->getWeightGoalEnergyExpenditure();
-	}
-
-	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
-	{
-		$result = $this->getWeightGoalEnergyExpenditure($calculator)->getInUnit($calculator->getUnits());
-
-		return new AmountWithUnitMetric("weightGoalEnergyExpenditure", $result);
-	}
-
-	public function getGoalNutrients(Calculator $calculator): Nutrients
-	{
-		$nutrients = new Nutrients;
-
-		return $nutrients;
-	}
 
 	public function calcDays(Calculator $calculator)
 	{
@@ -67,7 +53,9 @@ class LowEnergyTransition extends \Fatty\Approach
 				$day->setDaysToIncrease($previousDay->getDaysToIncrease() - 1);
 
 				// Jedná se o den, kdy se změnila hmotnost a došlo k nárůstu hmotnosti?
-				if ($previousDay->getDateTime()->format("Ymd") == $previousWeightDay->getDateTime()->format("Ymd")
+				if ($previousDay
+					&& $previousWeightDay
+					&& $previousDay->getDateTime()->format("Ymd") == $previousWeightDay->getDateTime()->format("Ymd")
 					&& $day->getWeight()->getInUnit("g")->getAmount()->getValue() > $previousWeightDay->getWeight()->getInUnit("g")->getAmount()->getValue()) {
 					// Snížit energii.
 					$decreasedEnergy = $previousDay->getWeightGoalEnergyExpenditure()->modify($energyDecrement);
@@ -103,5 +91,45 @@ class LowEnergyTransition extends \Fatty\Approach
 		}
 
 		return $collection->sortByOldest();
+	}
+
+	public function getWeightGoalEnergyExpenditure(Calculator $calculator): Energy
+	{
+		return $this->calcDays($calculator)->filterByDate($calculator->getReferenceDate())[0]->getWeightGoalEnergyExpenditure();
+	}
+
+	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
+	{
+		$result = $this->getWeightGoalEnergyExpenditure($calculator)->getInUnit($calculator->getUnits());
+
+		return new AmountWithUnitMetric("weightGoalEnergyExpenditure", $result);
+	}
+
+	public function getGoalNutrients(Calculator $calculator): Nutrients
+	{
+		$nutrients = new Nutrients;
+		$nutrients->setProteins($this->calcGoalNutrientProteins($calculator)->getResult());
+
+		$wgee = $calculator->calcWeightGoalEnergyExpenditure();
+
+		// TODO
+		if (false && $calculator->getGender() instanceof Female && $calculator->getGender()->isPregnant()) {
+		// TODO
+		} elseif (false && $calculator->getGender() instanceof Female && $calculator->getGender()->isBreastfeeding()) {
+		} else {
+			$dietCarbs = $calculator->getDiet()->getCarbs();
+			$nutrients->setCarbs($dietCarbs);
+			$nutrients->setFats(
+				Fats::createFromEnergy(
+					new Energy(
+						new Amount(
+							$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+						),
+						Energy::getBaseUnit(),
+					),
+				),
+			);
+		}
+		return $nutrients;
 	}
 }

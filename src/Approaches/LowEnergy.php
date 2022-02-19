@@ -10,9 +10,9 @@ use Fatty\Nutrients;
 
 class LowEnergy extends \Fatty\Approach
 {
-	const CARBS_DEFAULT = 50;
+	const CARBS_DEFAULT = 40;
 	const CARBS_MAX = 50;
-	const CARBS_MIN = 50;
+	const CARBS_MIN = 0;
 	const CODE = "LOW_ENERGY";
 	const ENERGY_DEFAULT = 800;
 	const ENERGY_UNIT = "kcal";
