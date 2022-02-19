@@ -211,7 +211,6 @@ abstract class Approach
 		}
 
 		$nutrients = $this->getGoalNutrients($calculator);
-		var_dump($nutrients);die;
 
 		return new MetricCollection([
 			new AmountWithUnitMetric("goalNutrientsCarbs", $nutrients->getCarbs()),
