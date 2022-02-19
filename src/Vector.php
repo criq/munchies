@@ -7,9 +7,10 @@ use Fatty\Metrics\AmountWithUnitMetric;
 
 abstract class Vector
 {
-	const LABEL_INFINITIVE = null;
+	const CODE = "";
+	const LABEL_INFINITIVE = "";
 	const TDEE_QUOTIENT = null;
-	const WEIGHT_CHANGE_PER_WEEK = '';
+	const WEIGHT_CHANGE_PER_WEEK = "";
 
 	abstract public function calcTdeeChangePerDay(Calculator $calculator): AmountWithUnitMetric;
 
@@ -18,32 +19,37 @@ abstract class Vector
 		return (string)$this->getLabelInfinitive();
 	}
 
-	public static function createFromString(string $value)
+	public static function createFromCode(string $value): ?Vector
 	{
-		try {
-			$class = 'Fatty\\Vectors\\' . ucfirst($value);
-
-			return new $class;
-		} catch (\Throwable $e) {
-			return null;
-		}
+		return static::getAvailableClasses()[$value] ?? null;
 	}
 
-	public function getCode()
+	public static function getAvailableClasses(): array
 	{
-		return lcfirst(array_slice(explode('\\', get_called_class()), -1, 1)[0]);
+		return [
+			\Fatty\Vectors\Gain::CODE => new \Fatty\Vectors\Gain,
+			\Fatty\Vectors\Loose::CODE => new \Fatty\Vectors\Loose,
+			\Fatty\Vectors\Maintain::CODE => new \Fatty\Vectors\Maintain,
+			\Fatty\Vectors\SlowGain::CODE => new \Fatty\Vectors\SlowGain,
+			\Fatty\Vectors\SlowLoose::CODE => new \Fatty\Vectors\SlowLoose,
+		];
+	}
+
+	public function getCode(): string
+	{
+		return static::CODE;
 	}
 
 	public function calcTdeeQuotient(Calculator $calculator): AmountMetric
 	{
-		return new AmountMetric('tdeeQuotient', new Amount((float)static::TDEE_QUOTIENT));
+		return new AmountMetric("tdeeQuotient", new Amount((float)static::TDEE_QUOTIENT));
 	}
 
 	public function getChangePerWeek()
 	{
 		return new Weight(
 			new Amount(static::WEIGHT_CHANGE_PER_WEEK),
-			'kg',
+			"kg",
 		);
 	}
 
@@ -59,10 +65,10 @@ abstract class Vector
 			Energy::getBaseUnit(),
 		);
 
-		return new AmountWithUnitMetric('goalWeightGoalEnergyExpenditure', $result);
+		return new AmountWithUnitMetric("goalWeightGoalEnergyExpenditure", $result);
 	}
 
-	public function getLabelInfinitive()
+	public function getLabelInfinitive(): string
 	{
 		return static::LABEL_INFINITIVE;
 	}

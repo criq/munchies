@@ -205,7 +205,7 @@ class Calculator
 
 		if (trim($params["goal_vector"] ?? null)) {
 			try {
-				$value = Vector::createFromString($params["goal_vector"]);
+				$value = Vector::createFromCode($params["goal_vector"]);
 				if (!$value) {
 					throw new \Fatty\Exceptions\InvalidGoalVectorException;
 				}
