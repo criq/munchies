@@ -88,7 +88,7 @@ class LowEnergyTransition extends \Fatty\Approach
 
 			// Pokud jsme dosáhli KETO úrovní, jet podle KETO.
 			$ketoCalculator = clone $calculator;
-			$ketoCalculator->getDiet()->setApproach(new \Fatty\Approaches\Keto);
+			$ketoCalculator->setDiet(new \Fatty\Diet(new \Fatty\Approaches\Keto));
 			$ketoWeightGoalEnergyExpenditure = $ketoCalculator->calcWeightGoalEnergyExpenditure()->getResult();
 
 			if ($day->getWeightGoalEnergyExpenditure()->getInUnit(static::ENERGY_UNIT)->getAmount()->getValue() > $ketoWeightGoalEnergyExpenditure->getInUnit(static::ENERGY_UNIT)->getAmount()->getValue()) {
