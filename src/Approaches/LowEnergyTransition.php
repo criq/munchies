@@ -23,6 +23,7 @@ class LowEnergyTransition extends \Fatty\Approach
 	const ENERGY_MIN = 800;
 	const ENERGY_START = 800;
 	const ENERGY_UNIT = "kcal";
+	// const PROTEINS_DEFAULT = 82;
 
 	public function calcDays(Calculator $calculator)
 	{
@@ -83,6 +84,15 @@ class LowEnergyTransition extends \Fatty\Approach
 			// Pokud je energie menší, než minimum, nastavit na minimum.
 			if ($day->getWeightGoalEnergyExpenditure()->getInUnit(static::ENERGY_UNIT)->getAmount()->getValue() < $energyMin->getInUnit(static::ENERGY_UNIT)->getAmount()->getValue()) {
 				$day->setWeightGoalEnergyExpenditure($energyMin);
+			}
+
+			// Pokud jsme dosáhli KETO úrovní, jet podle KETO.
+			$ketoCalculator = clone $calculator;
+			$ketoCalculator->getDiet()->setApproach(new \Fatty\Approaches\Keto);
+			$ketoWeightGoalEnergyExpenditure = $ketoCalculator->calcWeightGoalEnergyExpenditure()->getResult();
+
+			if ($day->getWeightGoalEnergyExpenditure()->getInUnit(static::ENERGY_UNIT)->getAmount()->getValue() > $ketoWeightGoalEnergyExpenditure->getInUnit(static::ENERGY_UNIT)->getAmount()->getValue()) {
+				$day->setWeightGoalEnergyExpenditure($ketoWeightGoalEnergyExpenditure);
 			}
 
 			$collection[] = $day;
