@@ -11,6 +11,7 @@ use Fatty\Genders\Female;
 use Fatty\Metrics\AmountWithUnitMetric;
 use Fatty\Nutrients;
 use Fatty\Nutrients\Fats;
+use Fatty\Nutrients\Proteins;
 
 class LowEnergyTransition extends \Fatty\Approach
 {
@@ -19,18 +20,17 @@ class LowEnergyTransition extends \Fatty\Approach
 	const CARBS_MIN = 0;
 	const CODE = "LOW_ENERGY_TRANSITION";
 	const ENERGY_DECREMENT = -150;
+	const ENERGY_DEFAULT = 800;
 	const ENERGY_INCREMENT = 150;
 	const ENERGY_MIN = 800;
-	const ENERGY_START = 800;
-	const ENERGY_UNIT = "kcal";
-	// const PROTEINS_DEFAULT = 82;
+	const PROTEINS_DEFAULT = 82;
 
 	public function calcDays(Calculator $calculator)
 	{
 		$energyDecrement = new Energy(new Amount(static::ENERGY_DECREMENT), static::ENERGY_UNIT);
 		$energyIncrement = new Energy(new Amount(static::ENERGY_INCREMENT), static::ENERGY_UNIT);
 		$energyMin = new Energy(new Amount(static::ENERGY_MIN), static::ENERGY_UNIT);
-		$energyStart = new Energy(new Amount(static::ENERGY_START), static::ENERGY_UNIT);
+		$energyStart = new Energy(new Amount(static::ENERGY_DEFAULT), static::ENERGY_UNIT);
 
 		$dateTimeStart = $calculator->getDiet()->getDateTimeStart();
 		$dateTimeEnd = $calculator->getReferenceDate();
@@ -118,10 +118,26 @@ class LowEnergyTransition extends \Fatty\Approach
 	public function getGoalNutrients(Calculator $calculator): Nutrients
 	{
 		$nutrients = new Nutrients;
-		$nutrients->setProteins($this->calcGoalNutrientProteins($calculator)->getResult());
 
 		$wgee = $calculator->calcWeightGoalEnergyExpenditure();
 
+		// Bílkoviny.
+		$ketoCalculator = clone $calculator;
+		$ketoCalculator->setDiet(new \Fatty\Diet(new \Fatty\Approaches\Keto));
+		$ketoWgee = $ketoCalculator->calcWeightGoalEnergyExpenditure();
+
+		$startEnergyValue = $this->getDefaultEnergy()->getInUnit("J")->getAmount()->getValue();
+		$goalEnergyValue = $ketoWgee->getResult()->getInUnit("J")->getAmount()->getValue();
+		$currentEnergyValue = $wgee->getResult()->getInUnit("J")->getAmount()->getValue();
+		$progress = ($currentEnergyValue - $startEnergyValue) / ($goalEnergyValue - $startEnergyValue);
+
+		$startProteinsValue = $this->getDefaultProteins()->getInUnit("g")->getAmount()->getValue();
+		$goalProteinsValue = $ketoCalculator->calcGoalNutrients()->filterByName("goalNutrientsProteins")[0]->getResult()->getInUnit("g")->getAmount()->getValue();
+		$addProteins = ($goalProteinsValue - $startProteinsValue) * $progress;
+		$proteins = new Proteins(new Amount($startProteinsValue + $addProteins), "g");
+		$nutrients->setProteins($proteins);
+
+		// Tuky a sacharidy.
 		// TODO
 		if (false && $calculator->getGender() instanceof Female && $calculator->getGender()->isPregnant()) {
 		// TODO

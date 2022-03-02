@@ -15,7 +15,6 @@ class LowEnergy extends \Fatty\Approach
 	const CARBS_MIN = 0;
 	const CODE = "LOW_ENERGY";
 	const ENERGY_DEFAULT = 800;
-	const ENERGY_UNIT = "kcal";
 	const FATS_DEFAULT = 30;
 	const LABEL_DECLINATED = "nízkoenergetickou dietu";
 	const PROTEINS_DEFAULT = 82;

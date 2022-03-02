@@ -17,6 +17,7 @@ abstract class Approach
 	const CARBS_MIN = null;
 	const CODE = null;
 	const ENERGY_DEFAULT = null;
+	const ENERGY_UNIT = "kcal";
 	const FATS_DEFAULT = null;
 	const LABEL_DECLINATED = null;
 	const PROTEINS_DEFAULT = null;
@@ -57,7 +58,7 @@ abstract class Approach
 
 	public function getDefaultEnergy(): ?Energy
 	{
-		return static::ENERGY_DEFAULT ? new Energy(new Amount((float)static::ENERGY_DEFAULT), "kcal") : null;
+		return static::ENERGY_DEFAULT ? new Energy(new Amount((float)static::ENERGY_DEFAULT), static::ENERGY_UNIT) : null;
 	}
 
 	public function getDefaultCarbs(): ?Carbs
