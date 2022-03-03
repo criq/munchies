@@ -629,8 +629,13 @@ class Calculator
 		$weight = $this->getWeight()->getInUnit("kg")->getAmount()->getValue();
 		$height = $this->getProportions()->getHeight()->getInUnit("m")->getAmount()->getValue();
 
-		$result = new Amount($weight / pow($height, 2));
-		$formula = "weight[" . $weight . "] / pow(height[" . $height . "], 2) = " . $result->getValue();
+		$resultValue = $weight / pow($height, 2);
+		$result = new Amount($resultValue);
+		$formula = "
+			weight[" . $weight . "] / pow(height[" . $height . "], 2)
+			= " . $weight . " / " . (pow($height, 2)) . "
+			= {$resultValue}
+		";
 
 		return new AmountMetric("bodyMassIndex", $result, $formula);
 	}
