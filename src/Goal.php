@@ -34,7 +34,7 @@ class Goal
 			throw new MissingGoalDurationException;
 		}
 
-		return new AmountWithUnitMetric('goalDuration', $duration);
+		return new AmountWithUnitMetric("goalDuration", $duration);
 	}
 
 	public function setVector(?Vector $value): Goal
@@ -65,9 +65,9 @@ class Goal
 	{
 		return new Weight(
 			new Amount(
-				$this->getVector()->getChangePerWeek()->getInUnit('kg')->getAmount()->getValue() * $this->getDuration()->getInUnit('weeks')->getAmount()->getValue()
+				$this->getVector()->getChangePerWeek()->getInUnit("kg")->getAmount()->getValue() * $this->getDuration()->getInUnit("weeks")->getAmount()->getValue()
 			),
-			'kg',
+			"kg",
 		);
 	}
 
@@ -79,17 +79,17 @@ class Goal
 		}
 
 		return new Weight(
-			$weight->getInUnit('kg')->getAmount() + $this->getChange()->getInUnit('kg')->getAmount(),
-			'kg'
+			$weight->getInUnit("kg")->getAmount() + $this->getChange()->getInUnit("kg")->getAmount(),
+			"kg"
 		);
 	}
 
 	public function getDifference(Calculator $calculator)
 	{
 		if ($this->getVector() instanceof Vectors\Loose) {
-			return $this->getFinal($calculator)->getInUnit('kg')->getAmount() - $this->getWeight()->getInUnit('kg')->getAmount();
+			return $this->getFinal($calculator)->getInUnit("kg")->getAmount() - $this->getWeight()->getInUnit("kg")->getAmount();
 		} elseif ($this->getVector() instanceof Vectors\Gain) {
-			return $this->getWeight()->getInUnit('kg')->getAmount() - $this->getFinal($calculator)->getInUnit('kg')->getAmount();
+			return $this->getWeight()->getInUnit("kg")->getAmount() - $this->getFinal($calculator)->getInUnit("kg")->getAmount();
 		}
 	}
 
@@ -100,7 +100,7 @@ class Goal
 			throw new MissingGoalVectorException;
 		}
 
-		return new StringMetric('goalVector', $vector->getCode(), $vector->getLabelInfinitive());
+		return new StringMetric("goalVector", $vector->getCode(), $vector->getLabelInfinitive());
 	}
 
 	public function calcGoalWeight(): AmountWithUnitMetric
@@ -110,7 +110,7 @@ class Goal
 			throw new MissingGoalWeightException;
 		}
 
-		return new AmountWithUnitMetric('goalWeight', $this->getWeight());
+		return new AmountWithUnitMetric("goalWeight", $this->getWeight());
 	}
 
 	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric

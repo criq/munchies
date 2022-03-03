@@ -7,6 +7,6 @@ class MissingGoalWeightException extends FattyException
 	public function __construct()
 	{
 		$this->message = "Chybějící cílová hmotnost.";
-		$this->names = ['goal_weight'];
+		$this->names = ["goal_weight"];
 	}
 }

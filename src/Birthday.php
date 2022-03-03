@@ -14,7 +14,8 @@ class Birthday
 	public static function createFromString(string $value): ?Birthday
 	{
 		try {
-			$datetime = \DateTime::createFromFormat('j.*n.*Y', $value);
+			$datetime = \DateTime::createFromFormat("j.*n.*Y", $value);
+
 			$datetime->setTime(0, 0, 0);
 
 			return new static($datetime);
