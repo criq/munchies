@@ -44,14 +44,14 @@ class Female extends \Fatty\Gender
 	 */
 	protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric
 	{
-		$waistValue = $calculator->getProportions()->getWaist()->getInUnit('cm')->getAmount()->getValue();
-		$neckValue = $calculator->getProportions()->getNeck()->getInUnit('cm')->getAmount()->getValue();
-		$heightValue = $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue();
+		$waistValue = $calculator->getProportions()->getWaist()->getInUnit("cm")->getAmount()->getValue();
+		$neckValue = $calculator->getProportions()->getNeck()->getInUnit("cm")->getAmount()->getValue();
+		$heightValue = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
 
 		$result = new Percentage(((495 / (1.0324 - (0.19077 * log10($waistValue - $neckValue)) + (0.15456 * log10($heightValue)))) - 450) * .01);
 		$formula = "((495 / (1.0324 - (0.19077 * log10(waist[{$waistValue}] - neck[{$neckValue}])) + (0.15456 * log10(height[{$heightValue}])))) - 450) * .01 = {$result->getValue()}";
 
-		return new AmountMetric('bodyFatPercentage', $result, $formula);
+		return new AmountMetric("bodyFatPercentage", $result, $formula);
 	}
 
 	/*****************************************************************************
@@ -77,20 +77,22 @@ class Female extends \Fatty\Gender
 			throw $exceptionCollection;
 		}
 
-		$weightValue = $calculator->getWeight()->getInUnit('kg')->getAmount()->getValue();
-		$heightValue = $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue();
+		$weightValue = $calculator->getWeight()->getInUnit("kg")->getAmount()->getValue();
+		$heightValue = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
 		$age = $calculator->getBirthday()->getAge();
 
-		$result = (new Energy(
-			new Amount(
-				(10 * $weightValue) + (6.25 * $heightValue) - (5 * $age) - 161
-			),
-			'kcal',
-		))->getInUnit('kJ');
+		$resultValue = (10 * $weightValue) + (6.25 * $heightValue) - (5 * $age) - 161;
+		$result = (new Energy(new Amount($resultValue), "kcal"))
+			->getInUnit($calculator->getUnits())
+			;
 
-		$formula = "(10 * weight[{$weightValue}]) + (6.25 * height[{$heightValue}]) - (5 * age[{$age}]) - 161";
+		$formula = "
+			(10 * weight[{$weightValue}]) + (6.25 * height[{$heightValue}]) - (5 * age[{$age}]) - 161
+			= " . (10 * $weightValue) . " + " . (6.25 * $heightValue) . " - " . (5 * $age) . " - 161
+			= {$resultValue} kcal
+		";
 
-		return new AmountWithUnitMetric('basalMetabolicRate', $result, $formula);
+		return new AmountWithUnitMetric("basalMetabolicRate", $result, $formula);
 	}
 
 	/*****************************************************************************
@@ -113,7 +115,7 @@ class Female extends \Fatty\Gender
 		}
 
 		if (is_string($pregnancyChildbirthDate)) {
-			$pregnancyChildbirthDate = \DateTime::createFromFormat('j.n.Y', $pregnancyChildbirthDate);
+			$pregnancyChildbirthDate = \DateTime::createFromFormat("j.n.Y", $pregnancyChildbirthDate);
 		}
 
 		if ($pregnancyChildbirthDate instanceof \DateTime) {
@@ -153,7 +155,7 @@ class Female extends \Fatty\Gender
 		}
 
 		if (is_string($breastfeedingChildbirthDate)) {
-			$breastfeedingChildbirthDate = \DateTime::createFromFormat('j.n.Y', $breastfeedingChildbirthDate);
+			$breastfeedingChildbirthDate = \DateTime::createFromFormat("j.n.Y", $breastfeedingChildbirthDate);
 		}
 
 		if ($breastfeedingChildbirthDate instanceof \DateTime) {
@@ -216,18 +218,18 @@ class Female extends \Fatty\Gender
 
 		$result = new Energy(
 			new Amount(
-				$referenceDailyIntakeBonusPregnancy->getResult()->getInUnit('kcal')->getAmount()->getValue() + $referenceDailyIntakeBonusBreastfeeding->getResult()->getInUnit('kcal')->getAmount()->getValue()
+				$referenceDailyIntakeBonusPregnancy->getResult()->getInUnit("kcal")->getAmount()->getValue() + $referenceDailyIntakeBonusBreastfeeding->getResult()->getInUnit("kcal")->getAmount()->getValue()
 			),
-			'kcal',
+			"kcal",
 		);
 
-		return new AmountWithUnitMetric('referenceDailyIntakeBonus', $result);
+		return new AmountWithUnitMetric("referenceDailyIntakeBonus", $result);
 	}
 
 	public function calcReferenceDailyIntakeBonusPregnancy(): AmountWithUnitMetric
 	{
 		if (!$this->isPregnant()) {
-			return new AmountWithUnitMetric('referenceDailyIntakeBonusPregnancy', new Energy(new Amount(0), 'kJ'));
+			return new AmountWithUnitMetric("referenceDailyIntakeBonusPregnancy", new Energy(new Amount(0), "kJ"));
 		}
 
 		if (!($this->getPregnancyChildbirthDate() instanceof Birthday)) {
@@ -243,7 +245,7 @@ class Female extends \Fatty\Gender
 			$change = 475;
 		}
 
-		return new AmountWithUnitMetric('referenceDailyIntakeBonusPregnancy', new Energy(new Amount($change), 'kcal'));
+		return new AmountWithUnitMetric("referenceDailyIntakeBonusPregnancy", new Energy(new Amount($change), "kcal"));
 	}
 
 	public function calcReferenceDailyIntakeBonusBreastfeeding(): AmountWithUnitMetric
@@ -251,7 +253,7 @@ class Female extends \Fatty\Gender
 		$exceptionCollection = new FattyExceptionCollection;
 
 		if (!$this->isBreastfeeding()) {
-			return new AmountWithUnitMetric('referenceDailyIntakeBonusBreastfeeding', new Energy(new Amount(0), 'kJ'));
+			return new AmountWithUnitMetric("referenceDailyIntakeBonusBreastfeeding", new Energy(new Amount(0), "kJ"));
 		}
 
 		if (!($this->getBreastfeedingChildbirthDate() instanceof Birthday)) {
@@ -285,7 +287,7 @@ class Female extends \Fatty\Gender
 			$change = 100;
 		}
 
-		return new AmountWithUnitMetric('referenceDailyIntakeBonusBreastfeeding', new Energy(new Amount($change), 'kcal'));
+		return new AmountWithUnitMetric("referenceDailyIntakeBonusBreastfeeding", new Energy(new Amount($change), "kcal"));
 	}
 
 	/*****************************************************************************
@@ -306,6 +308,6 @@ class Female extends \Fatty\Gender
 			$result = new AppleWithHigherRisk;
 		}
 
-		return new StringMetric('bodyType', $result->getCode(), $result->getLabel());
+		return new StringMetric("bodyType", $result->getCode(), $result->getLabel());
 	}
 }

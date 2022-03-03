@@ -27,14 +27,14 @@ class Male extends \Fatty\Gender
 	 */
 	protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric
 	{
-		$waistValue = $calculator->getProportions()->getWaist()->getInUnit('cm')->getAmount()->getValue();
-		$neckValue = $calculator->getProportions()->getNeck()->getInUnit('cm')->getAmount()->getValue();
-		$heightValue = $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue();
+		$waistValue = $calculator->getProportions()->getWaist()->getInUnit("cm")->getAmount()->getValue();
+		$neckValue = $calculator->getProportions()->getNeck()->getInUnit("cm")->getAmount()->getValue();
+		$heightValue = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
 
 		$result = new Percentage(((495 / (1.0324 - (0.19077 * log10($waistValue - $neckValue)) + (0.15456 * log10($heightValue)))) - 450) * .01);
 		$formula = "((495 / (1.0324 - (0.19077 * log10(waist[{$waistValue}] - neck[{$neckValue}])) + (0.15456 * log10(height[{$heightValue}])))) - 450) * .01 = {$result->getValue()}";
 
-		return new AmountMetric('bodyFatPercentage', $result, $formula);
+		return new AmountMetric("bodyFatPercentage", $result, $formula);
 	}
 
 	/*****************************************************************************
@@ -60,20 +60,22 @@ class Male extends \Fatty\Gender
 			throw $exceptionCollection;
 		}
 
-		$weightValue = $calculator->getWeight()->getInUnit('kg')->getAmount()->getValue();
-		$heightValue = $calculator->getProportions()->getHeight()->getInUnit('cm')->getAmount()->getValue();
+		$weightValue = $calculator->getWeight()->getInUnit("kg")->getAmount()->getValue();
+		$heightValue = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
 		$age = $calculator->getBirthday()->getAge();
 
-		$result = (new Energy(
-			new Amount(
-				(10 * $weightValue) + (6.25 * $heightValue) - (5 * $age) + 5
-			),
-			'kcal',
-		))->getInUnit('kJ');
+		$resultValue = (10 * $weightValue) + (6.25 * $heightValue) - (5 * $age) + 5;
+		$result = (new Energy(new Amount($resultValue), "kcal"))
+			->getInUnit($calculator->getUnits())
+			;
 
-		$formula = "(10 * weight[{$weightValue}]) + (6.25 * height[{$heightValue}]) - (5 * age[{$age}]) + 5";
+		$formula = "
+			(10 * weight[{$weightValue}]) + (6.25 * height[{$heightValue}]) - (5 * age[{$age}]) + 5
+			= " . (10 * $weightValue) . " + " . (6.25 * $heightValue) . " - " . (5 * $age) . " + 5
+			= {$resultValue} kcal
+		";
 
-		return new AmountWithUnitMetric('basalMetabolicRate', $result, $formula);
+		return new AmountWithUnitMetric("basalMetabolicRate", $result, $formula);
 	}
 
 	/*****************************************************************************
@@ -93,6 +95,6 @@ class Male extends \Fatty\Gender
 			$result = new AppleWithHigherRisk;
 		}
 
-		return new StringMetric('bodyType', $result->getCode(), $result->getLabel());
+		return new StringMetric("bodyType", $result->getCode(), $result->getLabel());
 	}
 }
