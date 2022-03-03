@@ -14,10 +14,10 @@ class Maintain extends \Fatty\Vector
 	const TDEE_QUOTIENT = 1;
 	const WEIGHT_CHANGE_PER_WEEK = 0;
 
-	public function calcTdeeChangePerDay(Calculator $calculator): AmountWithUnitMetric
-	{
-		return new AmountWithUnitMetric("tdeeChangePerDay", new Energy(new Amount(0), Energy::getBaseUnit()));
-	}
+	// public function calcTdeeChangePerDay(Calculator $calculator): AmountWithUnitMetric
+	// {
+	// 	return new AmountWithUnitMetric("tdeeChangePerDay", new Energy(new Amount(0), Energy::getBaseUnit()));
+	// }
 
 	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
 	{

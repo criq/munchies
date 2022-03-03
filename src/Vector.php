@@ -12,7 +12,7 @@ abstract class Vector
 	const TDEE_QUOTIENT = null;
 	const WEIGHT_CHANGE_PER_WEEK = "";
 
-	abstract public function calcTdeeChangePerDay(Calculator $calculator): AmountWithUnitMetric;
+	// abstract public function calcTdeeChangePerDay(Calculator $calculator): AmountWithUnitMetric;
 
 	public function __toString()
 	{
@@ -53,20 +53,20 @@ abstract class Vector
 		);
 	}
 
-	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
-	{
-		$weightGoalEnergyExpenditureValue = $calculator->calcWeightGoalEnergyExpenditure()->getResult()->getInBaseUnit()->getAmount()->getValue();
-		$tdeeChangePerDayValue = $this->calcTdeeChangePerDay($calculator)->getResult()->getInBaseUnit()->getAmount()->getValue();
+	// public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
+	// {
+	// 	$weightGoalEnergyExpenditureValue = $calculator->calcWeightGoalEnergyExpenditure()->getResult()->getInBaseUnit()->getAmount()->getValue();
+	// 	$tdeeChangePerDayValue = $this->calcTdeeChangePerDay($calculator)->getResult()->getInBaseUnit()->getAmount()->getValue();
 
-		$result = new Energy(
-			new Amount(
-				$weightGoalEnergyExpenditureValue + $tdeeChangePerDayValue
-			),
-			Energy::getBaseUnit(),
-		);
+	// 	$result = new Energy(
+	// 		new Amount(
+	// 			$weightGoalEnergyExpenditureValue + $tdeeChangePerDayValue
+	// 		),
+	// 		Energy::getBaseUnit(),
+	// 	);
 
-		return new AmountWithUnitMetric("goalWeightGoalEnergyExpenditure", $result);
-	}
+	// 	return new AmountWithUnitMetric("weightGoalEnergyExpenditure", $result);
+	// }
 
 	public function getLabelInfinitive(): string
 	{

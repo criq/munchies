@@ -639,7 +639,7 @@ class Calculator
 	{
 		$result = static::getDeviation($this->calcBodyMassIndex()->getResult()->getValue(), 22, [17.7, 40]);
 
-		return new AmountMetric("bodyMassIndexDeviation", $result, $result);
+		return new AmountMetric("bodyMassIndexDeviation", $result);
 	}
 
 	/*****************************************************************************
@@ -797,7 +797,7 @@ class Calculator
 			"kg",
 		);
 
-		return new AmountWithUnitMetric("activeBodyMassWeight", $result, $result);
+		return new AmountWithUnitMetric("activeBodyMassWeight", $result);
 	}
 
 	public function calcOptimalFatPercentage(): MetricCollection
@@ -1015,7 +1015,7 @@ class Calculator
 
 		$result = $bodyMassIndexDeviation->getResult();
 
-		return new AmountMetric("bodyFatDeviation", $result, $result);
+		return new AmountMetric("bodyFatDeviation", $result);
 	}
 
 	/*****************************************************************************
@@ -1063,16 +1063,21 @@ class Calculator
 	 */
 	public function calcTotalDailyEnergyExpenditure(): AmountWithUnitMetric
 	{
-		$basalMetabolicRate = $this->calcBasalMetabolicRate()->getResult();
-		$basalMetabolicRateValue = $basalMetabolicRate->getInUnit("kcal")->getAmount()->getValue();
+		$basalMetabolicRate = $this->calcBasalMetabolicRate()->getResult()->getInUnit("kcal");
+		$basalMetabolicRateValue = $basalMetabolicRate->getAmount()->getValue();
 		$physicalActivityLevel = $this->calcPhysicalActivityLevel()->getResult()->getValue();
 
+		$resultValue = $basalMetabolicRateValue * $physicalActivityLevel;
 		$result = (new Energy(
-			new Amount($basalMetabolicRateValue * $physicalActivityLevel),
+			new Amount($resultValue),
 			"kcal",
 		))->getInUnit($this->getUnits());
 
-		$formula = "basalMetabolicRate[" . $basalMetabolicRate . "] * physicalActivityLevel[" . $physicalActivityLevel . "] = " . $result;
+		$formula = "
+			basalMetabolicRate[" . $basalMetabolicRate . "] * physicalActivityLevel[" . $physicalActivityLevel . "]
+			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
+			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
+		";
 
 		return new AmountWithUnitMetric("totalDailyEnergyExpenditure", $result, $formula);
 	}
@@ -1097,7 +1102,7 @@ class Calculator
 		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		try {
-			$weightGoalEnergyExpenditure = $this->calcWeightGoalEnergyExpenditure()->getResult();
+			$weightGoalEnergyExpenditure = $this->calcWeightGoalEnergyExpenditure()->getResult()->getInUnit("kcal");
 		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
@@ -1117,16 +1122,21 @@ class Calculator
 			throw $exceptionCollection;
 		}
 
-		$weightGoalEnergyExpenditureValue = $weightGoalEnergyExpenditure->getInUnit("kcal")->getAmount()->getValue();
-		$referenceDailyIntakeBonus = $referenceDailyIntakeBonus->getResult();
-		$referenceDailyIntakeBonusValue = $referenceDailyIntakeBonus->getInUnit("kcal")->getAmount()->getValue();
+		$weightGoalEnergyExpenditureValue = $weightGoalEnergyExpenditure->getAmount()->getValue();
+		$referenceDailyIntakeBonus = $referenceDailyIntakeBonus->getResult()->getInUnit("kcal");
+		$referenceDailyIntakeBonusValue = $referenceDailyIntakeBonus->getAmount()->getValue();
 
+		$resultValue = $weightGoalEnergyExpenditureValue + $referenceDailyIntakeBonusValue;
 		$result = (new Energy(
-			new Amount($weightGoalEnergyExpenditureValue + $referenceDailyIntakeBonusValue),
+			new Amount($resultValue),
 			"kcal",
 		))->getInUnit($this->getUnits());
 
-		$formula = "weightGoalEnergyExpenditure[" . $weightGoalEnergyExpenditure . "] + referenceDailyIntakeBonus[" . $referenceDailyIntakeBonus . "] = " . $result;
+		$formula = "
+			weightGoalEnergyExpenditure[" . $weightGoalEnergyExpenditure . "] + referenceDailyIntakeBonus[" . $referenceDailyIntakeBonus . "]
+			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
+			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
+		";
 
 		return new AmountWithUnitMetric("referenceDailyIntake", $result, $formula);
 	}
@@ -1375,11 +1385,11 @@ class Calculator
 			$exceptionCollection->add($e);
 		}
 
-		try {
-			$metricCollection->append($this->getGoal()->calcWeightGoalEnergyExpenditure($this));
-		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
-		}
+		// try {
+		// 	$metricCollection->append($this->getGoal()->calcWeightGoalEnergyExpenditure($this));
+		// } catch (\Fatty\Exceptions\FattyException $e) {
+		// 	$exceptionCollection->add($e);
+		// }
 
 		try {
 			$metricCollection->append($this->getDiet()->calcDietApproach());

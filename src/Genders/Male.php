@@ -72,7 +72,8 @@ class Male extends \Fatty\Gender
 		$formula = "
 			(10 * weight[{$weightValue}]) + (6.25 * height[{$heightValue}]) - (5 * age[{$age}]) + 5
 			= " . (10 * $weightValue) . " + " . (6.25 * $heightValue) . " - " . (5 * $age) . " + 5
-			= {$resultValue} kcal
+			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
+			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
 		";
 
 		return new AmountWithUnitMetric("basalMetabolicRate", $result, $formula);
