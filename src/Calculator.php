@@ -639,7 +639,7 @@ class Calculator
 	{
 		$result = static::getDeviation($this->calcBodyMassIndex()->getResult()->getValue(), 22, [17.7, 40]);
 
-		return new AmountMetric("bodyMassIndexDeviation", $result);
+		return new AmountMetric("bodyMassIndexDeviation", $result, $result);
 	}
 
 	/*****************************************************************************
@@ -797,7 +797,7 @@ class Calculator
 			"kg",
 		);
 
-		return new AmountWithUnitMetric("activeBodyMassWeight", $result);
+		return new AmountWithUnitMetric("activeBodyMassWeight", $result, $result);
 	}
 
 	public function calcOptimalFatPercentage(): MetricCollection
@@ -1013,7 +1013,9 @@ class Calculator
 			return new AmountMetric("bodyFatDeviation", new Amount(0));
 		}
 
-		return new AmountMetric("bodyFatDeviation", $bodyMassIndexDeviation->getResult());
+		$result = $bodyMassIndexDeviation->getResult();
+
+		return new AmountMetric("bodyFatDeviation", $result, $result);
 	}
 
 	/*****************************************************************************
@@ -1029,12 +1031,17 @@ class Calculator
 		$weightValue = $weight->getInUnit("kg")->getAmount()->getValue();
 		$bodyFatPercentageValue = $this->calcBodyFatPercentage()->getResult()->getValue();
 
+		$resultValue = $weightValue - ($bodyFatPercentageValue * $weightValue);
 		$result = new Weight(
-			new Amount($weightValue - ($bodyFatPercentageValue * $weightValue)),
+			new Amount($resultValue),
 			"kg",
 		);
 
-		$formula = "weight[" . $weightValue . "] - (bodyFatPercentage[" . $bodyFatPercentageValue . "] * weight[" . $weightValue . "]) = " . $result->getAmount()->getValue();
+		$formula = "
+			weight[" . $weightValue . "] - (bodyFatPercentage[" . $bodyFatPercentageValue . "] * weight[" . $weightValue . "])
+			= $weightValue - " . ($bodyFatPercentageValue * $weightValue) . "
+			= {$resultValue}
+		";
 
 		return new AmountWithUnitMetric("fatFreeMass", $result, $formula);
 	}
