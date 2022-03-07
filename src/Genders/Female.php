@@ -17,12 +17,9 @@ use Fatty\Exceptions\BreastfeedingChildbirthDateInFutureException;
 use Fatty\Exceptions\FattyExceptionCollection;
 use Fatty\Exceptions\InvalidBreastfeedingChildbirthDateException;
 use Fatty\Exceptions\InvalidPregnancyChildbirthDateException;
-use Fatty\Exceptions\MissingBirthdayException;
 use Fatty\Exceptions\MissingBreastfeedingChildbirthDateException;
 use Fatty\Exceptions\MissingBreastfeedingModeException;
-use Fatty\Exceptions\MissingHeightException;
 use Fatty\Exceptions\MissingPregnancyChildbirthDateException;
-use Fatty\Exceptions\MissingWeightException;
 use Fatty\Exceptions\PregnancyChildbirthDateInPastException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\AmountWithUnitMetric;
@@ -54,48 +51,6 @@ class Female extends \Fatty\Gender
 		$formula = "((495 / (1.29579 - (0.35004 * log10(waist[{$waistValue}] + hips[{$hipsValue}] - neck[{$neckValue}])) + (0.22100 * log10(height[{$heightValue}])))) - 450) * 0.01 = {$resultValue}";
 
 		return new AmountMetric("bodyFatPercentage", $result, $formula);
-	}
-
-	/*****************************************************************************
-	 * Bazální metabolismus - BMR.
-	 */
-	public function calcBasalMetabolicRate(Calculator $calculator): AmountWithUnitMetric
-	{
-		$exceptionCollection = new FattyExceptionCollection;
-
-		if (!$calculator->getWeight()) {
-			$exceptionCollection->add(new MissingWeightException);
-		}
-
-		if (!$calculator->getProportions()->getHeight()) {
-			$exceptionCollection->add(new MissingHeightException);
-		}
-
-		if (!$calculator->getBirthday()) {
-			$exceptionCollection->add(new MissingBirthdayException);
-		}
-
-		if (count($exceptionCollection)) {
-			throw $exceptionCollection;
-		}
-
-		$weightValue = $calculator->getWeight()->getInUnit("kg")->getAmount()->getValue();
-		$heightValue = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
-		$age = $calculator->getBirthday()->getAge();
-
-		$resultValue = (10 * $weightValue) + (6.25 * $heightValue) - (5 * $age) - 161;
-		$result = (new Energy(new Amount($resultValue), "kcal"))
-			->getInUnit($calculator->getUnits())
-			;
-
-		$formula = "
-			(10 * weight[{$weightValue}]) + (6.25 * height[{$heightValue}]) - (5 * age[{$age}]) - 161
-			= " . (10 * $weightValue) . " + " . (6.25 * $heightValue) . " - " . (5 * $age) . " - 161
-			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
-			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
-		";
-
-		return new AmountWithUnitMetric("basalMetabolicRate", $result, $formula);
 	}
 
 	/*****************************************************************************

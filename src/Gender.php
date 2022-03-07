@@ -15,7 +15,7 @@ abstract class Gender
 	const ESSENTIAL_FAT_PERCENTAGE = null;
 
 	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
-	abstract public function calcBasalMetabolicRate(Calculator $calculator): AmountWithUnitMetric;
+	// abstract public function calcBasalMetabolicRate(Calculator $calculator): AmountWithUnitMetric;
 	abstract public function calcBodyType(Calculator $calculator): StringMetric;
 
 	public static function createFromString(string $value): ?Gender

@@ -1056,11 +1056,23 @@ class Calculator
 	 */
 	public function calcBasalMetabolicRate(): AmountWithUnitMetric
 	{
-		if (!$this->getGender()) {
-			throw new \Fatty\Exceptions\MissingGenderException;
-		}
+		$fatFreeMass = $this->calcFatFreeMass();
+		$fatFreeMassValue = $fatFreeMass->getResult()->getAmount()->getValue();
 
-		return $this->getGender()->calcBasalMetabolicRate($this);
+		$resultValue = 370 + (21.6 * $fatFreeMassValue);
+		$result = (new Energy(
+			new Amount($resultValue),
+			"kcal",
+		))->getInUnit($this->getUnits());
+
+		$formula = "
+			370 + (21.6 * fatFreeMass[{$fatFreeMassValue}])
+			= 370 + " . (21.6 * $fatFreeMassValue) . "
+			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
+			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
+		";
+
+		return new AmountWithUnitMetric("basalMetabolicRate", $result, $formula);
 	}
 
 	/*****************************************************************************
