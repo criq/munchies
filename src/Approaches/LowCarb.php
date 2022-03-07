@@ -11,7 +11,7 @@ use Fatty\Nutrients\Fats;
 
 class LowCarb extends \Fatty\Approach
 {
-	const CARBS_DEFAULT = 80;
+	const CARBS_DEFAULT = 90;
 	const CARBS_MAX = 120;
 	const CARBS_MIN = 50;
 	const CODE = "LOW_CARB";

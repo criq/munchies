@@ -33,11 +33,8 @@ class Female extends \Fatty\Gender
 {
 	const ESSENTIAL_FAT_PERCENTAGE = .13;
 
-	private $breastfeedingChildbirthDate;
-	private $breastfeedingMode;
 	private $isBreastfeeding;
 	private $isPregnant;
-	private $pregnancyChildbirthDate;
 
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
@@ -47,9 +44,14 @@ class Female extends \Fatty\Gender
 		$waistValue = $calculator->getProportions()->getWaist()->getInUnit("cm")->getAmount()->getValue();
 		$neckValue = $calculator->getProportions()->getNeck()->getInUnit("cm")->getAmount()->getValue();
 		$heightValue = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
+		$hipsValue = $calculator->getProportions()->getHips()->getInUnit("cm")->getAmount()->getValue();
 
-		$result = new Percentage(((495 / (1.0324 - (0.19077 * log10($waistValue - $neckValue)) + (0.15456 * log10($heightValue)))) - 450) * .01);
-		$formula = "((495 / (1.0324 - (0.19077 * log10(waist[{$waistValue}] - neck[{$neckValue}])) + (0.15456 * log10(height[{$heightValue}])))) - 450) * .01 = {$result->getValue()}";
+		// $result = new Percentage(((495 / (1.0324 - (0.19077 * log10($waistValue - $neckValue)) + (0.15456 * log10($heightValue)))) - 450) * .01);
+		// $formula = "((495 / (1.0324 - (0.19077 * log10(waist[{$waistValue}] - neck[{$neckValue}])) + (0.15456 * log10(height[{$heightValue}])))) - 450) * .01 = {$result->getValue()}";
+
+		$resultValue = ((495 / (1.29579 - (0.35004 * log10($waistValue + $hipsValue - $neckValue)) + (0.22100 * log10($heightValue)))) - 450) * 0.01;
+		$result = new Percentage($resultValue);
+		$formula = "((495 / (1.29579 - (0.35004 * log10(waist[{$waistValue}] + hips[{$hipsValue}] - neck[{$neckValue}])) + (0.22100 * log10(height[{$heightValue}])))) - 450) * 0.01 = {$resultValue}";
 
 		return new AmountMetric("bodyFatPercentage", $result, $formula);
 	}
