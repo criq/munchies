@@ -18,6 +18,6 @@ abstract class Metric
 
 	public function getFormula(): ?string
 	{
-		return $this->formula;
+		return trim(preg_replace("/\s+/", " ", preg_replace("/[\t\n]/", " ", $this->formula)));
 	}
 }
