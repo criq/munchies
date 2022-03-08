@@ -5,9 +5,9 @@ namespace Fatty;
 abstract class SportDuration extends Duration
 {
 	const QUOTIENT = null;
-	const BASE_UNIT = 'minutesPerWeek';
+	const BASE_UNIT = "minutesPerWeek";
 
-	public function __construct(Amount $amount, string $unit = 'minutesPerWeek')
+	public function __construct(Amount $amount, string $unit = "minutesPerWeek")
 	{
 		return parent::__construct($amount, $unit);
 	}

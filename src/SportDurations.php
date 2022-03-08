@@ -74,12 +74,12 @@ class SportDurations
 		return new AmountMetric('sportActivity', new Activity($amount));
 	}
 
-	public function getTotalDuration()
+	public function getTotalDuration(): int
 	{
 		return array_sum([
-			$this->lowFrequency instanceof SportDuration ? $this->lowFrequency->getAmount() : 0,
-			$this->aerobic instanceof SportDuration ? $this->aerobic->getAmount() : 0,
-			$this->anaerobic instanceof SportDuration ? $this->anaerobic->getAmount() : 0,
+			$this->getLowFrequency() instanceof SportDuration ? $this->getLowFrequency()->getAmount()->getValue() : 0,
+			$this->getAerobic() instanceof SportDuration ? $this->getAerobic()->getAmount()->getValue() : 0,
+			$this->getAnaerobic() instanceof SportDuration ? $this->getAnaerobic()->getAmount()->getValue() : 0,
 		]);
 	}
 
