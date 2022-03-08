@@ -107,8 +107,8 @@ class SportDurations
 
 	public function getMaxDurations(): array
 	{
-		return array_values(array_filter(array_map(function ($i) {
-			return $i->getAmount() == $this->getMaxDuration()->getAmount() ? $i : null;
+		return array_values(array_filter(array_map(function (SportDuration $i) {
+			return $i->getAmount()->getValue() == $this->getMaxDuration()->getAmount()->getValue() ? $i : null;
 		}, $this->getUtilizedDurations())));
 	}
 }
