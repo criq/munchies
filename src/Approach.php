@@ -109,7 +109,7 @@ abstract class Approach
 	public function calcGoalNutrientProteins(Calculator $calculator): AmountWithUnitMetric
 	{
 		// Velká fyzická zátěž.
-		if ($calculator->getSportDurations()->getTotalDuration() > 60 || $calculator->calcPhysicalActivityLevel()->getResult()->getValue() >= 1.9) {
+		if ($calculator->getSportDurations()->getTotalDuration()->getAmount()->getValue() > 60 || $calculator->calcPhysicalActivityLevel()->getResult()->getValue() >= 1.9) {
 			// Muž.
 			if ($calculator->getGender() instanceof Genders\Male) {
 				if ($calculator->calcFatOverOptimalWeight()->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()) {

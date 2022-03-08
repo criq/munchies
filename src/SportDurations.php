@@ -71,41 +71,41 @@ class SportDurations
 			$amount = static::DEFAULT_PAL;
 		}
 
-		return new AmountMetric('sportActivity', new Activity($amount));
+		return new AmountMetric("sportActivity", new Activity($amount));
 	}
 
-	public function getTotalDuration(): int
+	public function getTotalDuration(): Duration
 	{
-		return array_sum([
+		return new Duration(new Amount(array_sum([
 			$this->getLowFrequency() instanceof SportDuration ? $this->getLowFrequency()->getAmount()->getValue() : 0,
 			$this->getAerobic() instanceof SportDuration ? $this->getAerobic()->getAmount()->getValue() : 0,
 			$this->getAnaerobic() instanceof SportDuration ? $this->getAnaerobic()->getAmount()->getValue() : 0,
-		]);
+		])), "minutesPerWeek");
 	}
 
-	public function getUtilizedDurations()
+	public function getUtilizedDurations(): array
 	{
 		return array_values(array_filter([
-			$this->lowFrequency instanceof SportDuration && $this->lowFrequency->getAmount() ? $this->lowFrequency : null,
-			$this->aerobic instanceof SportDuration && $this->aerobic->getAmount() ? $this->aerobic : null,
-			$this->anaerobic instanceof SportDuration && $this->anaerobic->getAmount() ? $this->anaerobic : null,
+			$this->getLowFrequency() instanceof SportDuration && $this->getLowFrequency()->getAmount()->getValue() ? $this->getLowFrequency() : null,
+			$this->getAerobic() instanceof SportDuration && $this->getAerobic()->getAmount()->getValue() ? $this->getAerobic() : null,
+			$this->getAnaerobic() instanceof SportDuration && $this->getAnaerobic()->getAmount()->getValue() ? $this->getAnaerobic() : null,
 		]));
 	}
 
-	public function getMaxDuration()
+	public function getMaxDuration(): ?Duration
 	{
-		$amount = max(array_map(function ($i) {
-			return $i->getAmount();
+		$amount = max(array_map(function (SportDuration $i) {
+			return $i->getAmount()->getValue();
 		}, $this->getUtilizedDurations()));
 
 		if ($amount) {
-			return new Duration($amount, 'minutesPerWeek');
+			return new Duration(new Amount($amount), "minutesPerWeek");
 		}
 
-		return false;
+		return null;
 	}
 
-	public function getMaxDurations()
+	public function getMaxDurations(): array
 	{
 		return array_values(array_filter(array_map(function ($i) {
 			return $i->getAmount() == $this->getMaxDuration()->getAmount() ? $i : null;
