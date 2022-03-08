@@ -183,25 +183,25 @@ abstract class Approach
 		// Normální fyzická zátěž.
 		} else {
 			if ($calculator->getGender() instanceof Genders\Female && ($calculator->getGender()->isPregnant() || $calculator->getGender()->isBreastfeeding())) {
-				$res = new Nutrients\Proteins(min(($calculator->getWeight()->getInUnit("kg")->getAmount()->getValue() * 1.4) + 20, 90), "g");
+				$proteins = new Nutrients\Proteins(min(($calculator->getWeight()->getInUnit("kg")->getAmount()->getValue() * 1.4) + 20, 90), "g");
 			} else {
 				if ($calculator->getGender() instanceof Genders\Male) {
 					if ($calculator->calcFatOverOptimalWeight()->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()) {
-						$res = new Nutrients\Proteins(new Amount($calculator->getOptimalWeight()->getMax()->getInUnit("kg")->getAmount()->getValue() * 1.5), "g");
+						$proteins = new Nutrients\Proteins(new Amount($calculator->getOptimalWeight()->getMax()->getInUnit("kg")->getAmount()->getValue() * 1.5), "g");
 					} else {
-						$res = new Nutrients\Proteins(new Amount($calculator->getWeight()->getInUnit("kg")->getAmount()->getValue() * 1.5), "g");
+						$proteins = new Nutrients\Proteins(new Amount($calculator->getWeight()->getInUnit("kg")->getAmount()->getValue() * 1.5), "g");
 					}
 				} elseif ($calculator->getGender() instanceof Genders\Female) {
 					if ($calculator->calcFatOverOptimalWeight()->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()) {
-						$res = new Nutrients\Proteins(new Amount($calculator->getOptimalWeight()->getMax()->getInUnit("kg")->getAmount()->getValue() * 1.4), "g");
+						$proteins = new Nutrients\Proteins(new Amount($calculator->getOptimalWeight()->getMax()->getInUnit("kg")->getAmount()->getValue() * 1.4), "g");
 					} else {
-						$res = new Nutrients\Proteins(new Amount($calculator->getWeight()->getInUnit("kg")->getAmount()->getValue() * 1.4), "g");
+						$proteins = new Nutrients\Proteins(new Amount($calculator->getWeight()->getInUnit("kg")->getAmount()->getValue() * 1.4), "g");
 					}
 				}
 			}
 		}
 
-		return new \Fatty\Metrics\AmountWithUnitMetric("goalNutrientsProteins", $res);
+		return new \Fatty\Metrics\AmountWithUnitMetric("goalNutrientsProteins", $proteins);
 	}
 
 	public function calcGoalNutrients(Calculator $calculator): MetricCollection
