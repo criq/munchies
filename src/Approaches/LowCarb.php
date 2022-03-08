@@ -5,14 +5,14 @@ namespace Fatty\Approaches;
 use Fatty\Amount;
 use Fatty\Calculator;
 use Fatty\Energy;
-use Fatty\Genders\Female;
 use Fatty\Nutrients;
+use Fatty\Nutrients\Carbs;
 use Fatty\Nutrients\Fats;
 
 class LowCarb extends \Fatty\Approach
 {
 	const CARBS_DEFAULT = 90;
-	const CARBS_MAX = 120;
+	const CARBS_MAX = 90;
 	const CARBS_MIN = 50;
 	const CODE = "LOW_CARB";
 	const LABEL_DECLINATED = "nízkosacharidovou dietu";
@@ -24,45 +24,33 @@ class LowCarb extends \Fatty\Approach
 
 		$wgee = $calculator->calcWeightGoalEnergyExpenditure();
 
-		// Pregnant.
-		if ($calculator->getGender() instanceof Female && $calculator->getGender()->isPregnant()) {
-			$nutrients->setCarbs($calculator->getDiet()->getCarbs());
-			$nutrients->setFats(
-				Fats::createFromEnergy(
-					new Energy(
-						new Amount(
-							$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
-						),
-						Energy::getBaseUnit(),
-					),
+		// Sacharidy, maximum je 90 g.
+		$carbs = Carbs::createFromEnergy(
+			new Energy(
+				new Amount(
+					$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() * .2,
 				),
-			);
-		// Breastfeeding.
-		} elseif ($calculator->getGender() instanceof Female && $calculator->getGender()->isBreastfeeding()) {
-			$nutrients->setCarbs($calculator->getDiet()->getCarbs());
-			$nutrients->setFats(
-				Fats::createFromEnergy(
-					new Energy(
-						new Amount(
-							$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
-						),
-						Energy::getBaseUnit(),
-					),
-				),
-			);
-		} else {
-			$nutrients->setCarbs($calculator->getDiet()->getCarbs());
-			$nutrients->setFats(
-				Fats::createFromEnergy(
-					new Energy(
-						new Amount(
-							$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
-						),
-						Energy::getBaseUnit(),
-					),
-				),
-			);
+				Energy::getBaseUnit(),
+			),
+		);
+
+		if ($carbs->getInUnit("g")->getAmount()->getValue() > static::CARBS_MAX) {
+			$carbs = new Carbs(new Amount(static::CARBS_MAX));
 		}
+
+		$nutrients->setCarbs($carbs);
+
+		// Tuky.
+		$nutrients->setFats(
+			Fats::createFromEnergy(
+				new Energy(
+					new Amount(
+						$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+					),
+					Energy::getBaseUnit(),
+				),
+			),
+		);
 
 		return $nutrients;
 	}
