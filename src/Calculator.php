@@ -350,6 +350,8 @@ class Calculator
 			return new Amount($res);
 		} catch (\Fatty\Exceptions\FattyException $e) {
 			return new Amount(0);
+		} catch (\Throwable $e) {
+			return new Amount(0);
 		}
 	}
 
