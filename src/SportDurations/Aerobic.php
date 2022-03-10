@@ -4,5 +4,6 @@ namespace Fatty\SportDurations;
 
 class Aerobic extends \Fatty\SportDuration
 {
-	const QUOTIENT = .6;
+	const CODE = "AEROBIC";
+	const QUOTIENT = 0.6;
 }

@@ -2,7 +2,6 @@
 
 namespace Fatty;
 
-use Fatty\Exceptions\FattyException;
 use Fatty\Exceptions\MissingBodyFatPercentageInputException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\AmountWithUnitMetric;
@@ -13,10 +12,13 @@ abstract class Gender
 	const BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT = "measurement";
 	const BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS = "proportions";
 	const ESSENTIAL_FAT_PERCENTAGE = null;
+	const SPORT_PROTEIN_COEFFICIENT = null;
 
-	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
 	// abstract public function calcBasalMetabolicRate(Calculator $calculator): AmountWithUnitMetric;
+	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
 	abstract public function calcBodyType(Calculator $calculator): StringMetric;
+	abstract public function getFitnessLevel(Calculator $calculator): StringMetric;
+	abstract public function getSportProteinMatrix(): array;
 
 	public static function createFromString(string $value): ?Gender
 	{
@@ -151,6 +153,11 @@ abstract class Gender
 	public function calcEssentialFatPercentage(): AmountMetric
 	{
 		return new AmountMetric("essentialFatPercentage", new Percentage((float)static::ESSENTIAL_FAT_PERCENTAGE));
+	}
+
+	public function getSportProteinCoefficient(): float
+	{
+		return (float)static::SPORT_PROTEIN_COEFFICIENT;
 	}
 
 	/*****************************************************************************

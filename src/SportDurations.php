@@ -111,4 +111,21 @@ class SportDurations
 			return $i->getAmount()->getValue() == $this->getMaxDuration()->getAmount()->getValue() ? $i : null;
 		}, $this->getUtilizedDurations())));
 	}
+
+	public function getMaxProteinSportDuration(): ?SportDuration
+	{
+		if ($this->getAnaerobic() && $this->getAnaerobic()->getAmount()->getValue() >= 60) {
+			return $this->getAnaerobic();
+		}
+
+		if ($this->getAerobic() && $this->getAerobic()->getAmount()->getValue() >= 60) {
+			return $this->getAerobic();
+		}
+
+		if ($this->getLowFrequency() && $this->getLowFrequency()->getAmount()->getValue() >= 60) {
+			return $this->getLowFrequency();
+		}
+
+		return null;
+	}
 }

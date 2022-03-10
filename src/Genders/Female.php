@@ -28,7 +28,8 @@ use Fatty\Percentage;
 
 class Female extends \Fatty\Gender
 {
-	const ESSENTIAL_FAT_PERCENTAGE = .13;
+	const ESSENTIAL_FAT_PERCENTAGE = 0.13;
+	const SPORT_PROTEIN_COEFFICIENT = 1.4;
 
 	private $isBreastfeeding;
 	private $isPregnant;
@@ -267,5 +268,31 @@ class Female extends \Fatty\Gender
 		}
 
 		return new StringMetric("bodyType", $result->getCode(), $result->getLabel());
+	}
+
+	/****************************************************************************
+	 * Sport protein matrix.
+	 */
+	public function getSportProteinMatrix(): array
+	{
+		return [
+			"FIT" => [
+				"LOW_FREQUENCY" => 1.4,
+				"AEROBIC" => 1.6,
+				"ANAEROBIC" => 1.8,
+			],
+			"UNFIT" => [
+				"LOW_FREQUENCY" => 1.5,
+				"AEROBIC" => 1.8,
+				"ANAEROBIC" => 1.8,
+			],
+		];
+	}
+
+	public function getFitnessLevel(Calculator $calculator): StringMetric
+	{
+		$string = $calculator->calcBodyFatPercentage()->getResult()->getValue() > .25 || $calculator->calcBodyMassIndex()->getResult()->getValue() > 25 ? "UNFIT" : "FIT";
+
+		return new StringMetric("fitnessLevel", $string);
 	}
 }

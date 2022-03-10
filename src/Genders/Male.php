@@ -13,7 +13,8 @@ use Fatty\Percentage;
 
 class Male extends \Fatty\Gender
 {
-	const ESSENTIAL_FAT_PERCENTAGE = .5;
+	const ESSENTIAL_FAT_PERCENTAGE = 0.5;
+	const SPORT_PROTEIN_COEFFICIENT = 1.5;
 
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
@@ -49,5 +50,31 @@ class Male extends \Fatty\Gender
 		}
 
 		return new StringMetric("bodyType", $result->getCode(), $result->getLabel());
+	}
+
+	/****************************************************************************
+	 * Sport protein matrix.
+	 */
+	public function getSportProteinMatrix(): array
+	{
+		return [
+			"FIT" => [
+				"LOW_FREQUENCY" => 1.5,
+				"AEROBIC" => 1.8,
+				"ANAEROBIC" => 2.2,
+			],
+			"UNFIT" => [
+				"LOW_FREQUENCY" => 1.5,
+				"AEROBIC" => 1.7,
+				"ANAEROBIC" => 2,
+			],
+		];
+	}
+
+	public function getFitnessLevel(Calculator $calculator): StringMetric
+	{
+		$string = $calculator->calcBodyFatPercentage()->getResult()->getValue() > .19 || $calculator->calcBodyMassIndex()->getResult()->getValue() > 25 ? "UNFIT" : "FIT";
+
+		return new StringMetric("fitnessLevel", $string);
 	}
 }

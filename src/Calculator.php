@@ -550,6 +550,34 @@ class Calculator
 		return $this->getSportDurations()->calcSportActivity();
 	}
 
+	public function getSportProteinMatrix(): array
+	{
+		$gender = $this->getGender();
+		if (!$gender) {
+			throw new \Fatty\Exceptions\MissingGenderException;
+		}
+
+		return $gender->getSportProteinMatrix();
+	}
+
+	public function calcSportProteinCoefficient(): AmountMetric
+	{
+		$maxSportDuration = $this->getSportDurations()->getMaxProteinSportDuration();
+
+		// Velká fyzická zátěž.
+		if (($maxSportDuration && $maxSportDuration->getAmount()->getValue() > 60) || $this->calcPhysicalActivityLevel()->getResult()->getValue() >= 1.9) {
+			$fitnessLevel = $this->calcFitnessLevel()->getResult();
+			$sportProteinMatrix = $this->getSportProteinMatrix();
+			$sportDurationCode = $maxSportDuration ? $maxSportDuration->getCode() : \Fatty\SportDurations\Anaerobic::getCode();
+			$proteinCoefficient = $sportProteinMatrix[$fitnessLevel][$sportDurationCode];
+		// Normální fyzická zátěž.
+		} else {
+			$proteinCoefficient = $this->getGender()->getSportProteinCoefficient();
+		}
+
+		return new AmountMetric("sportProteinCoefficient", new Amount($proteinCoefficient));
+	}
+
 	/*****************************************************************************
 	 * Physical activity level.
 	 */
@@ -995,6 +1023,17 @@ class Calculator
 		]);
 	}
 
+	public function calcMaxOptimalWeight(): AmountWithUnitMetric
+	{
+		if ($this->calcFatOverOptimalWeight()->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()) {
+			$weight = $this->getOptimalWeight()->getMax();
+		} else {
+			$weight = $this->getWeight();
+		}
+
+		return new AmountWithUnitMetric("maxOptimalWeight", $weight);
+	}
+
 	public function calcFatOverOptimalPercentage(): MetricCollection
 	{
 		$fatOverOptimalWeight = $this->calcFatOverOptimalWeight();
@@ -1023,6 +1062,11 @@ class Calculator
 		$result = $bodyMassIndexDeviation->getResult();
 
 		return new AmountMetric("bodyFatDeviation", $result);
+	}
+
+	public function calcFitnessLevel(): StringMetric
+	{
+		return $this->getGender()->getFitnessLevel($this);
 	}
 
 	/*****************************************************************************
@@ -1424,6 +1468,24 @@ class Calculator
 
 		try {
 			$metricCollection->append($this->calcBodyType($this));
+		} catch (\Fatty\Exceptions\FattyException $e) {
+			$exceptionCollection->add($e);
+		}
+
+		try {
+			$metricCollection->append($this->calcMaxOptimalWeight());
+		} catch (\Fatty\Exceptions\FattyException $e) {
+			$exceptionCollection->add($e);
+		}
+
+		try {
+			$metricCollection->append($this->calcFitnessLevel());
+		} catch (\Fatty\Exceptions\FattyException $e) {
+			$exceptionCollection->add($e);
+		}
+
+		try {
+			$metricCollection->append($this->calcSportProteinCoefficient());
 		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptionCollection->add($e);
 		}
