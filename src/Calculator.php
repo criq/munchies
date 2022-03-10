@@ -560,16 +560,27 @@ class Calculator
 		return $gender->getSportProteinMatrix();
 	}
 
+	public function calcSportProteinCoefficientKey(): StringMetric
+	{
+		try {
+			$value = $maxSportDuration = $this->getSportDurations()->getMaxProteinSportDuration()->getSportProteinCoefficientKey();;
+		} catch (\Throwable $e) {
+			$value = null;
+		}
+
+		return new StringMetric("sportProteinCoefficientKey", (string)$value);
+	}
+
 	public function calcSportProteinCoefficient(): AmountMetric
 	{
 		$maxSportDuration = $this->getSportDurations()->getMaxProteinSportDuration();
 
 		// Velká fyzická zátěž.
-		if (($maxSportDuration && $maxSportDuration->getAmount()->getValue() > 60) || $this->calcPhysicalActivityLevel()->getResult()->getValue() >= 1.9) {
+		if (($maxSportDuration && $maxSportDuration->getAmount()->getValue() >= 60) || $this->calcPhysicalActivityLevel()->getResult()->getValue() >= 1.9) {
 			$fitnessLevel = $this->calcFitnessLevel()->getResult();
 			$sportProteinMatrix = $this->getSportProteinMatrix();
-			$sportDurationCode = $maxSportDuration ? $maxSportDuration->getCode() : \Fatty\SportDurations\Anaerobic::getCode();
-			$proteinCoefficient = $sportProteinMatrix[$fitnessLevel][$sportDurationCode];
+			$sportProteinCoefficientKey = $this->calcSportProteinCoefficientKey()->getResult() ?: \Fatty\SportDurations\Anaerobic::getCode();
+			$proteinCoefficient = $sportProteinMatrix[$fitnessLevel][$sportProteinCoefficientKey];
 		// Normální fyzická zátěž.
 		} else {
 			$proteinCoefficient = $this->getGender()->getSportProteinCoefficient();

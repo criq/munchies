@@ -280,11 +280,15 @@ class Female extends \Fatty\Gender
 				"LOW_FREQUENCY" => 1.4,
 				"AEROBIC" => 1.6,
 				"ANAEROBIC" => 1.8,
+				"ANAEROBIC_SHORT" => 1.6,
+				"ANAEROBIC_LONG" => 1.8,
 			],
 			"UNFIT" => [
 				"LOW_FREQUENCY" => 1.5,
 				"AEROBIC" => 1.8,
 				"ANAEROBIC" => 1.8,
+				"ANAEROBIC_SHORT" => 1.8,
+				"ANAEROBIC_LONG" => 1.8,
 			],
 		];
 	}

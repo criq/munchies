@@ -62,11 +62,15 @@ class Male extends \Fatty\Gender
 				"LOW_FREQUENCY" => 1.5,
 				"AEROBIC" => 1.8,
 				"ANAEROBIC" => 2.2,
+				"ANAEROBIC_SHORT" => 1.8,
+				"ANAEROBIC_LONG" => 2.2,
 			],
 			"UNFIT" => [
 				"LOW_FREQUENCY" => 1.5,
 				"AEROBIC" => 1.7,
 				"ANAEROBIC" => 2,
+				"ANAEROBIC_SHORT" => 1.7,
+				"ANAEROBIC_LONG" => 2,
 			],
 		];
 	}
