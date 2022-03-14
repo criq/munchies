@@ -14,6 +14,7 @@ use Fatty\Percentage;
 class Male extends \Fatty\Gender
 {
 	const ESSENTIAL_FAT_PERCENTAGE = 0.5;
+	const FIT_BODY_FAT_PERCENTAGE = 0.19;
 	const SPORT_PROTEIN_COEFFICIENT = 1.5;
 
 	/*****************************************************************************
@@ -73,12 +74,5 @@ class Male extends \Fatty\Gender
 				"ANAEROBIC_LONG" => 2,
 			],
 		];
-	}
-
-	public function getFitnessLevel(Calculator $calculator): StringMetric
-	{
-		$string = $calculator->calcBodyFatPercentage()->getResult()->getValue() > .19 || $calculator->calcBodyMassIndex()->getResult()->getValue() > 25 ? "UNFIT" : "FIT";
-
-		return new StringMetric("fitnessLevel", $string);
 	}
 }

@@ -563,7 +563,7 @@ class Calculator
 	public function calcSportProteinCoefficientKey(): StringMetric
 	{
 		try {
-			$value = $maxSportDuration = $this->getSportDurations()->getMaxProteinSportDuration()->getSportProteinCoefficientKey();;
+			$value = $this->getSportDurations()->getMaxProteinSportDuration()->getSportProteinCoefficientKey();
 		} catch (\Throwable $e) {
 			$value = null;
 		}
@@ -814,7 +814,10 @@ class Calculator
 			"kg",
 		);
 
-		$formula = "weight[{$weightValue}] * bodyFatPercentageValue[{$bodyFatPercentageValue}] = {$result->getAmount()->getValue()}";
+		$formula = "
+			weight[{$weightValue}] * bodyFatPercentageValue[{$bodyFatPercentageValue}]
+			= {$result->getAmount()->getValue()} kg
+		";
 
 		return new AmountWithUnitMetric("bodyFatWeight", $result, $formula);
 	}
@@ -1036,13 +1039,12 @@ class Calculator
 
 	public function calcMaxOptimalWeight(): AmountWithUnitMetric
 	{
-		if ($this->calcFatOverOptimalWeight()->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()) {
-			$weight = $this->getOptimalWeight()->getMax();
-		} else {
-			$weight = $this->getWeight();
+		$gender = $this->getGender();
+		if (!$gender) {
+			throw new \Fatty\Exceptions\MissingGenderException;
 		}
 
-		return new AmountWithUnitMetric("maxOptimalWeight", $weight);
+		return $gender->calcMaxOptimalWeight($this);
 	}
 
 	public function calcFatOverOptimalPercentage(): MetricCollection
@@ -1102,7 +1104,7 @@ class Calculator
 		$formula = "
 			weight[" . $weightValue . "] - (bodyFatPercentage[" . $bodyFatPercentageValue . "] * weight[" . $weightValue . "])
 			= $weightValue - " . ($bodyFatPercentageValue * $weightValue) . "
-			= {$resultValue}
+			= {$resultValue} kg
 		";
 
 		return new AmountWithUnitMetric("fatFreeMass", $result, $formula);

@@ -12,12 +12,12 @@ abstract class Gender
 	const BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT = "measurement";
 	const BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS = "proportions";
 	const ESSENTIAL_FAT_PERCENTAGE = null;
+	const FIT_BODY_FAT_PERCENTAGE = null;
 	const SPORT_PROTEIN_COEFFICIENT = null;
 
 	// abstract public function calcBasalMetabolicRate(Calculator $calculator): AmountWithUnitMetric;
 	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
 	abstract public function calcBodyType(Calculator $calculator): StringMetric;
-	abstract public function getFitnessLevel(Calculator $calculator): StringMetric;
 	abstract public function getSportProteinMatrix(): array;
 
 	public static function createFromString(string $value): ?Gender
@@ -166,5 +166,45 @@ abstract class Gender
 	public function calcReferenceDailyIntakeBonus(): AmountWithUnitMetric
 	{
 		return new AmountWithUnitMetric("referenceDailyIntakeBonus", new Energy(new Amount(0), "kJ"));
+	}
+
+	/****************************************************************************
+	 * Fitness level.
+	 */
+	public function getFitnessLevel(Calculator $calculator): StringMetric
+	{
+		$bodyFatPercentage = $calculator->calcBodyFatPercentage();
+		$bodyFatPercentageValue = $bodyFatPercentage->getResult()->getValue();
+
+		$fitBodyFatPercentage = static::FIT_BODY_FAT_PERCENTAGE;
+
+		$string = $calculator->calcBodyFatPercentage()->getResult()->getValue() > $fitBodyFatPercentage ? "UNFIT" : "FIT";
+		$formula = "bodyFatPercentage[{$bodyFatPercentageValue}] > {$fitBodyFatPercentage} ? UNFIT : FIT";
+
+		return new StringMetric("fitnessLevel", $string, $string, $formula);
+	}
+
+	public function calcMaxOptimalWeight(Calculator $calculator): AmountWithUnitMetric
+	{
+		if ($calculator->calcFitnessLevel()->getResult() == "UNFIT") {
+			$fatFreeMass = $calculator->calcFatFreeMass();
+			$fatFreeMassValue = $fatFreeMass->getResult()->getInUnit("kg")->getAmount()->getValue();
+
+			$fitBodyFatPercentage = static::FIT_BODY_FAT_PERCENTAGE;
+
+			$value = $fatFreeMassValue * (1 + $fitBodyFatPercentage);
+
+			$weight = new Weight(new Amount($value), "kg");
+			$formula = "
+				fatFreeMass[{$fatFreeMassValue}] * (1 + fitBodyFatPercentage[{$fitBodyFatPercentage}])
+				= {$fatFreeMassValue} * " . (1 + $fitBodyFatPercentage) . "
+				= {$value} kg
+			";
+		} else {
+			$weight = $calculator->getWeight();
+			$formula = "weight[$weight]";
+		}
+
+		return new AmountWithUnitMetric("maxOptimalWeight", $weight, $formula);
 	}
 }
