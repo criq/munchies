@@ -2,15 +2,15 @@
 
 namespace Fatty;
 
-abstract class AmountWithUnit
+abstract class Quantity
 {
 	const BASE_UNIT = null;
 
 	protected $amount;
 	protected $unit;
 
-	abstract public function getInBaseUnit(): AmountWithUnit;
-	abstract public function getInUnit(string $unit): AmountWithUnit;
+	abstract public function getInBaseUnit(): Quantity;
+	abstract public function getInUnit(string $unit): Quantity;
 
 	public function __construct(Amount $amount, string $unit = null)
 	{
@@ -23,7 +23,7 @@ abstract class AmountWithUnit
 		return $this->getFormatted();
 	}
 
-	public static function createFromString(string $value, string $unit): ?AmountWithUnit
+	public static function createFromString(string $value, string $unit): ?Quantity
 	{
 		try {
 			$amount = Amount::createFromString($value);
@@ -79,7 +79,7 @@ abstract class AmountWithUnit
 		]);
 	}
 
-	public function modify(AmountWithUnit $modifier): AmountWithUnit
+	public function modify(Quantity $modifier): Quantity
 	{
 		return new static(new Amount($this->getAmount()->getValue() + $modifier->getInUnit($this->getUnit())->getAmount()->getValue()), $this->getUnit());
 	}

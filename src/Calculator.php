@@ -3,7 +3,7 @@
 namespace Fatty;
 
 use Fatty\Metrics\AmountMetric;
-use Fatty\Metrics\AmountWithUnitMetric;
+use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Nutrients\Carbs;
 use Fatty\SportDurations\Aerobic;
@@ -450,7 +450,7 @@ class Calculator
 
 		$formula = "weight[{$weightValue}] = {$weightValue}";
 
-		return new AmountWithUnitMetric("weight", $weight, $formula);
+		return new QuantityMetric("weight", $weight, $formula);
 	}
 
 	public function setWeightHistory(?WeightHistory $value): Calculator
@@ -794,7 +794,7 @@ class Calculator
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
 	 */
-	public function calcBodyFatWeight(): AmountWithUnitMetric
+	public function calcBodyFatWeight(): QuantityMetric
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
@@ -819,7 +819,7 @@ class Calculator
 			= {$result->getAmount()->getValue()} kg
 		";
 
-		return new AmountWithUnitMetric("bodyFatWeight", $result, $formula);
+		return new QuantityMetric("bodyFatWeight", $result, $formula);
 	}
 
 	public function calcActiveBodyMassPercentage(): AmountMetric
@@ -832,7 +832,7 @@ class Calculator
 		return new AmountMetric("activeBodyMassPercentage", $result, $formula);
 	}
 
-	public function calcActiveBodyMassWeight(): AmountWithUnitMetric
+	public function calcActiveBodyMassWeight(): QuantityMetric
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
@@ -846,7 +846,7 @@ class Calculator
 			"kg",
 		);
 
-		return new AmountWithUnitMetric("activeBodyMassWeight", $result);
+		return new QuantityMetric("activeBodyMassWeight", $result);
 	}
 
 	public function calcOptimalFatPercentage(): MetricCollection
@@ -902,7 +902,7 @@ class Calculator
 		}
 
 		return new MetricCollection([
-			new AmountWithUnitMetric(
+			new QuantityMetric(
 				"optimalFatWeightMin",
 				new Weight(
 					new Amount(
@@ -911,7 +911,7 @@ class Calculator
 					"kg",
 				)
 			),
-			new AmountWithUnitMetric(
+			new QuantityMetric(
 				"optimalFatWeightMax",
 				new Weight(
 					new Amount(
@@ -952,7 +952,7 @@ class Calculator
 		return $this->getGender()->calcEssentialFatPercentage();
 	}
 
-	public function calcEssentialFatWeight(): AmountWithUnitMetric
+	public function calcEssentialFatWeight(): QuantityMetric
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
@@ -964,7 +964,7 @@ class Calculator
 			throw new \Fatty\Exceptions\UnableToCalcEssentialFatPercentageException;
 		}
 
-		return new AmountWithUnitMetric(
+		return new QuantityMetric(
 			"essentialFatWeight",
 			new Weight(
 				new Amount(
@@ -998,13 +998,13 @@ class Calculator
 		$max = $bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue() - $optimalFatWeight->filterByName("optimalFatWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()->getValue();
 
 		return new MetricCollection([
-			new AmountWithUnitMetric("fatWithinOptimalWeightMin", new Weight(
+			new QuantityMetric("fatWithinOptimalWeightMin", new Weight(
 				new Amount(
 					$bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue() - ($min >= 0 ? $min : 0)
 				),
 				"kg",
 			)),
-			new AmountWithUnitMetric("fatWithinOptimalWeightMax", new Weight(
+			new QuantityMetric("fatWithinOptimalWeightMax", new Weight(
 				new Amount(
 					$bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue() - ($max >= 0 ? $max : 0)
 				),
@@ -1022,13 +1022,13 @@ class Calculator
 		$max = $bodyFatWeight->getResult()->getInUnit("kg")->getAmount()->getValue() - $optimalFatWeight->filterByName("optimalFatWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()->getValue();
 
 		return new MetricCollection([
-			new AmountWithUnitMetric("fatOverOptimalWeightMin", new Weight(
+			new QuantityMetric("fatOverOptimalWeightMin", new Weight(
 				new Amount(
 					$min >= 0 ? $min : 0
 				),
 				"kg",
 			)),
-			new AmountWithUnitMetric("fatOverOptimalWeightMax", new Weight(
+			new QuantityMetric("fatOverOptimalWeightMax", new Weight(
 				new Amount(
 					$max >= 0 ? $max : 0
 				),
@@ -1037,7 +1037,7 @@ class Calculator
 		]);
 	}
 
-	public function calcMaxOptimalWeight(): AmountWithUnitMetric
+	public function calcMaxOptimalWeight(): QuantityMetric
 	{
 		$gender = $this->getGender();
 		if (!$gender) {
@@ -1085,7 +1085,7 @@ class Calculator
 	/*****************************************************************************
 	 * Beztuková tělesná hmotnost - FFM.
 	 */
-	public function calcFatFreeMass(): AmountWithUnitMetric
+	public function calcFatFreeMass(): QuantityMetric
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
@@ -1107,13 +1107,13 @@ class Calculator
 			= {$resultValue} kg
 		";
 
-		return new AmountWithUnitMetric("fatFreeMass", $result, $formula);
+		return new QuantityMetric("fatFreeMass", $result, $formula);
 	}
 
 	/*****************************************************************************
 	 * Bazální metabolismus - BMR.
 	 */
-	public function calcBasalMetabolicRate(): AmountWithUnitMetric
+	public function calcBasalMetabolicRate(): QuantityMetric
 	{
 		$fatFreeMass = $this->calcFatFreeMass();
 		$fatFreeMassValue = $fatFreeMass->getResult()->getAmount()->getValue();
@@ -1131,13 +1131,13 @@ class Calculator
 			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
 		";
 
-		return new AmountWithUnitMetric("basalMetabolicRate", $result, $formula);
+		return new QuantityMetric("basalMetabolicRate", $result, $formula);
 	}
 
 	/*****************************************************************************
 	 * Total Energy Expenditure - Termický efekt pohybu - TEE.
 	 */
-	public function calcTotalDailyEnergyExpenditure(): AmountWithUnitMetric
+	public function calcTotalDailyEnergyExpenditure(): QuantityMetric
 	{
 		$basalMetabolicRate = $this->calcBasalMetabolicRate()->getResult()->getInUnit("kcal");
 		$basalMetabolicRateValue = $basalMetabolicRate->getAmount()->getValue();
@@ -1155,13 +1155,13 @@ class Calculator
 			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
 		";
 
-		return new AmountWithUnitMetric("totalDailyEnergyExpenditure", $result, $formula);
+		return new QuantityMetric("totalDailyEnergyExpenditure", $result, $formula);
 	}
 
 	/*****************************************************************************
 	 * Total Daily Energy Expenditure - Celkový doporučený denní příjem - TDEE.
 	 */
-	public function calcWeightGoalEnergyExpenditure(): AmountWithUnitMetric
+	public function calcWeightGoalEnergyExpenditure(): QuantityMetric
 	{
 		if (!$this->getDiet()->getApproach()) {
 			throw new \Fatty\Exceptions\MissingDietApproachException;
@@ -1173,7 +1173,7 @@ class Calculator
 	/*****************************************************************************
 	 * Reference Daily Intake - Doporučený denní příjem - DDP.
 	 */
-	public function calcReferenceDailyIntake(): AmountWithUnitMetric
+	public function calcReferenceDailyIntake(): QuantityMetric
 	{
 		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
 
@@ -1214,7 +1214,7 @@ class Calculator
 			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
 		";
 
-		return new AmountWithUnitMetric("referenceDailyIntake", $result, $formula);
+		return new QuantityMetric("referenceDailyIntake", $result, $formula);
 	}
 
 	/*****************************************************************************

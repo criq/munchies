@@ -23,7 +23,7 @@ abstract class SportDuration extends Duration
 		return clone $this;
 	}
 
-	public function getInUnit(string $unit): AmountWithUnit
+	public function getInUnit(string $unit): Quantity
 	{
 		return $this->getInBaseUnit();
 	}

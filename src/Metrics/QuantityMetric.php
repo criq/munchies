@@ -2,20 +2,20 @@
 
 namespace Fatty\Metrics;
 
-use Fatty\AmountWithUnit;
+use Fatty\Quantity;
 use Fatty\Locale;
 use Fatty\Metric;
 
-class AmountWithUnitMetric extends Metric
+class QuantityMetric extends Metric
 {
-	public function __construct(string $name, AmountWithUnit $result, ?string $formula = null)
+	public function __construct(string $name, Quantity $result, ?string $formula = null)
 	{
 		$this->name = $name;
 		$this->result = $result;
 		$this->formula = $formula;
 	}
 
-	public function getResult(): AmountWithUnit
+	public function getResult(): Quantity
 	{
 		return $this->result;
 	}

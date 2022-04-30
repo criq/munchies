@@ -2,9 +2,9 @@
 
 namespace Fatty;
 
-class Length extends AmountWithUnit
+class Length extends Quantity
 {
-	const BASE_UNIT = 'm';
+	const BASE_UNIT = "m";
 
 	public function __construct(Amount $amount, string $unit)
 	{
@@ -17,7 +17,7 @@ class Length extends AmountWithUnit
 			case mb_strtolower(static::getBaseUnit()):
 				return clone $this;
 				break;
-			case 'cm':
+			case "cm":
 				return new static($this->getAmount()->getMultiplied(.01), static::getBaseUnit());
 				break;
 		}
@@ -29,8 +29,8 @@ class Length extends AmountWithUnit
 			case mb_strtolower(static::getBaseUnit()):
 				return $this->getInBaseUnit();
 				break;
-			case 'cm':
-				return new static($this->getInBaseUnit()->getAmount()->getMultiplied(100), 'cm');
+			case "cm":
+				return new static($this->getInBaseUnit()->getAmount()->getMultiplied(100), "cm");
 				break;
 		}
 	}

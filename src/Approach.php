@@ -2,13 +2,10 @@
 
 namespace Fatty;
 
-use Fatty\Metrics\AmountWithUnitMetric;
+use Fatty\Metrics\QuantityMetric;
 use Fatty\Nutrients\Carbs;
 use Fatty\Nutrients\Fats;
 use Fatty\Nutrients\Proteins;
-use Fatty\SportDurations\Aerobic;
-use Fatty\SportDurations\Anaerobic;
-use Fatty\SportDurations\LowFrequency;
 
 abstract class Approach
 {
@@ -86,7 +83,7 @@ abstract class Approach
 		return static::PROTEINS_DEFAULT ? new Proteins(new Amount((float)static::PROTEINS_DEFAULT), "g") : null;
 	}
 
-	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
+	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetric
 	{
 		if (!$calculator->getGoal()->getVector()) {
 			throw new \Fatty\Exceptions\MissingGoalVectorException;
@@ -103,10 +100,10 @@ abstract class Approach
 
 		$formula = "totalDailyEnergyExpenditure[" . $totalDailyEnergyExpenditure . "] * weightGoalQuotient[" . $tdeeQuotientValue . "] = " . $result;
 
-		return new AmountWithUnitMetric("weightGoalEnergyExpenditure", $result, $formula);
+		return new QuantityMetric("weightGoalEnergyExpenditure", $result, $formula);
 	}
 
-	public function calcGoalNutrientProteins(Calculator $calculator): AmountWithUnitMetric
+	public function calcGoalNutrientProteins(Calculator $calculator): QuantityMetric
 	{
 		$maxOptimalWeight = $calculator->calcMaxOptimalWeight();
 		$calcSportProteinCoefficient = $calculator->calcSportProteinCoefficient();
@@ -119,7 +116,7 @@ abstract class Approach
 			$proteins = new Nutrients\Proteins(new Amount($proteins->getInUnit("g")->getAmount()->getValue() + 20), "g");
 		}
 
-		return new \Fatty\Metrics\AmountWithUnitMetric("goalNutrientsProteins", $proteins);
+		return new \Fatty\Metrics\QuantityMetric("goalNutrientsProteins", $proteins);
 	}
 
 	public function calcGoalNutrients(Calculator $calculator): MetricCollection
@@ -132,9 +129,9 @@ abstract class Approach
 		$nutrients = $this->getGoalNutrients($calculator);
 
 		return new MetricCollection([
-			new AmountWithUnitMetric("goalNutrientsCarbs", $nutrients->getCarbs()),
-			new AmountWithUnitMetric("goalNutrientsFats", $nutrients->getFats()),
-			new AmountWithUnitMetric("goalNutrientsProteins", $nutrients->getProteins()),
+			new QuantityMetric("goalNutrientsCarbs", $nutrients->getCarbs()),
+			new QuantityMetric("goalNutrientsFats", $nutrients->getFats()),
+			new QuantityMetric("goalNutrientsProteins", $nutrients->getProteins()),
 		]);
 	}
 }

@@ -6,7 +6,7 @@ use Fatty\Exceptions\MissingGoalDurationException;
 use Fatty\Exceptions\MissingGoalVectorException;
 use Fatty\Exceptions\MissingGoalWeightException;
 use Fatty\Exceptions\MissingWeightException;
-use Fatty\Metrics\AmountWithUnitMetric;
+use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 
 class Goal
@@ -27,14 +27,14 @@ class Goal
 		return $this->duration;
 	}
 
-	public function calcGoalDuration(): AmountWithUnitMetric
+	public function calcGoalDuration(): QuantityMetric
 	{
 		$duration = $this->getDuration();
 		if (!$duration) {
 			throw new MissingGoalDurationException;
 		}
 
-		return new AmountWithUnitMetric("goalDuration", $duration);
+		return new QuantityMetric("goalDuration", $duration);
 	}
 
 	public function setVector(?Vector $value): Goal
@@ -103,17 +103,17 @@ class Goal
 		return new StringMetric("goalVector", $vector->getCode(), $vector->getLabelInfinitive());
 	}
 
-	public function calcGoalWeight(): AmountWithUnitMetric
+	public function calcGoalWeight(): QuantityMetric
 	{
 		$weight = $this->getWeight();
 		if (!$weight) {
 			throw new MissingGoalWeightException;
 		}
 
-		return new AmountWithUnitMetric("goalWeight", $this->getWeight());
+		return new QuantityMetric("goalWeight", $this->getWeight());
 	}
 
-	// public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
+	// public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetric
 	// {
 	// 	$vector = $this->getVector();
 	// 	if (!$vector) {

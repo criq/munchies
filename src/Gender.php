@@ -4,7 +4,7 @@ namespace Fatty;
 
 use Fatty\Exceptions\MissingBodyFatPercentageInputException;
 use Fatty\Metrics\AmountMetric;
-use Fatty\Metrics\AmountWithUnitMetric;
+use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 
 abstract class Gender
@@ -15,7 +15,7 @@ abstract class Gender
 	const FIT_BODY_FAT_PERCENTAGE = null;
 	const SPORT_PROTEIN_COEFFICIENT = null;
 
-	// abstract public function calcBasalMetabolicRate(Calculator $calculator): AmountWithUnitMetric;
+	// abstract public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric;
 	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
 	abstract public function calcBodyType(Calculator $calculator): StringMetric;
 	abstract public function getSportProteinMatrix(): array;
@@ -163,9 +163,9 @@ abstract class Gender
 	/*****************************************************************************
 	 * Doporučený denní příjem - bonusy.
 	 */
-	public function calcReferenceDailyIntakeBonus(): AmountWithUnitMetric
+	public function calcReferenceDailyIntakeBonus(): QuantityMetric
 	{
-		return new AmountWithUnitMetric("referenceDailyIntakeBonus", new Energy(new Amount(0), "kJ"));
+		return new QuantityMetric("referenceDailyIntakeBonus", new Energy(new Amount(0), "kJ"));
 	}
 
 	/****************************************************************************
@@ -184,7 +184,7 @@ abstract class Gender
 		return new StringMetric("fitnessLevel", $string, $string, $formula);
 	}
 
-	public function calcMaxOptimalWeight(Calculator $calculator): AmountWithUnitMetric
+	public function calcMaxOptimalWeight(Calculator $calculator): QuantityMetric
 	{
 		if ($calculator->calcFitnessLevel()->getResult() == "UNFIT") {
 			$fatFreeMass = $calculator->calcFatFreeMass();
@@ -205,6 +205,6 @@ abstract class Gender
 			$formula = "weight[$weight]";
 		}
 
-		return new AmountWithUnitMetric("maxOptimalWeight", $weight, $formula);
+		return new QuantityMetric("maxOptimalWeight", $weight, $formula);
 	}
 }

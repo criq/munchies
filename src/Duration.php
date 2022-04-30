@@ -2,9 +2,9 @@
 
 namespace Fatty;
 
-class Duration extends AmountWithUnit
+class Duration extends Quantity
 {
-	public function __construct(Amount $amount, $unit = 'days')
+	public function __construct(Amount $amount, $unit = "days")
 	{
 		return parent::__construct($amount, $unit);
 	}
@@ -12,23 +12,23 @@ class Duration extends AmountWithUnit
 	public function getInBaseUnit(): Duration
 	{
 		switch (mb_strtolower($this->getUnit())) {
-			case 'days':
+			case "days":
 				return clone $this;
 				break;
-			case 'weeks':
-				return new static($this->getAmount()->getMultiplied(7), 'weeks');
+			case "weeks":
+				return new static($this->getAmount()->getMultiplied(7), "weeks");
 				break;
 		}
 	}
 
-	public function getInUnit(string $unit): AmountWithUnit
+	public function getInUnit(string $unit): Quantity
 	{
 		switch (mb_strtolower($unit)) {
-			case 'days':
+			case "days":
 				return $this->getInBaseUnit();
 				break;
-			case 'weeks':
-				return new static($this->getAmount()->getMultiplied(1 / 7), 'weeks');
+			case "weeks":
+				return new static($this->getAmount()->getMultiplied(1 / 7), "weeks");
 				break;
 		}
 	}
@@ -36,10 +36,10 @@ class Duration extends AmountWithUnit
 	public function getFormatted(?Locale $locale = null): string
 	{
 		switch (mb_strtolower($this->getUnit())) {
-			case 'days':
+			case "days":
 				return "{$this->getAmount()->getValue()} dní";
 				break;
-			case 'weeks':
+			case "weeks":
 				return "{$this->getAmount()->getValue()} týdnů";
 				break;
 		}

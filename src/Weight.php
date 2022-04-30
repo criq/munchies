@@ -2,7 +2,7 @@
 
 namespace Fatty;
 
-class Weight extends AmountWithUnit
+class Weight extends Quantity
 {
 	const BASE_UNIT = "g";
 

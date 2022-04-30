@@ -3,7 +3,6 @@
 namespace Fatty;
 
 use Fatty\Metrics\AmountMetric;
-use Fatty\Metrics\AmountWithUnitMetric;
 
 abstract class Vector
 {
@@ -12,7 +11,7 @@ abstract class Vector
 	const TDEE_QUOTIENT = null;
 	const WEIGHT_CHANGE_PER_WEEK = "";
 
-	// abstract public function calcTdeeChangePerDay(Calculator $calculator): AmountWithUnitMetric;
+	// abstract public function calcTdeeChangePerDay(Calculator $calculator): QuantityMetric;
 
 	public function __toString()
 	{
@@ -53,7 +52,7 @@ abstract class Vector
 		);
 	}
 
-	// public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
+	// public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetric
 	// {
 	// 	$weightGoalEnergyExpenditureValue = $calculator->calcWeightGoalEnergyExpenditure()->getResult()->getInBaseUnit()->getAmount()->getValue();
 	// 	$tdeeChangePerDayValue = $this->calcTdeeChangePerDay($calculator)->getResult()->getInBaseUnit()->getAmount()->getValue();
@@ -65,7 +64,7 @@ abstract class Vector
 	// 		Energy::getBaseUnit(),
 	// 	);
 
-	// 	return new AmountWithUnitMetric("weightGoalEnergyExpenditure", $result);
+	// 	return new QuantityMetric("weightGoalEnergyExpenditure", $result);
 	// }
 
 	public function getLabelInfinitive(): string

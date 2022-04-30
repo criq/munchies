@@ -2,7 +2,7 @@
 
 namespace Fatty;
 
-class Energy extends AmountWithUnit
+class Energy extends Quantity
 {
 	const BASE_UNIT = "J";
 	const CAL_TO_J_RATIO = 4.128;

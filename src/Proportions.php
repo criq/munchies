@@ -3,7 +3,7 @@
 namespace Fatty;
 
 use Fatty\Exceptions\MissingHeightException;
-use Fatty\Metrics\AmountWithUnitMetric;
+use Fatty\Metrics\QuantityMetric;
 
 class Proportions
 {
@@ -27,7 +27,7 @@ class Proportions
 		return $this->height;
 	}
 
-	public function calcHeight(): AmountWithUnitMetric
+	public function calcHeight(): QuantityMetric
 	{
 		$height = $this->getHeight();
 		if (!$height) {
@@ -38,7 +38,7 @@ class Proportions
 
 		$formula = "height[{$heightValue}] = {$heightValue}";
 
-		return new AmountWithUnitMetric('height', $height, $formula);
+		return new QuantityMetric('height', $height, $formula);
 	}
 
 	/*****************************************************************************

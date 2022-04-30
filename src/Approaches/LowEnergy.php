@@ -5,7 +5,7 @@ namespace Fatty\Approaches;
 use Fatty\Amount;
 use Fatty\Calculator;
 use Fatty\Energy;
-use Fatty\Metrics\AmountWithUnitMetric;
+use Fatty\Metrics\QuantityMetric;
 use Fatty\Nutrients;
 
 class LowEnergy extends \Fatty\Approach
@@ -19,7 +19,7 @@ class LowEnergy extends \Fatty\Approach
 	const LABEL_DECLINATED = "nízkoenergetickou dietu";
 	const PROTEINS_DEFAULT = 82;
 
-	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): AmountWithUnitMetric
+	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetric
 	{
 		if (!$calculator->getGoal()->getVector()) {
 			throw new \Fatty\Exceptions\MissingGoalVectorException;
@@ -30,7 +30,7 @@ class LowEnergy extends \Fatty\Approach
 			static::ENERGY_UNIT,
 		))->getInUnit($calculator->getUnits());
 
-		return new AmountWithUnitMetric("weightGoalEnergyExpenditure", $result);
+		return new QuantityMetric("weightGoalEnergyExpenditure", $result);
 	}
 
 	public function getGoalNutrients(Calculator $calculator): Nutrients

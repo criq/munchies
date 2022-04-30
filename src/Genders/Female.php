@@ -22,7 +22,7 @@ use Fatty\Exceptions\MissingBreastfeedingModeException;
 use Fatty\Exceptions\MissingPregnancyChildbirthDateException;
 use Fatty\Exceptions\PregnancyChildbirthDateInPastException;
 use Fatty\Metrics\AmountMetric;
-use Fatty\Metrics\AmountWithUnitMetric;
+use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Percentage;
 
@@ -156,7 +156,7 @@ class Female extends \Fatty\Gender
 	/*****************************************************************************
 	 * Doporučený denní příjem - bonusy.
 	 */
-	public function calcReferenceDailyIntakeBonus(): AmountWithUnitMetric
+	public function calcReferenceDailyIntakeBonus(): QuantityMetric
 	{
 		$exceptionCollection = new FattyExceptionCollection;
 
@@ -183,13 +183,13 @@ class Female extends \Fatty\Gender
 			"kcal",
 		);
 
-		return new AmountWithUnitMetric("referenceDailyIntakeBonus", $result);
+		return new QuantityMetric("referenceDailyIntakeBonus", $result);
 	}
 
-	public function calcReferenceDailyIntakeBonusPregnancy(): AmountWithUnitMetric
+	public function calcReferenceDailyIntakeBonusPregnancy(): QuantityMetric
 	{
 		if (!$this->isPregnant()) {
-			return new AmountWithUnitMetric("referenceDailyIntakeBonusPregnancy", new Energy(new Amount(0), "kJ"));
+			return new QuantityMetric("referenceDailyIntakeBonusPregnancy", new Energy(new Amount(0), "kJ"));
 		}
 
 		if (!($this->getPregnancyChildbirthDate() instanceof Birthday)) {
@@ -205,15 +205,15 @@ class Female extends \Fatty\Gender
 			$change = 475;
 		}
 
-		return new AmountWithUnitMetric("referenceDailyIntakeBonusPregnancy", new Energy(new Amount($change), "kcal"));
+		return new QuantityMetric("referenceDailyIntakeBonusPregnancy", new Energy(new Amount($change), "kcal"));
 	}
 
-	public function calcReferenceDailyIntakeBonusBreastfeeding(): AmountWithUnitMetric
+	public function calcReferenceDailyIntakeBonusBreastfeeding(): QuantityMetric
 	{
 		$exceptionCollection = new FattyExceptionCollection;
 
 		if (!$this->isBreastfeeding()) {
-			return new AmountWithUnitMetric("referenceDailyIntakeBonusBreastfeeding", new Energy(new Amount(0), "kJ"));
+			return new QuantityMetric("referenceDailyIntakeBonusBreastfeeding", new Energy(new Amount(0), "kJ"));
 		}
 
 		if (!($this->getBreastfeedingChildbirthDate() instanceof Birthday)) {
@@ -247,7 +247,7 @@ class Female extends \Fatty\Gender
 			$change = 100;
 		}
 
-		return new AmountWithUnitMetric("referenceDailyIntakeBonusBreastfeeding", new Energy(new Amount($change), "kcal"));
+		return new QuantityMetric("referenceDailyIntakeBonusBreastfeeding", new Energy(new Amount($change), "kcal"));
 	}
 
 	/*****************************************************************************
