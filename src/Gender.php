@@ -32,7 +32,7 @@ abstract class Gender
 		}
 	}
 
-	public function getCode()
+	public function getCode(): string
 	{
 		return lcfirst(array_slice(explode("\\", get_called_class()), -1, 1)[0]);
 	}
@@ -40,7 +40,7 @@ abstract class Gender
 	/****************************************************************************
 	 * Těhotenství.
 	 */
-	public function isPregnant()
+	public function isPregnant(): bool
 	{
 		return false;
 	}

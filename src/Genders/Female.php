@@ -58,9 +58,9 @@ class Female extends \Fatty\Gender
 	/*****************************************************************************
 	 * Těhotenství.
 	 */
-	public function isPregnant()
+	public function isPregnant(): bool
 	{
-		return $this->isPregnant;
+		return (bool)$this->isPregnant;
 	}
 
 	public function setIsPregnant($isPregnant)
