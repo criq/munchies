@@ -31,14 +31,6 @@ class Calculator
 		$this->setParams($params);
 	}
 
-	public static function createFromParams(array $params): Calculator
-	{
-		$object = new static;
-		$object->setParams($params);
-
-		return $object;
-	}
-
 	public function setParams(array $params): Calculator
 	{
 		$this->params = $params;
@@ -217,10 +209,10 @@ class Calculator
 		}
 
 		try {
-			$goalWeightString = trim($params["goal_weight"]);
+			$goalWeightString = trim($params["goal_weight"] ?? null);
 		} catch (\Throwable $e) {
 			try {
-				$goalWeightString = trim($params["goal_weight_" . $params["goal_vector"]]);
+				$goalWeightString = trim($params["goal_weight_{$params["goal_vector"]}"] ?? null);
 			} catch (\Throwable $e) {
 				$goalWeightString = null;
 			}
@@ -255,10 +247,10 @@ class Calculator
 		}
 
 		try {
-			$dietCarbsString = trim($params["diet_carbs"]);
+			$dietCarbsString = trim($params["diet_carbs"] ?? null);
 		} catch (\Throwable $e) {
 			try {
-				$dietCarbsString = trim($params["diet_carbs_" . $params["diet_approach"]]);
+				$dietCarbsString = trim($params["diet_carbs_{$params["diet_approach"]}"]);
 			} catch (\Throwable $e) {
 				$dietCarbsString = null;
 			}
