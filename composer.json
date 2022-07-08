@@ -3,8 +3,15 @@
 	"description": "fatty caloric calculator",
 	"type": "library",
 	"minimum-stability": "dev",
+	"repositories": [
+		{
+			"type": "git",
+			"url": "https://github.com/criq/effekt"
+		}
+	],
 	"require" : {
-		"criq/katu": "v2.x-dev"
+		"criq/katu": "v2.x-dev",
+		"criq/effekt": "v2.x-dev"
 	},
 	"autoload": {
 		"psr-4": {
