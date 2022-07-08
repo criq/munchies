@@ -2,7 +2,7 @@
 
 namespace Fatty;
 
-abstract class Quantity
+abstract class Quantity implements \Effekt\QuantityInterface
 {
 	const BASE_UNIT = null;
 
@@ -45,6 +45,11 @@ abstract class Quantity
 		return $this->amount;
 	}
 
+	public function getAmountFloat(): float
+	{
+		return $this->getAmount()->getValue();
+	}
+
 	public static function getBaseUnit(): string
 	{
 		return (string)static::BASE_UNIT;
@@ -53,6 +58,11 @@ abstract class Quantity
 	public function getUnit(): ?string
 	{
 		return $this->unit;
+	}
+
+	public function getUnitString(): string
+	{
+		return $this->getUnit();
 	}
 
 	/**
