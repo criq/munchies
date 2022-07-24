@@ -9,6 +9,9 @@ use Fatty\Nutrients\Carbs;
 use Fatty\SportDurations\Aerobic;
 use Fatty\SportDurations\Anaerobic;
 use Fatty\SportDurations\LowFrequency;
+use Katu\Tools\Validation\Params\UserInput;
+use Katu\Tools\Validation\ValidationCollection;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Calculator
 {
@@ -26,41 +29,18 @@ class Calculator
 	protected $weight;
 	protected $weightHistory;
 
-	public function __construct(?array $params = [])
+	public static function createFromRequest(ServerRequestInterface $request)
 	{
-		$this->setParams($params);
-	}
+		$validations = new ValidationCollection;
 
-	public function setParams(array $params): Calculator
-	{
-		$this->params = $params;
+		$params = $request->getQueryParams();
 
-		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
-
-		if (trim($params["gender"] ?? null)) {
-			try {
-				$value = \Fatty\Gender::createFromString($params["gender"]);
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidGenderException;
-				}
-
-				$this->setGender($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+		if (strlen(trim($params["gender"] ?? null))) {
+			$validations[] = \Fatty\Gender::createFromString(new UserInput("gender", $params["gender"]));
 		}
 
-		if (trim($params["birthday"] ?? null)) {
-			try {
-				$value = \Fatty\Birthday::createFromString($params["birthday"]);
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidBirthdayException;
-				}
-
-				$this->setBirthday($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+		if (strlen(trim($params["birthday"] ?? null))) {
+			$validations[] = \Fatty\Birthday::createFromString(new UserInput("birthday", $params["birthday"]));
 		}
 
 		if (trim($params["weight"] ?? null)) {
@@ -1071,6 +1051,10 @@ class Calculator
 
 	public function calcFitnessLevel(): StringMetric
 	{
+		if (!$this->getGender()) {
+			throw new \Fatty\Exceptions\MissingGenderException;
+		}
+
 		return $this->getGender()->getFitnessLevel($this);
 	}
 

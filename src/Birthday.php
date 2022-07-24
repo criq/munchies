@@ -24,6 +24,23 @@ class Birthday
 		}
 	}
 
+	// public static function createFromString(Param $code): Validation
+	// {
+	// 	$validation = new Validation;
+
+	// 	$value = ucfirst(trim($code));
+	// 	$class = new TClass("Fatty\Genders\\{$value}");
+	// 	if (!$class->exists()) {
+	// 		$validation->addError((new Error("Invalid gender."))->addParam($code));
+	// 	} else {
+	// 		$className = $class->getName();
+	// 		$gender = new $className;
+	// 		$validation->setResponse($gender)->addParam($code->setOutput($gender));
+	// 	}
+
+	// 	return $validation;
+	// }
+
 	public function getDatetime(): \DateTime
 	{
 		return $this->datetime;

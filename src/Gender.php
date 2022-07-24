@@ -6,6 +6,10 @@ use Fatty\Exceptions\MissingBodyFatPercentageInputException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
+use Katu\Errors\Error;
+use Katu\Tools\Validation\Param;
+use Katu\Tools\Validation\Validation;
+use Katu\Types\TClass;
 
 abstract class Gender
 {
@@ -20,16 +24,21 @@ abstract class Gender
 	abstract public function calcBodyType(Calculator $calculator): StringMetric;
 	abstract public function getSportProteinMatrix(): array;
 
-	public static function createFromString(string $value): ?Gender
+	public static function createFromString(Param $code): Validation
 	{
-		try {
-			$value = ucfirst($value);
-			$class = "Fatty\\Genders\\{$value}";
+		$validation = new Validation;
 
-			return new $class;
-		} catch (\Throwable $e) {
-			return null;
+		$value = ucfirst(trim($code));
+		$class = new TClass("Fatty\Genders\\{$value}");
+		if (!$class->exists()) {
+			$validation->addError((new Error("Invalid gender."))->addParam($code));
+		} else {
+			$className = $class->getName();
+			$gender = new $className;
+			$validation->setResponse($gender)->addParam($code->setOutput($gender));
 		}
+
+		return $validation;
 	}
 
 	public function getCode(): string
