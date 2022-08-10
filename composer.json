@@ -10,8 +10,8 @@
 		}
 	],
 	"require" : {
-		"criq/katu": "v2.x-dev",
-		"criq/effekt": "v2.x-dev"
+		"criq/katu": "^4",
+		"criq/effekt": "^4"
 	},
 	"autoload": {
 		"psr-4": {
