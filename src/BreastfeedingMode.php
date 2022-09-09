@@ -4,8 +4,19 @@ namespace Fatty;
 
 class BreastfeedingMode
 {
-	public function getCode()
+	const CODE = "";
+
+	public function getCode(): string
 	{
-		return lcfirst(array_slice(explode("\\", get_called_class()), -1, 1)[0]);
+		return static::CODE;
+	}
+
+	public static function getAvailable(): array
+	{
+		return [
+			BreastfeedingModes\None::CODE => new BreastfeedingModes\None,
+			BreastfeedingModes\Partial::CODE => new BreastfeedingModes\Partial,
+			BreastfeedingModes\Full::CODE => new BreastfeedingModes\Full,
+		];
 	}
 }
