@@ -3,6 +3,7 @@
 namespace Fatty\Exceptions;
 
 use Katu\Errors\Error;
+use Katu\Tools\Validation\Param;
 
 class FattyException extends \Exception
 {
@@ -10,6 +11,12 @@ class FattyException extends \Exception
 
 	public function getError(): Error
 	{
-		return new Error($this->getMessage());
+		$error = new Error($this->getMessage());
+
+		foreach ($this->names as $name) {
+			$error->addParam(new Param($name));
+		}
+
+		return $error;
 	}
 }
