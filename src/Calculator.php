@@ -515,22 +515,22 @@ class Calculator implements RestResponseInterface
 	 */
 	public function calcPhysicalActivityLevel(): AmountMetric
 	{
-		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
+		$exceptions = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		try {
 			$activity = $this->calcActivity();
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$sportActivity = $this->calcSportActivity();
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
-		if (count($exceptionCollection)) {
-			throw $exceptionCollection;
+		if ($exceptions->hasExceptions()) {
+			throw $exceptions;
 		}
 
 		$activityValue = $activity->getResult()->getValue();
@@ -574,18 +574,18 @@ class Calculator implements RestResponseInterface
 	 */
 	public function calcBodyMassIndex(): AmountMetric
 	{
-		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
+		$exceptions = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		if (!($this->getWeight() instanceof Weight)) {
-			$exceptionCollection->add(new \Fatty\Exceptions\MissingWeightException);
+			$exceptions->addException(new \Fatty\Exceptions\MissingWeightException);
 		}
 
 		if (!($this->getProportions()->getHeight() instanceof Length)) {
-			$exceptionCollection->add(new \Fatty\Exceptions\MissingHeightException);
+			$exceptions->addException(new \Fatty\Exceptions\MissingHeightException);
 		}
 
-		if (count($exceptionCollection)) {
-			throw $exceptionCollection;
+		if ($exceptions->hasExceptions()) {
+			throw $exceptions;
 		}
 
 		$weight = $this->getWeight()->getInUnit("kg")->getAmount()->getValue();
@@ -614,18 +614,18 @@ class Calculator implements RestResponseInterface
 	 */
 	public function calcWaistHipRatio(): AmountMetric
 	{
-		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
+		$exceptions = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		if (!($this->getProportions()->getWaist() instanceof Length)) {
-			$exceptionCollection->add(new \Fatty\Exceptions\MissingWaistException);
+			$exceptions->addException(new \Fatty\Exceptions\MissingWaistException);
 		}
 
 		if (!($this->getProportions()->getHips() instanceof Length)) {
-			$exceptionCollection->add(new \Fatty\Exceptions\MissingHipsException);
+			$exceptions->addException(new \Fatty\Exceptions\MissingHipsException);
 		}
 
-		if (count($exceptionCollection)) {
-			throw $exceptionCollection;
+		if ($exceptions->hasExceptions()) {
+			throw $exceptions;
 		}
 
 		$waist = $this->getProportions()->getWaist()->getInUnit("cm")->getAmount()->getValue();
@@ -1100,12 +1100,12 @@ class Calculator implements RestResponseInterface
 	 */
 	public function calcReferenceDailyIntake(): QuantityMetric
 	{
-		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
+		$exceptions = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		try {
 			$weightGoalEnergyExpenditure = $this->calcWeightGoalEnergyExpenditure()->getResult()->getInUnit("kcal");
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
@@ -1116,11 +1116,11 @@ class Calculator implements RestResponseInterface
 
 			$referenceDailyIntakeBonus = $gender->calcReferenceDailyIntakeBonus();
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
-		if (count($exceptionCollection)) {
-			throw $exceptionCollection;
+		if ($exceptions->hasExceptions()) {
+			throw $exceptions;
 		}
 
 		$weightGoalEnergyExpenditureValue = $weightGoalEnergyExpenditure->getAmount()->getValue();
@@ -1156,7 +1156,7 @@ class Calculator implements RestResponseInterface
 
 	public function getResponse(): array
 	{
-		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
+		$exceptions = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		$res = [];
 
@@ -1221,221 +1221,221 @@ class Calculator implements RestResponseInterface
 		try {
 			$metricCollection->append($this->calcWeight());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->getProportions()->calcHeight());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBodyMassIndex());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBodyMassIndexDeviation());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcWaistHipRatio());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcWaistHipRatioDeviation());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBodyFatPercentage());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBodyFatWeight());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcActiveBodyMassPercentage());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcOptimalFatPercentage());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcOptimalFatWeight());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcEssentialFatPercentage());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcEssentialFatWeight());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcFatWithinOptimalPercentage());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcFatWithinOptimalWeight());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcFatOverOptimalPercentage());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcFatOverOptimalWeight());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBodyFatDeviation());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcRiskDeviation());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcActiveBodyMassWeight());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcFatFreeMass());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBasalMetabolicRate());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcPhysicalActivityLevel());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcTotalDailyEnergyExpenditure());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcWeightGoalEnergyExpenditure());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcReferenceDailyIntake());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->getGoal()->calcGoalVector());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->getGoal()->calcGoalWeight());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		// try {
 		// 	$metricCollection->append($this->getGoal()->calcWeightGoalEnergyExpenditure($this));
 		// } catch (\Fatty\Exceptions\FattyException $e) {
-		// 	$exceptionCollection->add($e);
+		// 	$exceptions->addException($e);
 		// }
 
 		try {
 			$metricCollection->append($this->getDiet()->calcDietApproach());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->getGoal()->calcGoalDuration());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcBodyType($this));
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcMaxOptimalWeight());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcFitnessLevel());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->append($this->calcSportProteinCoefficient());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$metricCollection->merge($this->calcGoalNutrients());
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
-		if (count($exceptionCollection)) {
-			throw $exceptionCollection;
+		if ($exceptions->hasExceptions()) {
+			throw $exceptions;
 		}
 
 		$locale = new Locale("cs_CZ");

@@ -5,27 +5,20 @@ namespace Fatty\Exceptions;
 use Katu\Errors\Error;
 use Katu\Errors\ErrorCollection;
 
-class FattyExceptionCollection extends FattyException implements \Countable, \ArrayAccess, \Iterator
+class FattyExceptionCollection extends \Fatty\Exceptions\FattyException
 {
 	protected $exceptions = [];
-	protected $offset = 0;
 
-	public function __construct(?array $exceptions = [])
+	public function addException(FattyException $exception): FattyExceptionCollection
 	{
-		foreach ((array)$exceptions as $exception) {
-			$this->add($exception);
-		}
+		$this->exceptions[] = $exception;
+
+		return $this;
 	}
 
-	public function add(FattyException $e): FattyExceptionCollection
+	public function setExceptions(array $exceptions): FattyExceptionCollection
 	{
-		if (is_iterable($e)) {
-			foreach ($e as $_e) {
-				$this->add($_e);
-			}
-		} else {
-			$this->exceptions[] = $e;
-		}
+		$this->exceptions = $exceptions;
 
 		return $this;
 	}
@@ -35,9 +28,14 @@ class FattyExceptionCollection extends FattyException implements \Countable, \Ar
 		return $this->exceptions;
 	}
 
+	public function hasExceptions(): bool
+	{
+		return (bool)count($this->getExceptions());
+	}
+
 	public function getUnique(): FattyExceptionCollection
 	{
-		return new static(array_values(array_unique($this->getExceptions())));
+		return (new static)->setExceptions(array_values(array_unique($this->getExceptions())));
 	}
 
 	public function getNames(): array
@@ -59,62 +57,5 @@ class FattyExceptionCollection extends FattyException implements \Countable, \Ar
 		}
 
 		return $errors;
-	}
-
-	/****************************************************************************
-	 * Interfaces.
-	 */
-	public function count(): int
-	{
-		return count($this->exceptions);
-	}
-
-	public function offsetExists($offset): bool
-	{
-		return isset($this->exceptions[$offset]);
-	}
-
-	public function offsetGet($offset)
-	{
-		return $this->exceptions[$offset];
-	}
-
-	public function offsetSet($offset, $value): void
-	{
-		if (is_null($offset)) {
-			$this->exceptions[] = $value;
-		} else {
-			$this->exceptions[$offset] = $value;
-		}
-	}
-
-	public function offsetUnset($offset): void
-	{
-		unset($this->exceptions[$offset]);
-	}
-
-	public function current()
-	{
-		return $this->exceptions[$this->offset];
-	}
-
-	public function next()
-	{
-		++$this->offset;
-	}
-
-	public function key(): int
-	{
-		return $this->offset;
-	}
-
-	public function valid(): bool
-	{
-		return isset($this->exceptions[$this->offset]);
-	}
-
-	public function rewind(): void
-	{
-		$this->offset = 0;
 	}
 }
