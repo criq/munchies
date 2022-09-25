@@ -2,6 +2,8 @@
 
 namespace Fatty\Exceptions;
 
+use Katu\Errors\Error;
+
 class FattyException extends \Exception
 {
 	protected $names = [];
@@ -16,5 +18,10 @@ class FattyException extends \Exception
 	public function getNames(): array
 	{
 		return $this->names;
+	}
+
+	public function getError(): Error
+	{
+		return new Error($this->getMessage());
 	}
 }

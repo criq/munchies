@@ -53,7 +53,7 @@ class FattyExceptionCollection extends \Fatty\Exceptions\FattyException
 		$errors = new ErrorCollection;
 
 		foreach ($this->getUnique()->getExceptions() as $exception) {
-			$errors[] = new Error($exception->getMessage());
+			$errors[] = $exception->getError();
 		}
 
 		return $errors;
