@@ -500,6 +500,10 @@ class Calculator implements RestResponseInterface
 			$proteinCoefficient = $sportProteinMatrix[$fitnessLevel][$sportProteinCoefficientKey];
 		// Normální fyzická zátěž.
 		} else {
+			if (!$this->getGender()) {
+				throw new \Fatty\Exceptions\MissingGenderException;
+			}
+
 			$proteinCoefficient = $this->getGender()->getSportProteinCoefficient();
 		}
 
@@ -996,6 +1000,10 @@ class Calculator implements RestResponseInterface
 
 	public function calcFitnessLevel(): StringMetric
 	{
+		if (!$this->getGender()) {
+			throw new \Fatty\Exceptions\MissingGenderException;
+		}
+
 		return $this->getGender()->getFitnessLevel($this);
 	}
 
