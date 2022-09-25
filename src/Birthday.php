@@ -34,7 +34,7 @@ class Birthday
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid birthday."))->addParam($birthday));
 		} else {
-			return (new Validation)->addParam($birthday->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($birthday->setOutput($output));
 		}
 	}
 

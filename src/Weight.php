@@ -21,7 +21,7 @@ class Weight extends Quantity
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid weight."))->addParam($weight));
 		} else {
-			return (new Validation)->addParam($weight->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($weight->setOutput($output));
 		}
 	}
 

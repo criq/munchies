@@ -24,7 +24,7 @@ class Proportions
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid height."))->addParam($height));
 		} else {
-			return (new Validation)->addParam($height->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($height->setOutput($output));
 		}
 	}
 

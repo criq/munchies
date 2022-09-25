@@ -41,7 +41,7 @@ abstract class Gender
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid gender."))->addParam($gender));
 		} else {
-			return (new Validation)->addParam($gender->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($gender->setOutput($output));
 		}
 	}
 

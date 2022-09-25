@@ -38,22 +38,42 @@ class Calculator
 	{
 		$validations = new ValidationCollection;
 		$params = $request->getQueryParams();
+		$calculator = new static;
 
 		if (trim($params["gender"] ?? null)) {
-			$validations[] = Gender::validateGender(new Param("gender", $params["gender"]));
+			$genderValidation = Gender::validateGender(new Param("gender", $params["gender"]));
+			$validations[] = $genderValidation;
+
+			if (!$genderValidation->hasErrors()) {
+				$calculator->setGender($genderValidation->getResponse());
+			}
 		}
 
 		if (trim($params["birthday"] ?? null)) {
-			$validations[] = Birthday::validateBirthday(new Param("birthday", $params["birthday"]));
+			$birthdayValidation = Birthday::validateBirthday(new Param("birthday", $params["birthday"]));
+			$validations[] = $birthdayValidation;
+
+			if (!$birthdayValidation->hasErrors()) {
+				$calculator->setBirthday($birthdayValidation->getResponse());
+			}
 		}
 
 		if (trim($params["weight"] ?? null)) {
-			$validations[] = Weight::validateWeight(new Param("weight", $params["weight"]));
+			$weightValidation = Weight::validateWeight(new Param("weight", $params["weight"]));
+			$validations[] = $weightValidation;
+
+			if (!$weightValidation->hasErrors()) {
+				$calculator->setWeight($weightValidation->getResponse());
+			}
 		}
 
 		if (trim($params["proportions_height"] ?? null)) {
-			$validations[] = Proportions::validateHeight(new Param("proportions_height", $params["proportions_height"]));
-			// $this->getProportions()->setHeight($value);
+			$heightValidation = Proportions::validateHeight(new Param("proportions_height", $params["proportions_height"]));
+			$validations[] = $heightValidation;
+
+			if (!$heightValidation->hasErrors()) {
+				$calculator->getProportions()->setHeight($heightValidation->getResponse());
+			}
 		}
 
 		if (trim($params["proportions_waist"] ?? null)) {
@@ -142,7 +162,12 @@ class Calculator
 			// $this->setUnits($params["units"]);
 		}
 
-		return $validations->getMerged();
+		$validation = $validations->getMerged();
+		if ($validation->hasErrors()) {
+			return $validation;
+		}
+
+		return $validation->setResponse($calculator);
 	}
 
 	public function setParams(array $params): Calculator
