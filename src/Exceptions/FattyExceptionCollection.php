@@ -2,6 +2,9 @@
 
 namespace Fatty\Exceptions;
 
+use Katu\Errors\Error;
+use Katu\Errors\ErrorCollection;
+
 class FattyExceptionCollection extends FattyException implements \Countable, \ArrayAccess, \Iterator
 {
 	protected $exceptions = [];
@@ -45,6 +48,17 @@ class FattyExceptionCollection extends FattyException implements \Countable, \Ar
 		}
 
 		return array_values(array_unique($res));
+	}
+
+	public function getErrors(): ErrorCollection
+	{
+		$errors = new ErrorCollection;
+
+		foreach ($this->getUnique()->getExceptions() as $exception) {
+			$errors[] = new Error($exception->getMessage());
+		}
+
+		return $errors;
 	}
 
 	/****************************************************************************
