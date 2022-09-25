@@ -24,7 +24,7 @@ class SportDurations
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid amount of low frequency activity."))->addParam($lowFrequency));
 		} else {
-			return (new Validation)->addParam($lowFrequency->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($lowFrequency->setOutput($output));
 		}
 	}
 
@@ -46,7 +46,7 @@ class SportDurations
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid amount of aerobic activity."))->addParam($aerobic));
 		} else {
-			return (new Validation)->addParam($aerobic->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($aerobic->setOutput($output));
 		}
 	}
 
@@ -68,7 +68,7 @@ class SportDurations
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid amount of anaerobic activity."))->addParam($anaerobic));
 		} else {
-			return (new Validation)->addParam($anaerobic->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($anaerobic->setOutput($output));
 		}
 	}
 

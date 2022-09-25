@@ -104,34 +104,60 @@ class Calculator
 		}
 
 		if (trim($params["bodyFatPercentage"] ?? null)) {
-			$validations[] = static::validateBodyFatPercentage(new Param("bodyFatPercentage", $params["bodyFatPercentage"]));
-			// $this->setBodyFatPercentage($value);
+			$bodyFatPercentageValidation = static::validateBodyFatPercentage(new Param("bodyFatPercentage", $params["bodyFatPercentage"]));
+			$validations[] = $bodyFatPercentageValidation;
+
+			if (!$bodyFatPercentageValidation->hasErrors()) {
+				$calculator->setBodyFatPercentage($bodyFatPercentageValidation->getResponse());
+			}
 		}
 
 		if (trim($params["activity"] ?? null)) {
-			$validations[] = Activity::validateActivity(new Param("activity", $params["activity"]));
-			// $this->setActivity($value);
+			$activityValidation = Activity::validateActivity(new Param("activity", $params["activity"]));
+			$validations[] = $activityValidation;
+
+			if (!$activityValidation->hasErrors()) {
+				$calculator->setActivity($activityValidation->getResponse());
+			}
 		}
 
 		if (trim($params["sportDurations_lowFrequency"] ?? null)) {
-			$validations[] = SportDurations::validateLowFrequency(new Param("sportDurations_lowFrequency", $params["sportDurations_lowFrequency"]));
-			// $this->getSportDurations()->setLowFrequency($value);
+			$lowFrequencyValidation = SportDurations::validateLowFrequency(new Param("sportDurations_lowFrequency", $params["sportDurations_lowFrequency"]));
+			$validations[] = $lowFrequencyValidation;
+
+			if (!$lowFrequencyValidation->hasErrors()) {
+				$calculator->getSportDurations()->setLowFrequency($lowFrequencyValidation->getResponse());
+			}
 		}
 
 		if (trim($params["sportDurations_aerobic"] ?? null)) {
-			$validations[] = SportDurations::validateAerobic(new Param("sportDurations_aerobic", $params["sportDurations_aerobic"]));
+			$aerobicValidation = SportDurations::validateAerobic(new Param("sportDurations_aerobic", $params["sportDurations_aerobic"]));
+			$validations[] = $aerobicValidation;
+
+			if (!$aerobicValidation->hasErrors()) {
+				$calculator->getSportDurations()->setAerobic($aerobicValidation->getResponse());
+			}
 		}
 
 		if (trim($params["sportDurations_anaerobic"] ?? null)) {
-			$validations[] = SportDurations::validateAerobic(new Param("sportDurations_anaerobic", $params["sportDurations_anaerobic"]));
+			$anaerobicValidation = SportDurations::validateAnaerobic(new Param("sportDurations_anaerobic", $params["sportDurations_anaerobic"]));
+			$validations[] = $anaerobicValidation;
+
+			if (!$anaerobicValidation->hasErrors()) {
+				$calculator->getSportDurations()->setAnaerobic($anaerobicValidation->getResponse());
+			}
 		}
 
 		if (trim($params["goal_vector"] ?? null)) {
-			$validations[] = Goal::validateVector(new Param("goal_vector", $params["goal_vector"]));
-			// $this->getGoal()->setVector($value);
+			$goalVectorValidation = Goal::validateVector(new Param("goal_vector", $params["goal_vector"]));
+			$validations[] = $goalVectorValidation;
+
+			if (!$goalVectorValidation->hasErrors()) {
+				$calculator->getGoal()->setVector($goalVectorValidation->getResponse());
+			}
 		}
 
-		// $this->getGoal()->setDuration(new Duration(new Amount(12), "weeks"));
+		$calculator->getGoal()->setDuration(new Duration(new Amount(12), "weeks"));
 
 		try {
 			$goalWeightString = trim($params["goal_weight"] ?? null);
@@ -146,13 +172,21 @@ class Calculator
 		}
 
 		if ($goalWeightString) {
-			$validations[] = Goal::validateWeight(new Param("goal_weight", $goalWeightString));
-			// $this->getGoal()->setWeight($value);
+			$goalWeightValidation = Goal::validateWeight(new Param("goal_weight", $goalWeightString));
+			$validations[] = $goalWeightValidation;
+
+			if (!$goalWeightValidation->hasErrors()) {
+				$calculator->getGoal()->setWeight($goalWeightValidation->getResponse());
+			}
 		}
 
 		if (trim($params["diet_approach"] ?? null)) {
-			$validations[] = Diet::validateApproach(new Param("diet_approach", $params["diet_approach"]));
-			// $this->getDiet()->setApproach($value);
+			$dietApproachValidation = Diet::validateApproach(new Param("diet_approach", $params["diet_approach"]));
+			$validations[] = $dietApproachValidation;
+
+			if (!$dietApproachValidation->hasErrors()) {
+				$calculator->getDiet()->setApproach($dietApproachValidation->getResponse());
+			}
 		}
 
 		try {
@@ -168,13 +202,21 @@ class Calculator
 		}
 
 		if ($dietCarbsString) {
-			$validations[] = Diet::validateCarbs(new Param("diet_carbs", $dietCarbsString));
-			// $this->getDiet()->setCarbs($value);
+			$dietCarbsValidation = Diet::validateCarbs(new Param("diet_carbs", $dietCarbsString));
+			$validations[] = $dietCarbsValidation;
+
+			if (!$dietCarbsValidation->hasErrors()) {
+				$calculator->getDiet()->setCarbs($dietCarbsValidation->getResponse());
+			}
 		}
 
 		if (trim($params["units"] ?? null)) {
-			$validations[] = static::validateUnits(new Param("units", $params["units"]));
-			// $this->setUnits($params["units"]);
+			$unitsValidation = static::validateUnits(new Param("units", $params["units"]));
+			$validations[] = $unitsValidation;
+
+			if (!$unitsValidation->hasErrors()) {
+				$calculator->setUnits($unitsValidation->getResponse());
+			}
 		}
 
 		$validation = $validations->getMerged();
@@ -248,7 +290,7 @@ class Calculator
 		if (!in_array($output, ["kJ", "kcal"])) {
 			return (new Validation)->addError((new Error("Invalid units."))->addParam($units));
 		} else {
-			return (new Validation)->addParam($units->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($units->setOutput($output));
 		}
 	}
 
@@ -354,7 +396,7 @@ class Calculator
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid body fat percentage."))->addParam($bodyFatPercentage));
 		} else {
-			return (new Validation)->addParam($bodyFatPercentage->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($bodyFatPercentage->setOutput($output));
 		}
 	}
 

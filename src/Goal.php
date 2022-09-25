@@ -46,7 +46,7 @@ class Goal
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid goal vector code."))->addParam($vector));
 		} else {
-			return (new Validation)->addParam($vector->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($vector->setOutput($output));
 		}
 	}
 
@@ -68,7 +68,7 @@ class Goal
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid goal weight."))->addParam($weight));
 		} else {
-			return (new Validation)->addParam($weight->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($weight->setOutput($output));
 		}
 	}
 

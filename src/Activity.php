@@ -14,7 +14,7 @@ class Activity extends Amount
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalida activity."))->addParam($activity));
 		} else {
-			return (new Validation)->addParam($activity->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($activity->setOutput($output));
 		}
 	}
 }

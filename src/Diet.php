@@ -27,7 +27,7 @@ class Diet
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid diet approach."))->addParam($approach));
 		} else {
-			return (new Validation)->addParam($approach->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($approach->setOutput($output));
 		}
 	}
 
@@ -49,7 +49,7 @@ class Diet
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid diet carbs."))->addParam($carbs));
 		} else {
-			return (new Validation)->addParam($carbs->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($carbs->setOutput($output));
 		}
 	}
 
