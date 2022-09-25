@@ -77,15 +77,30 @@ class Calculator
 		}
 
 		if (trim($params["proportions_waist"] ?? null)) {
-			$validations[] = Proportions::validateWaist(new Param("proportions_waist", $params["proportions_waist"]));
+			$waistValidation = Proportions::validateWaist(new Param("proportions_waist", $params["proportions_waist"]));
+			$validations[] = $waistValidation;
+
+			if (!$waistValidation->hasErrors()) {
+				$calculator->getProportions()->setWaist($waistValidation->getResponse());
+			}
 		}
 
 		if (trim($params["proportions_hips"] ?? null)) {
-			$validations[] = Proportions::validateHips(new Param("proportions_hips", $params["proportions_hips"]));
+			$hipsValidation = Proportions::validateHips(new Param("proportions_hips", $params["proportions_hips"]));
+			$validations[] = $hipsValidation;
+
+			if (!$hipsValidation->hasErrors()) {
+				$calculator->getProportions()->setHips($hipsValidation->getResponse());
+			}
 		}
 
 		if (trim($params["proportions_neck"] ?? null)) {
-			$validations[] = Proportions::validateNeck(new Param("proportions_neck", $params["proportions_neck"]));
+			$neckValidation = Proportions::validateNeck(new Param("proportions_neck", $params["proportions_neck"]));
+			$validations[] = $neckValidation;
+
+			if (!$neckValidation->hasErrors()) {
+				$calculator->getProportions()->setNeck($neckValidation->getResponse());
+			}
 		}
 
 		if (trim($params["bodyFatPercentage"] ?? null)) {

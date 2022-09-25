@@ -63,7 +63,7 @@ class Proportions
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid waist."))->addParam($waist));
 		} else {
-			return (new Validation)->addParam($waist->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($waist->setOutput($output));
 		}
 	}
 
@@ -88,7 +88,7 @@ class Proportions
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid hips."))->addParam($hips));
 		} else {
-			return (new Validation)->addParam($hips->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($hips->setOutput($output));
 		}
 	}
 
@@ -113,7 +113,7 @@ class Proportions
 		if (!$output) {
 			return (new Validation)->addError((new Error("Invalid neck."))->addParam($neck));
 		} else {
-			return (new Validation)->addParam($neck->setOutput($output));
+			return (new Validation)->setResponse($output)->addParam($neck->setOutput($output));
 		}
 	}
 
