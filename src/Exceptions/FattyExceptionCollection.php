@@ -3,6 +3,7 @@
 namespace Fatty\Exceptions;
 
 use Katu\Errors\ErrorCollection;
+use Katu\Types\TClass;
 
 class FattyExceptionCollection extends \Fatty\Exceptions\FattyException
 {
@@ -10,7 +11,7 @@ class FattyExceptionCollection extends \Fatty\Exceptions\FattyException
 
 	public function addException(FattyException $exception): FattyExceptionCollection
 	{
-		$this->exceptions[] = $exception;
+		$this->exceptions[(new TClass($exception))->getPortableName()] = $exception;
 
 		return $this;
 	}
