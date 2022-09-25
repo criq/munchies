@@ -2,6 +2,10 @@
 
 namespace Fatty;
 
+use Katu\Errors\Error;
+use Katu\Tools\Validation\Param;
+use Katu\Tools\Validation\Validation;
+
 class Weight extends Quantity
 {
 	const BASE_UNIT = "g";
@@ -9,6 +13,16 @@ class Weight extends Quantity
 	public function __construct(Amount $amount, string $unit)
 	{
 		return parent::__construct($amount, $unit);
+	}
+
+	public static function validateWeight(Param $weight): Validation
+	{
+		$output = Weight::createFromString($weight, "kg");
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid weight."))->addParam($weight));
+		} else {
+			return (new Validation)->addParam($weight->setOutput($output));
+		}
 	}
 
 	public function getInBaseUnit(): Weight

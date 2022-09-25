@@ -4,6 +4,9 @@ namespace Fatty;
 
 use Fatty\Exceptions\MissingHeightException;
 use Fatty\Metrics\QuantityMetric;
+use Katu\Errors\Error;
+use Katu\Tools\Validation\Param;
+use Katu\Tools\Validation\Validation;
 
 class Proportions
 {
@@ -15,6 +18,16 @@ class Proportions
 	/*****************************************************************************
 	 * Výška
 	 */
+	public static function validateHeight(Param $height): Validation
+	{
+		$output = Length::createFromString($height, "cm");
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid height."))->addParam($height));
+		} else {
+			return (new Validation)->addParam($height->setOutput($output));
+		}
+	}
+
 	public function setHeight(?Length $length): Proportions
 	{
 		$this->height = $length;
@@ -44,6 +57,16 @@ class Proportions
 	/*****************************************************************************
 	 * Obvod pasu.
 	 */
+	public static function validateWaist(Param $waist): Validation
+	{
+		$output = Length::createFromString($waist, "cm");
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid waist."))->addParam($waist));
+		} else {
+			return (new Validation)->addParam($waist->setOutput($output));
+		}
+	}
+
 	public function setWaist(?Length $length): Proportions
 	{
 		$this->waist = $length;
@@ -59,6 +82,16 @@ class Proportions
 	/*****************************************************************************
 	 * Obvod boků.
 	 */
+	public static function validateHips(Param $hips): Validation
+	{
+		$output = Length::createFromString($hips, "cm");
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid hips."))->addParam($hips));
+		} else {
+			return (new Validation)->addParam($hips->setOutput($output));
+		}
+	}
+
 	public function setHips(?Length $length): Proportions
 	{
 		$this->hips = $length;
@@ -74,6 +107,16 @@ class Proportions
 	/*****************************************************************************
 	 * Obvod krku.
 	 */
+	public static function validateNeck(Param $neck): Validation
+	{
+		$output = Length::createFromString($neck, "cm");
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid neck."))->addParam($neck));
+		} else {
+			return (new Validation)->addParam($neck->setOutput($output));
+		}
+	}
+
 	public function setNeck(?Length $length): Proportions
 	{
 		$this->neck = $length;

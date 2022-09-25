@@ -6,6 +6,9 @@ use Fatty\Exceptions\InvalidDietCarbsException;
 use Fatty\Exceptions\MissingDietApproachException;
 use Fatty\Metrics\StringMetric;
 use Fatty\Nutrients\Carbs;
+use Katu\Errors\Error;
+use Katu\Tools\Validation\Param;
+use Katu\Tools\Validation\Validation;
 
 class Diet
 {
@@ -18,6 +21,16 @@ class Diet
 		$this->setApproach($approach);
 	}
 
+	public static function validateApproach(Param $approach): Validation
+	{
+		$output = Approach::createFromCode($approach);
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid diet approach."))->addParam($approach));
+		} else {
+			return (new Validation)->addParam($approach->setOutput($output));
+		}
+	}
+
 	public function setApproach(?Approach $value): Diet
 	{
 		$this->approach = $value;
@@ -28,6 +41,16 @@ class Diet
 	public function getApproach(): ?Approach
 	{
 		return $this->approach;
+	}
+
+	public static function validateCarbs(Param $carbs): Validation
+	{
+		$output = Carbs::createFromString($carbs, "g");
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid diet carbs."))->addParam($carbs));
+		} else {
+			return (new Validation)->addParam($carbs->setOutput($output));
+		}
 	}
 
 	public function setCarbs(Carbs $carbs): Diet

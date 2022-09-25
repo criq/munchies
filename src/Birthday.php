@@ -2,6 +2,10 @@
 
 namespace Fatty;
 
+use Katu\Errors\Error;
+use Katu\Tools\Validation\Param;
+use Katu\Tools\Validation\Validation;
+
 class Birthday
 {
 	private $datetime;
@@ -21,6 +25,16 @@ class Birthday
 			return new static($datetime);
 		} catch (\Throwable $e) {
 			return null;
+		}
+	}
+
+	public static function validateBirthday(Param $birthday): Validation
+	{
+		$output = static::createFromString($birthday);
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid birthday."))->addParam($birthday));
+		} else {
+			return (new Validation)->addParam($birthday->setOutput($output));
 		}
 	}
 

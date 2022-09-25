@@ -3,6 +3,9 @@
 namespace Fatty;
 
 use Fatty\Metrics\AmountMetric;
+use Katu\Errors\Error;
+use Katu\Tools\Validation\Param;
+use Katu\Tools\Validation\Validation;
 
 abstract class Vector
 {
@@ -10,8 +13,6 @@ abstract class Vector
 	const LABEL_INFINITIVE = "";
 	const TDEE_QUOTIENT = null;
 	const WEIGHT_CHANGE_PER_WEEK = "";
-
-	// abstract public function calcTdeeChangePerDay(Calculator $calculator): QuantityMetric;
 
 	public function __toString()
 	{
@@ -51,21 +52,6 @@ abstract class Vector
 			"kg",
 		);
 	}
-
-	// public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetric
-	// {
-	// 	$weightGoalEnergyExpenditureValue = $calculator->calcWeightGoalEnergyExpenditure()->getResult()->getInBaseUnit()->getAmount()->getValue();
-	// 	$tdeeChangePerDayValue = $this->calcTdeeChangePerDay($calculator)->getResult()->getInBaseUnit()->getAmount()->getValue();
-
-	// 	$result = new Energy(
-	// 		new Amount(
-	// 			$weightGoalEnergyExpenditureValue + $tdeeChangePerDayValue
-	// 		),
-	// 		Energy::getBaseUnit(),
-	// 	);
-
-	// 	return new QuantityMetric("weightGoalEnergyExpenditure", $result);
-	// }
 
 	public function getLabelInfinitive(): string
 	{

@@ -8,6 +8,9 @@ use Fatty\Exceptions\MissingGoalWeightException;
 use Fatty\Exceptions\MissingWeightException;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
+use Katu\Errors\Error;
+use Katu\Tools\Validation\Param;
+use Katu\Tools\Validation\Validation;
 
 class Goal
 {
@@ -37,6 +40,16 @@ class Goal
 		return new QuantityMetric("goalDuration", $duration);
 	}
 
+	public static function validateVector(Param $vector): Validation
+	{
+		$output = Vector::createFromCode($vector);
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid goal vector code."))->addParam($vector));
+		} else {
+			return (new Validation)->addParam($vector->setOutput($output));
+		}
+	}
+
 	public function setVector(?Vector $value): Goal
 	{
 		$this->vector = $value;
@@ -47,6 +60,16 @@ class Goal
 	public function getVector(): ?Vector
 	{
 		return $this->vector;
+	}
+
+	public static function validateWeight(Param $weight): Validation
+	{
+		$output = Weight::createFromString($weight, "kg");
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid goal weight."))->addParam($weight));
+		} else {
+			return (new Validation)->addParam($weight->setOutput($output));
+		}
 	}
 
 	public function setWeight(?Weight $weight): Goal

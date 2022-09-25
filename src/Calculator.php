@@ -6,9 +6,11 @@ use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Nutrients\Carbs;
-use Fatty\SportDurations\Aerobic;
-use Fatty\SportDurations\Anaerobic;
-use Fatty\SportDurations\LowFrequency;
+use Katu\Errors\Error;
+use Katu\Tools\Validation\Param;
+use Katu\Tools\Validation\Validation;
+use Katu\Tools\Validation\ValidationCollection;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Calculator
 {
@@ -26,187 +28,75 @@ class Calculator
 	protected $weight;
 	protected $weightHistory;
 
+	// Posílat už zvalidovaný parametry.
 	public function __construct(?array $params = [])
 	{
 		$this->setParams($params);
 	}
 
-	public function setParams(array $params): Calculator
+	public static function createFromRequest(ServerRequestInterface $request): Validation
 	{
-		$this->params = $params;
-
-		$exceptionCollection = new \Fatty\Exceptions\FattyExceptionCollection;
+		$validations = new ValidationCollection;
+		$params = $request->getQueryParams();
 
 		if (trim($params["gender"] ?? null)) {
-			try {
-				$value = \Fatty\Gender::createFromString($params["gender"]);
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidGenderException;
-				}
-
-				$this->setGender($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = Gender::validateGender(new Param("gender", $params["gender"]));
 		}
 
 		if (trim($params["birthday"] ?? null)) {
-			try {
-				$value = \Fatty\Birthday::createFromString($params["birthday"]);
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidBirthdayException;
-				}
-
-				$this->setBirthday($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = Birthday::validateBirthday(new Param("birthday", $params["birthday"]));
 		}
 
 		if (trim($params["weight"] ?? null)) {
-			try {
-				$value = Weight::createFromString($params["weight"], "kg");
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidWeightException;
-				}
-
-				$this->setWeight($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = Weight::validateWeight(new Param("weight", $params["weight"]));
 		}
 
 		if (trim($params["proportions_height"] ?? null)) {
-			try {
-				$value = Length::createFromString($params["proportions_height"], "cm");
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidHeightException;
-				}
-
-				$this->getProportions()->setHeight($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = Proportions::validateHeight(new Param("proportions_height", $params["proportions_height"]));
+			// $this->getProportions()->setHeight($value);
 		}
 
 		if (trim($params["proportions_waist"] ?? null)) {
-			try {
-				$value = Length::createFromString($params["proportions_waist"], "cm");
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidWaistException;
-				}
-
-				$this->getProportions()->setWaist($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = Proportions::validateWaist(new Param("proportions_waist", $params["proportions_waist"]));
 		}
 
 		if (trim($params["proportions_hips"] ?? null)) {
-			try {
-				$value = Length::createFromString($params["proportions_hips"], "cm");
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidHipsException;
-				}
-
-				$this->getProportions()->setHips($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = Proportions::validateHips(new Param("proportions_hips", $params["proportions_hips"]));
 		}
 
 		if (trim($params["proportions_neck"] ?? null)) {
-			try {
-				$value = Length::createFromString($params["proportions_neck"], "cm");
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidNeckException;
-				}
-
-				$this->getProportions()->setNeck($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = Proportions::validateNeck(new Param("proportions_neck", $params["proportions_neck"]));
 		}
 
 		if (trim($params["bodyFatPercentage"] ?? null)) {
-			try {
-				$value = Percentage::createFromPercent($params["bodyFatPercentage"]);
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidBodyFatPercentageException;
-				}
-
-				$this->setBodyFatPercentage($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = static::validateBodyFatPercentage(new Param("bodyFatPercentage", $params["bodyFatPercentage"]));
+			// $this->setBodyFatPercentage($value);
 		}
 
 		if (trim($params["activity"] ?? null)) {
-			try {
-				$value = Activity::createFromString($params["activity"]);
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidActivityException;
-				}
-
-				$this->setActivity($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = Activity::validateActivity(new Param("activity", $params["activity"]));
+			// $this->setActivity($value);
 		}
 
 		if (trim($params["sportDurations_lowFrequency"] ?? null)) {
-			try {
-				$value = LowFrequency::createFromString($params["sportDurations_lowFrequency"], "minutesPerWeek");
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidSportDurationsLowFrequencyException;
-				}
-
-				$this->getSportDurations()->setLowFrequency($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = SportDurations::validateLowFrequency(new Param("sportDurations_lowFrequency", $params["sportDurations_lowFrequency"]));
+			// $this->getSportDurations()->setLowFrequency($value);
 		}
 
 		if (trim($params["sportDurations_aerobic"] ?? null)) {
-			try {
-				$value = Aerobic::createFromString($params["sportDurations_aerobic"], "minutesPerWeek");
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidSportDurationsAerobicException;
-				}
-
-				$this->getSportDurations()->setAerobic($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = SportDurations::validateAerobic(new Param("sportDurations_aerobic", $params["sportDurations_aerobic"]));
 		}
 
 		if (trim($params["sportDurations_anaerobic"] ?? null)) {
-			try {
-				$value = Anaerobic::createFromString($params["sportDurations_anaerobic"], "minutesPerWeek");
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidSportDurationsAnaerobicException;
-				}
-
-				$this->getSportDurations()->setAnaerobic($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = SportDurations::validateAerobic(new Param("sportDurations_anaerobic", $params["sportDurations_anaerobic"]));
 		}
-
-		$this->getGoal()->setDuration(new Duration(new Amount(12), "weeks"));
 
 		if (trim($params["goal_vector"] ?? null)) {
-			try {
-				$value = Vector::createFromCode($params["goal_vector"]);
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidGoalVectorException;
-				}
-
-				$this->getGoal()->setVector($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = Goal::validateVector(new Param("goal_vector", $params["goal_vector"]));
+			// $this->getGoal()->setVector($value);
 		}
+
+		// $this->getGoal()->setDuration(new Duration(new Amount(12), "weeks"));
 
 		try {
 			$goalWeightString = trim($params["goal_weight"] ?? null);
@@ -221,29 +111,13 @@ class Calculator
 		}
 
 		if ($goalWeightString) {
-			try {
-				$value = Weight::createFromString($goalWeightString, "kg");
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidGoalWeightException;
-				}
-
-				$this->getGoal()->setWeight($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = Goal::validateWeight(new Param("goal_weight", $goalWeightString));
+			// $this->getGoal()->setWeight($value);
 		}
 
 		if (trim($params["diet_approach"] ?? null)) {
-			try {
-				$value = Approach::createFromCode($params["diet_approach"]);
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidDietApproachException;
-				}
-
-				$this->getDiet()->setApproach($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = Diet::validateApproach(new Param("diet_approach", $params["diet_approach"]));
+			// $this->getDiet()->setApproach($value);
 		}
 
 		try {
@@ -259,63 +133,21 @@ class Calculator
 		}
 
 		if ($dietCarbsString) {
-			try {
-				$value = Carbs::createFromString($dietCarbsString, "g");
-				if (!$value) {
-					throw new \Fatty\Exceptions\InvalidDietCarbsException;
-				}
-
-				$this->getDiet()->setCarbs($value);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = Diet::validateCarbs(new Param("diet_carbs", $dietCarbsString));
+			// $this->getDiet()->setCarbs($value);
 		}
-
-		// if ($this->getGender() instanceof \App\Classes\Profile\Genders\Female) {
-		// 	if (isset($params["pregnancyIsPregnant"]) && $params["pregnancyIsPregnant"]) {
-		// 		$this->getGender()->setIsPregnant(true);
-
-		// 		if (isset($params["pregnancyChildbirthDate"])) {
-		// 			try {
-		// 				$this->getGender()->setPregnancyChildbirthDate($params["pregnancyChildbirthDate"]);
-		// 			} catch (\Fatty\Exceptions\FattyException $e) {
-		// 				$exceptionCollection->add($e);
-		// 			}
-		// 		}
-		// 	}
-
-		// 	if (isset($params["breastfeedingIsBreastfeeding"]) && $params["breastfeedingIsBreastfeeding"]) {
-		// 		$this->getGender()->setIsBreastfeeding(true);
-
-		// 		if (isset($params["breastfeeding"]["childbirthDate"])) {
-		// 			try {
-		// 				$this->getGender()->setBreastfeedingChildbirthDate($params["breastfeeding"]["childbirthDate"]);
-		// 			} catch (\Fatty\Exceptions\FattyException $e) {
-		// 				$exceptionCollection->add($e);
-		// 			}
-		// 		}
-
-		// 		if (isset($params["breastfeedingMode"])) {
-		// 			try {
-		// 				$this->getGender()->setBreastfeedingMode($params["breastfeedingMode"]);
-		// 			} catch (\Fatty\Exceptions\FattyException $e) {
-		// 				$exceptions->add($e);
-		// 			}
-		// 		}
-		// 	}
-		// }
 
 		if (trim($params["units"] ?? null)) {
-			try {
-				$this->setUnits($params["units"]);
-			} catch (\Fatty\Exceptions\FattyException $e) {
-				$exceptionCollection->add($e);
-			}
+			$validations[] = static::validateUnits(new Param("units", $params["units"]));
+			// $this->setUnits($params["units"]);
 		}
 
-		if (count($exceptionCollection)) {
-			throw $exceptionCollection;
-		}
+		return $validations->getMerged();
+	}
+
+	public function setParams(array $params): Calculator
+	{
+		$this->params = $params;
 
 		return $this;
 	}
@@ -370,12 +202,18 @@ class Calculator
 	/*****************************************************************************
 	 * Units.
 	 */
+	public static function validateUnits(Param $units): Validation
+	{
+		$output = trim($units);
+		if (!in_array($output, ["kJ", "kcal"])) {
+			return (new Validation)->addError((new Error("Invalid units."))->addParam($units));
+		} else {
+			return (new Validation)->addParam($units->setOutput($output));
+		}
+	}
+
 	public function setUnits(string $value): Calculator
 	{
-		if (!in_array($value, ["kJ", "kcal"])) {
-			throw new \Fatty\Exceptions\InvalidUnitsException;
-		}
-
 		$this->units = $value;
 
 		return $this;
@@ -470,6 +308,16 @@ class Calculator
 	/*****************************************************************************
 	 * Body fat percentage.
 	 */
+	public static function validateBodyFatPercentage(Param $bodyFatPercentage): Validation
+	{
+		$output = Percentage::createFromPercent($bodyFatPercentage);
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid body fat percentage."))->addParam($bodyFatPercentage));
+		} else {
+			return (new Validation)->addParam($bodyFatPercentage->setOutput($output));
+		}
+	}
+
 	public function setBodyFatPercentage(?Percentage $value): Calculator
 	{
 		$this->bodyFatPercentage = $value;

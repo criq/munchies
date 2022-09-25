@@ -6,6 +6,9 @@ use Fatty\Metrics\AmountMetric;
 use Fatty\SportDurations\Aerobic;
 use Fatty\SportDurations\Anaerobic;
 use Fatty\SportDurations\LowFrequency;
+use Katu\Errors\Error;
+use Katu\Tools\Validation\Param;
+use Katu\Tools\Validation\Validation;
 
 class SportDurations
 {
@@ -14,6 +17,16 @@ class SportDurations
 	private $aerobic;
 	private $anaerobic;
 	private $lowFrequency;
+
+	public static function validateLowFrequency(Param $lowFrequency): Validation
+	{
+		$output = LowFrequency::createFromString($lowFrequency, "minutesPerWeek");
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid amount of low frequency activity."))->addParam($lowFrequency));
+		} else {
+			return (new Validation)->addParam($lowFrequency->setOutput($output));
+		}
+	}
 
 	public function setLowFrequency(?LowFrequency $value): SportDurations
 	{
@@ -27,6 +40,16 @@ class SportDurations
 		return $this->lowFrequency;
 	}
 
+	public static function validateAerobic(Param $aerobic): Validation
+	{
+		$output = Aerobic::createFromString($aerobic, "minutesPerWeek");
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid amount of aerobic activity."))->addParam($aerobic));
+		} else {
+			return (new Validation)->addParam($aerobic->setOutput($output));
+		}
+	}
+
 	public function setAerobic(?Aerobic $value): SportDurations
 	{
 		$this->aerobic = $value;
@@ -37,6 +60,16 @@ class SportDurations
 	public function getAerobic(): ?SportDuration
 	{
 		return $this->aerobic;
+	}
+
+	public static function validateAnaerobic(Param $anaerobic): Validation
+	{
+		$output = Anaerobic::createFromString($anaerobic, "minutesPerWeek");
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid amount of anaerobic activity."))->addParam($anaerobic));
+		} else {
+			return (new Validation)->addParam($anaerobic->setOutput($output));
+		}
 	}
 
 	public function setAnaerobic(?Anaerobic $value): SportDurations

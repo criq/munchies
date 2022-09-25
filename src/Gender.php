@@ -6,6 +6,9 @@ use Fatty\Exceptions\MissingBodyFatPercentageInputException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
+use Katu\Errors\Error;
+use Katu\Tools\Validation\Param;
+use Katu\Tools\Validation\Validation;
 
 abstract class Gender
 {
@@ -29,6 +32,16 @@ abstract class Gender
 			return new $class;
 		} catch (\Throwable $e) {
 			return null;
+		}
+	}
+
+	public static function validateGender(Param $gender): Validation
+	{
+		$output = \Fatty\Gender::createFromString((string)$gender);
+		if (!$output) {
+			return (new Validation)->addError((new Error("Invalid gender."))->addParam($gender));
+		} else {
+			return (new Validation)->addParam($gender->setOutput($output));
 		}
 	}
 
