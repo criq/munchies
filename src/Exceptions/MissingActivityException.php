@@ -7,6 +7,6 @@ class MissingActivityException extends FattyException
 	public function __construct()
 	{
 		$this->message = "Chybějící úroveň aktivity.";
-		$this->names = ['activity'];
+		$this->paramKeys = ['activity'];
 	}
 }

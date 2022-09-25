@@ -7,6 +7,6 @@ class MissingWeightException extends FattyException
 	public function __construct()
 	{
 		$this->message = "Chybějící hmotnost.";
-		$this->names = ['weight'];
+		$this->paramKeys = ['weight'];
 	}
 }

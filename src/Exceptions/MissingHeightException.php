@@ -7,6 +7,6 @@ class MissingHeightException extends FattyException
 	public function __construct()
 	{
 		$this->message = "Chybějící výška.";
-		$this->names = ['proportions_height'];
+		$this->paramKeys = ['proportions_height'];
 	}
 }

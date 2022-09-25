@@ -7,14 +7,14 @@ use Katu\Tools\Validation\Param;
 
 class FattyException extends \Exception
 {
-	protected $names = [];
+	protected $paramKeys = [];
 
 	public function getError(): Error
 	{
 		$error = new Error($this->getMessage());
 
-		foreach ($this->names as $name) {
-			$error->addParam(new Param($name));
+		foreach ($this->paramKeys as $paramKey) {
+			$error->addParam(new Param($paramKey));
 		}
 
 		return $error;
