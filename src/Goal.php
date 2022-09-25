@@ -135,14 +135,4 @@ class Goal
 
 		return new QuantityMetric("goalWeight", $this->getWeight());
 	}
-
-	// public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetric
-	// {
-	// 	$vector = $this->getVector();
-	// 	if (!$vector) {
-	// 		throw new MissingGoalVectorException;
-	// 	}
-
-	// 	return $vector->calcWeightGoalEnergyExpenditure($calculator);
-	// }
 }

@@ -537,7 +537,7 @@ class Calculator implements RestResponseInterface
 		$sportActivityValue = $sportActivity->getResult()->getValue();
 
 		$result = new Activity($activityValue + $sportActivityValue);
-		$formula = "activityPal[" . $activityValue . "] + sportPal[" . $sportActivityValue . "] = " . $result->getValue();
+		$formula = "activityPal[{$activityValue}] + sportPal[{$sportActivityValue}] = {$result->getValue()}";
 
 		return new AmountMetric("physicalActivityLevel", $result, $formula);
 	}
@@ -594,8 +594,8 @@ class Calculator implements RestResponseInterface
 		$resultValue = $weight / pow($height, 2);
 		$result = new Amount($resultValue);
 		$formula = "
-			weight[" . $weight . "] / pow(height[" . $height . "], 2)
-			= " . $weight . " / " . (pow($height, 2)) . "
+			weight[{$weight}] / pow(height[{$height}], 2)
+			= {$weight} / " . (pow($height, 2)) . "
 			= {$resultValue}
 		";
 
@@ -632,7 +632,7 @@ class Calculator implements RestResponseInterface
 		$hips = $this->getProportions()->getHips()->getInUnit("cm")->getAmount()->getValue();
 
 		$result = new Amount($waist / $hips);
-		$formula = "waist[" . $waist . "] / hips[" . $hips . "] = " . $result->getValue();
+		$formula = "waist[{$waist}] / hips[{$hips}] = {$result->getValue()}";
 
 		return new AmountMetric("waistHipRatio", $result, $formula);
 	}
