@@ -5,14 +5,15 @@ namespace Fatty;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
-use Fatty\Nutrients\Carbs;
 use Katu\Errors\Error;
+use Katu\Tools\Rest\RestResponse;
+use Katu\Tools\Rest\RestResponseInterface;
 use Katu\Tools\Validation\Param;
 use Katu\Tools\Validation\Validation;
 use Katu\Tools\Validation\ValidationCollection;
 use Psr\Http\Message\ServerRequestInterface;
 
-class Calculator
+class Calculator implements RestResponseInterface
 {
 	protected $activity;
 	protected $birthday;
@@ -27,12 +28,6 @@ class Calculator
 	protected $units = "kJ";
 	protected $weight;
 	protected $weightHistory;
-
-	// Posílat už zvalidovaný parametry.
-	public function __construct(?array $params = [])
-	{
-		$this->setParams($params);
-	}
 
 	public static function createFromRequest(ServerRequestInterface $request): Validation
 	{
@@ -239,7 +234,7 @@ class Calculator
 		return $this->params;
 	}
 
-	public static function getDeviation($value, $ideal, $extremes): Amount
+	public static function getDeviation(float $value, float $ideal, array $extremes): Amount
 	{
 		try {
 			$deviation = $value - $ideal;
@@ -1439,5 +1434,10 @@ class Calculator
 		$res["output"]["metrics"] = $metricCollection->getSorted()->getResponse($locale);
 
 		return $res;
+	}
+
+	public function getRestResponse(): RestResponse
+	{
+		return new RestResponse($this->getResponse());
 	}
 }

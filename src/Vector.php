@@ -3,9 +3,6 @@
 namespace Fatty;
 
 use Fatty\Metrics\AmountMetric;
-use Katu\Errors\Error;
-use Katu\Tools\Validation\Param;
-use Katu\Tools\Validation\Validation;
 
 abstract class Vector
 {
