@@ -11,7 +11,13 @@ class FattyExceptionCollection extends \Fatty\Exceptions\FattyException
 
 	public function addException(FattyException $exception): FattyExceptionCollection
 	{
-		$this->exceptions[(new TClass($exception))->getPortableName()] = $exception;
+		if ($exception instanceof static) {
+			foreach ($exception->getExceptions() as $e) {
+				$this->addException($e);
+			}
+		} else {
+			$this->exceptions[(new TClass($exception))->getPortableName()] = $exception;
+		}
 
 		return $this;
 	}

@@ -14,7 +14,6 @@ use Fatty\BreastfeedingModes\Partial;
 use Fatty\Calculator;
 use Fatty\Energy;
 use Fatty\Exceptions\BreastfeedingChildbirthDateInFutureException;
-use Fatty\Exceptions\FattyExceptionCollection;
 use Fatty\Exceptions\InvalidBreastfeedingChildbirthDateException;
 use Fatty\Exceptions\InvalidPregnancyChildbirthDateException;
 use Fatty\Exceptions\MissingBreastfeedingChildbirthDateException;
@@ -158,22 +157,22 @@ class Female extends \Fatty\Gender
 	 */
 	public function calcReferenceDailyIntakeBonus(): QuantityMetric
 	{
-		$exceptionCollection = new FattyExceptionCollection;
+		$exceptions = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		try {
 			$referenceDailyIntakeBonusPregnancy = $this->calcReferenceDailyIntakeBonusPregnancy();
 		} catch (\Throwable $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
 		try {
 			$referenceDailyIntakeBonusBreastfeeding = $this->calcReferenceDailyIntakeBonusBreastfeeding();
 		} catch (\Throwable $e) {
-			$exceptionCollection->add($e);
+			$exceptions->addException($e);
 		}
 
-		if (count($exceptionCollection)) {
-			throw $exceptionCollection;
+		if ($exceptions->hasExceptions()) {
+			throw $exceptions;
 		}
 
 		$result = new Energy(
@@ -210,22 +209,22 @@ class Female extends \Fatty\Gender
 
 	public function calcReferenceDailyIntakeBonusBreastfeeding(): QuantityMetric
 	{
-		$exceptionCollection = new FattyExceptionCollection;
+		$exceptions = new \Fatty\Exceptions\FattyExceptionCollection;
 
 		if (!$this->isBreastfeeding()) {
 			return new QuantityMetric("referenceDailyIntakeBonusBreastfeeding", new Energy(new Amount(0), "kJ"));
 		}
 
 		if (!($this->getBreastfeedingChildbirthDate() instanceof Birthday)) {
-			$exceptionCollection->add(new MissingBreastfeedingChildbirthDateException);
+			$exceptions->addException(new MissingBreastfeedingChildbirthDateException);
 		}
 
 		if (!($this->getBreastfeedingMode() instanceof BreastfeedingMode)) {
-			$exceptionCollection->add(new MissingBreastfeedingModeException);
+			$exceptions->addException(new MissingBreastfeedingModeException);
 		}
 
-		if (count($exceptionCollection)) {
-			throw $exceptionCollection;
+		if ($exceptions->hasExceptions()) {
+			throw $exceptions;
 		}
 
 		$diff = $this->getBreastfeedingChildbirthDate()->diff(new \DateTime);
