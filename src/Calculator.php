@@ -1444,7 +1444,7 @@ class Calculator implements RestResponseInterface
 		return $res;
 	}
 
-	public function getRestResponse(): RestResponse
+	public function getRestResponse(?ServerRequestInterface $request = null): RestResponse
 	{
 		return new RestResponse($this->getResponse());
 	}
