@@ -39,7 +39,7 @@ class Standard extends \Fatty\Approach
 					Energy::getBaseUnit(),
 				),
 			));
-		} elseif ($calculator->getGender() instanceof Female && ($calculator->getGender()->isPregnant() || $calculator->getGender()->isBreastfeeding())) {
+		} elseif ($calculator->getGender() instanceof Female && ($calculator->getGender()->getIsPregnant() || $calculator->getGender()->isBreastfeeding())) {
 			$nutrients->setFats(
 				Fats::createFromEnergy(
 					new Energy(

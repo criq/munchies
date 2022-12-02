@@ -112,7 +112,7 @@ abstract class Approach
 
 		$proteins = new Nutrients\Proteins(new Amount($resultValue), "g");
 
-		if ($calculator->getGender()->isPregnant() || $calculator->getGender()->isBreastfeeding()) {
+		if ($calculator->getGender()->getIsPregnant() || $calculator->getGender()->isBreastfeeding()) {
 			$proteins = new Nutrients\Proteins(new Amount($proteins->getInUnit("g")->getAmount()->getValue() + 20), "g");
 		}
 

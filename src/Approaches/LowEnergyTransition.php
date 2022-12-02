@@ -139,7 +139,7 @@ class LowEnergyTransition extends \Fatty\Approach
 
 		// Tuky a sacharidy.
 		// TODO
-		if (false && $calculator->getGender() instanceof Female && $calculator->getGender()->isPregnant()) {
+		if (false && $calculator->getGender() instanceof Female && $calculator->getGender()->getIsPregnant()) {
 		// TODO
 		} elseif (false && $calculator->getGender() instanceof Female && $calculator->getGender()->isBreastfeeding()) {
 		} else {

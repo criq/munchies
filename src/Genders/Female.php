@@ -12,19 +12,16 @@ use Fatty\BreastfeedingMode;
 use Fatty\BreastfeedingModes\Full;
 use Fatty\BreastfeedingModes\Partial;
 use Fatty\Calculator;
+use Fatty\ChildCollection;
 use Fatty\Energy;
-use Fatty\Exceptions\BreastfeedingChildbirthDateInFutureException;
-use Fatty\Exceptions\InvalidBreastfeedingChildbirthDateException;
-use Fatty\Exceptions\InvalidPregnancyChildbirthDateException;
 use Fatty\Exceptions\MissingBreastfeedingChildbirthDateException;
 use Fatty\Exceptions\MissingBreastfeedingModeException;
 use Fatty\Exceptions\MissingPregnancyChildbirthDateException;
-use Fatty\Exceptions\PregnancyChildbirthDateInPastException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Percentage;
-use Fatty\Weight;
+use Fatty\Pregnancy;
 
 class Female extends \Fatty\Gender
 {
@@ -32,9 +29,8 @@ class Female extends \Fatty\Gender
 	const FIT_BODY_FAT_PERCENTAGE = 0.25;
 	const SPORT_PROTEIN_COEFFICIENT = 1.4;
 
-	protected $isBreastfeeding;
-	protected $isPregnant;
-	protected $weightBeforePregnancy;
+	protected $children;
+	protected $pregnancy;
 
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
@@ -59,104 +55,24 @@ class Female extends \Fatty\Gender
 	/*****************************************************************************
 	 * Těhotenství.
 	 */
-	public function isPregnant(): bool
+	public function setPregnancy(?Pregnancy $pregnancy): Female
+	{
+		$this->pregnancy = $pregnancy;
+
+		return $this;
+	}
+
+	public function getIsPregnant(): bool
 	{
 		return (bool)$this->isPregnant;
-	}
-
-	public function setIsPregnant($isPregnant)
-	{
-		$this->isPregnant = (bool)$isPregnant;
-	}
-
-	public function setPregnancyChildbirthDate($pregnancyChildbirthDate)
-	{
-		if (!$pregnancyChildbirthDate) {
-			throw new MissingPregnancyChildbirthDateException;
-		}
-
-		if (is_string($pregnancyChildbirthDate)) {
-			$pregnancyChildbirthDate = \DateTime::createFromFormat("j.n.Y", $pregnancyChildbirthDate);
-		}
-
-		if ($pregnancyChildbirthDate instanceof \DateTime) {
-			$pregnancyChildbirthDate = new Birthday($pregnancyChildbirthDate);
-		}
-
-		if (!($pregnancyChildbirthDate instanceof Birthday)) {
-			throw new InvalidPregnancyChildbirthDateException;
-		}
-
-		if ($pregnancyChildbirthDate->getBirthday()->isInPast()) {
-			throw new PregnancyChildbirthDateInPastException;
-		}
-
-		$this->pregnancyChildbirthDate = $pregnancyChildbirthDate;
-
-		return $this;
-	}
-
-	public function setWeightBeforePregnancy(?Weight $weight): Female
-	{
-		$this->weightBeforePregnancy = $weight;
-
-		return $this;
 	}
 
 	/*****************************************************************************
 	 * Kojení.
 	 */
-	public function setIsBreastfeeding($isBreastfeeding)
+	public function setChildren(?ChildCollection $children): Female
 	{
-		$this->isBreastfeeding = (bool)$isBreastfeeding;
-	}
-
-	public function isBreastfeeding()
-	{
-		return $this->isBreastfeeding;
-	}
-
-	public function setBreastfeedingChildbirthDate($breastfeedingChildbirthDate)
-	{
-		if (!$breastfeedingChildbirthDate) {
-			throw new MissingBreastfeedingChildbirthDateException;
-		}
-
-		if (is_string($breastfeedingChildbirthDate)) {
-			$breastfeedingChildbirthDate = \DateTime::createFromFormat("j.n.Y", $breastfeedingChildbirthDate);
-		}
-
-		if ($breastfeedingChildbirthDate instanceof \DateTime) {
-			$breastfeedingChildbirthDate = new Birthday($breastfeedingChildbirthDate);
-		}
-
-		if (!($breastfeedingChildbirthDate instanceof Birthday)) {
-			throw new InvalidBreastfeedingChildbirthDateException;
-		}
-
-		if ($breastfeedingChildbirthDate->getBirthday()->isInFuture()) {
-			throw new BreastfeedingChildbirthDateInFutureException;
-		}
-
-		$this->breastfeedingChildbirthDate = $breastfeedingChildbirthDate;
-
-		return $this;
-	}
-
-	public function setBreastfeedingMode($breastfeedingMode)
-	{
-		if (is_string($breastfeedingMode)) {
-			$className = "Fatty\\BreastfeedingModes\\" . ucfirst($breastfeedingMode);
-			if (class_exists($className)) {
-				$breastfeedingMode = new $className;
-			}
-		}
-
-		if (!($breastfeedingMode instanceof BreastfeedingMode)) {
-			throw new InvalidBreastfeedingChildbirthDateException;
-		}
-
-		$this->breastfeedingMode = $breastfeedingMode;
+		$this->children = $children;
 
 		return $this;
 	}
@@ -196,15 +112,15 @@ class Female extends \Fatty\Gender
 
 	public function calcReferenceDailyIntakeBonusPregnancy(): QuantityMetric
 	{
-		if (!$this->isPregnant()) {
+		if (!$this->getIsPregnant()) {
 			return new QuantityMetric("referenceDailyIntakeBonusPregnancy", new Energy(new Amount(0), "kJ"));
 		}
 
-		if (!($this->getPregnancyChildbirthDate() instanceof Birthday)) {
+		if (!($this->getChildbirthDate() instanceof Birthday)) {
 			throw new MissingPregnancyChildbirthDateException;
 		}
 
-		$diff = $this->getPregnancyChildbirthDate()->diff(new \DateTime);
+		$diff = $this->getChildbirthDate()->diff(new \DateTime);
 		if ($diff->days <= 90) {
 			$change = 85;
 		} elseif ($diff->days <= 180) {

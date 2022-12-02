@@ -25,7 +25,7 @@ class Keto extends \Fatty\Approach
 		$wgee = $calculator->calcWeightGoalEnergyExpenditure();
 
 		// TODO
-		if (false && $calculator->getGender() instanceof Female && $calculator->getGender()->isPregnant()) {
+		if (false && $calculator->getGender() instanceof Female && $calculator->getGender()->getIsPregnant()) {
 		// TODO
 		} elseif (false && $calculator->getGender() instanceof Female && $calculator->getGender()->isBreastfeeding()) {
 		} else {

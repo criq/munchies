@@ -49,59 +49,6 @@ abstract class Gender
 		return lcfirst(array_slice(explode("\\", get_called_class()), -1, 1)[0]);
 	}
 
-	/****************************************************************************
-	 * Těhotenství.
-	 */
-	public function isPregnant(): bool
-	{
-		return false;
-	}
-
-	public function setIsPregnant(bool $isPregnant)
-	{
-		return false;
-	}
-
-	public function setPregnancyChildbirthDate($pregnancyChildbirthDate)
-	{
-		return false;
-	}
-
-	public function getPregnancyChildbirthDate()
-	{
-		return $this->pregnancyChildbirthDate;
-	}
-
-	public function isBreastfeeding()
-	{
-		return false;
-	}
-
-	public function setIsBreastfeeding($isBreastfeeding)
-	{
-		return false;
-	}
-
-	public function setBreastfeedingChildbirthDate($breastfeedingChildbirthDate)
-	{
-		return false;
-	}
-
-	public function getBreastfeedingChildbirthDate()
-	{
-		return $this->breastfeedingChildbirthDate;
-	}
-
-	public function setBreastfeedingMode($breastfeedingMode)
-	{
-		return false;
-	}
-
-	public function getBreastfeedingMode()
-	{
-		return $this->breastfeedingMode;
-	}
-
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
 	 */

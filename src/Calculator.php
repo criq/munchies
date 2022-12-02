@@ -1201,14 +1201,14 @@ class Calculator implements RestResponseInterface
 
 		// $res["input"]["pregnancyIsPregnant"] =
 		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
-		// 	&& $this->getGender()->isPregnant()
+		// 	&& $this->getGender()->getIsPregnant()
 		// 		? true : false;
 
-		// $res["input"]["pregnancyChildbirthDate"] =
+		// $res["input"]["childbirthDate"] =
 		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
-		// 	&& $this->getGender()->isPregnant()
-		// 	&& $this->getGender()->getPregnancyChildbirthDate() instanceof \App\Classes\Profile\Birthday
-		// 		? $this->getGender()->getPregnancyChildbirthDate()->getBirthday()->format("Y-m-d") : null;
+		// 	&& $this->getGender()->getIsPregnant()
+		// 	&& $this->getGender()->getChildbirthDate() instanceof \App\Classes\Profile\Birthday
+		// 		? $this->getGender()->getChildbirthDate()->getBirthday()->format("Y-m-d") : null;
 
 		// $res["input"]["breastfeedingIsBreastfeeding"] =
 		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
