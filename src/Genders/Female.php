@@ -24,6 +24,7 @@ use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Percentage;
+use Fatty\Weight;
 
 class Female extends \Fatty\Gender
 {
@@ -31,8 +32,9 @@ class Female extends \Fatty\Gender
 	const FIT_BODY_FAT_PERCENTAGE = 0.25;
 	const SPORT_PROTEIN_COEFFICIENT = 1.4;
 
-	private $isBreastfeeding;
-	private $isPregnant;
+	protected $isBreastfeeding;
+	protected $isPregnant;
+	protected $weightBeforePregnancy;
 
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
@@ -90,6 +92,13 @@ class Female extends \Fatty\Gender
 		}
 
 		$this->pregnancyChildbirthDate = $pregnancyChildbirthDate;
+
+		return $this;
+	}
+
+	public function setWeightBeforePregnancy(?Weight $weight): Female
+	{
+		$this->weightBeforePregnancy = $weight;
 
 		return $this;
 	}
