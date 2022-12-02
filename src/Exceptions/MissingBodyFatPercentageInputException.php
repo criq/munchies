@@ -8,10 +8,11 @@ class MissingBodyFatPercentageInputException extends FattyException
 	{
 		$this->message = "Chybí míry k výpočtu procenta tělesného tuku, nebo jeho přímé zadání.";
 		$this->paramKeys = [
-			'proportions_height',
-			'proportions_neck',
-			'proportions_waist',
-			'bodyFatPercentage',
+			"bodyFatPercentage",
+			"proportions_height",
+			"proportions_hips",
+			"proportions_neck",
+			"proportions_waist",
 		];
 	}
 }

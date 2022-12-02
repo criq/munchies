@@ -132,6 +132,12 @@ abstract class Gender
 			$waist = false;
 		}
 
+		try {
+			$waist = $calculator->getProportions()->getHips();
+		} catch (\Throwable $e) {
+			$waist = false;
+		}
+
 		if ($bodyFatPercentage) {
 			return static::BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT;
 		} elseif ($height && $neck && $waist) {

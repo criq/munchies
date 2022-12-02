@@ -375,6 +375,13 @@ class Calculator implements RestResponseInterface
 	/*****************************************************************************
 	 * Proportions.
 	 */
+	public function setProportions(Proportions $proportions): Calculator
+	{
+		$this->proportions = $proportions;
+
+		return $this;
+	}
+
 	public function getProportions(): Proportions
 	{
 		$this->proportions = $this->proportions instanceof Proportions ? $this->proportions : new Proportions;
@@ -545,6 +552,13 @@ class Calculator implements RestResponseInterface
 	/*****************************************************************************
 	 * Goal.
 	 */
+	public function setGoal(Goal $goal): Calculator
+	{
+		$this->goal = $goal;
+
+		return $this;
+	}
+
 	public function getGoal(): Goal
 	{
 		$this->goal = $this->goal instanceof Goal ? $this->goal : new Goal;
