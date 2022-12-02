@@ -18,7 +18,6 @@ abstract class Gender
 	const FIT_BODY_FAT_PERCENTAGE = null;
 	const SPORT_PROTEIN_COEFFICIENT = null;
 
-	// abstract public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric;
 	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
 	abstract public function calcBodyType(Calculator $calculator): StringMetric;
 	abstract public function getSportProteinMatrix(): array;
@@ -133,14 +132,14 @@ abstract class Gender
 		}
 
 		try {
-			$waist = $calculator->getProportions()->getHips();
+			$hips = $calculator->getProportions()->getHips();
 		} catch (\Throwable $e) {
-			$waist = false;
+			$hips = false;
 		}
 
 		if ($bodyFatPercentage) {
 			return static::BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT;
-		} elseif ($height && $neck && $waist) {
+		} elseif ($height && $neck && $waist && $hips) {
 			return static::BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS;
 		} else {
 			return false;
