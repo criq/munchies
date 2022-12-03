@@ -2,20 +2,22 @@
 
 namespace Fatty;
 
-class DateTimeWeight
+use Katu\Tools\Calendar\Time;
+
+class TimeWeight
 {
-	protected $dateTime;
+	protected $time;
 	protected $weight;
 
-	public function __construct(\DateTime $dateTime, Weight $weight)
+	public function __construct(Time $time, Weight $weight)
 	{
-		$this->dateTime = $dateTime;
+		$this->time = $time;
 		$this->weight = $weight;
 	}
 
-	public function getDateTime(): \DateTime
+	public function getTime(): Time
 	{
-		return $this->dateTime;
+		return $this->time;
 	}
 
 	public function getWeight(): Weight

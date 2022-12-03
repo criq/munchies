@@ -3,20 +3,21 @@
 namespace Fatty\Approaches\LowEnergyTransition;
 
 use Fatty\Weight;
+use Katu\Tools\Calendar\Time;
 
 class LowEnergyTransitionDayCollection extends \ArrayObject
 {
-	public function filterByDate(\DateTime $dateTime): LowEnergyTransitionDayCollection
+	public function filterByDate(Time $time): LowEnergyTransitionDayCollection
 	{
-		return new static(array_values(array_filter($this->getArrayCopy(), function (LowEnergyTransitionDay $day) use ($dateTime) {
-			return $day->getDateTime()->format("Ymd") == $dateTime->format("Ymd");
+		return new static(array_values(array_filter($this->getArrayCopy(), function (LowEnergyTransitionDay $day) use ($time) {
+			return $day->getTime()->format("Ymd") == $time->format("Ymd");
 		})));
 	}
 
-	public function filterBeforeDate(\DateTime $dateTime): LowEnergyTransitionDayCollection
+	public function filterBeforeDate(Time $time): LowEnergyTransitionDayCollection
 	{
-		return new static(array_values(array_filter($this->getArrayCopy(), function (LowEnergyTransitionDay $day) use ($dateTime) {
-			return $day->getDateTime()->format("Ymd") < $dateTime->format("Ymd");
+		return new static(array_values(array_filter($this->getArrayCopy(), function (LowEnergyTransitionDay $day) use ($time) {
+			return $day->getTime()->format("Ymd") < $time->format("Ymd");
 		})));
 	}
 
@@ -27,16 +28,16 @@ class LowEnergyTransitionDayCollection extends \ArrayObject
 		})));
 	}
 
-	public function getPreviousWeightDay(\DateTime $dateTime, Weight $weight): ?LowEnergyTransitionDay
+	public function getPreviousWeightDay(Time $time, Weight $weight): ?LowEnergyTransitionDay
 	{
-		return $this->filterBeforeDate($dateTime)->filterDifferentWeight($weight)->sortByNewest()[0] ?? null;
+		return $this->filterBeforeDate($time)->filterDifferentWeight($weight)->sortByNewest()[0] ?? null;
 	}
 
 	public function sortByOldest(): LowEnergyTransitionDayCollection
 	{
 		$array = $this->getArrayCopy();
 		usort($array, function (LowEnergyTransitionDay $a, LowEnergyTransitionDay $b) {
-			return ($a->getDateTime()->format("Ymd") > $b->getDateTime()->format("Ymd")) ? 1 : -1;
+			return ($a->getTime()->format("Ymd") > $b->getTime()->format("Ymd")) ? 1 : -1;
 		});
 
 		return new static($array);

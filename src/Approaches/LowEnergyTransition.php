@@ -32,31 +32,31 @@ class LowEnergyTransition extends \Fatty\Approach
 		$energyMin = new Energy(new Amount(static::ENERGY_MIN), static::ENERGY_UNIT);
 		$energyStart = new Energy(new Amount(static::ENERGY_DEFAULT), static::ENERGY_UNIT);
 
-		$dateTimeStart = $calculator->getDiet()->getDateTimeStart();
-		$dateTimeEnd = $calculator->getReferenceDate();
-		$dateTime = clone $dateTimeStart;
+		$timeStart = $calculator->getDiet()->getTimeStart();
+		$timeEnd = $calculator->getReferenceDate();
+		$time = clone $timeStart;
 
 		$collection = new LowEnergyTransitionDayCollection;
 
-		while ($dateTime->format("Ymd") <= $dateTimeEnd->format("Ymd")) {
-			$day = new LowEnergyTransitionDay($dateTime);
-			$day->setWeight($calculator->getWeightHistory()->getForDate($dateTime)->getWeight());
+		while ($time->format("Ymd") <= $timeEnd->format("Ymd")) {
+			$day = new LowEnergyTransitionDay($time);
+			$day->setWeight($calculator->getWeightHistory()->getForDate($time)->getWeight());
 
-			if ($dateTimeStart->format("Ymd") == $dateTime->format("Ymd")) {
+			if ($timeStart->format("Ymd") == $time->format("Ymd")) {
 				// First day.
 				$day->setWeightGoalEnergyExpenditure($energyStart);
 				$day->setDaysToIncrease(7);
 			} else {
 				// Other days.
-				$previousDay = $collection->filterByDate((clone $dateTime)->modify("- 1 day"))[0];
-				$previousWeightDay = $collection->getPreviousWeightDay($dateTime, $day->getWeight());
+				$previousDay = $collection->filterByDate((clone $time)->modify("- 1 day"))[0];
+				$previousWeightDay = $collection->getPreviousWeightDay($time, $day->getWeight());
 
 				$day->setDaysToIncrease($previousDay->getDaysToIncrease() - 1);
 
 				// Jedná se o den, kdy se změnila hmotnost a došlo k nárůstu hmotnosti?
 				if ($previousDay
 					&& $previousWeightDay
-					&& $previousDay->getDateTime()->format("Ymd") == $previousWeightDay->getDateTime()->format("Ymd")
+					&& $previousDay->getTime()->format("Ymd") == $previousWeightDay->getTime()->format("Ymd")
 					&& $day->getWeight()->getInUnit("g")->getAmount()->getValue() > $previousWeightDay->getWeight()->getInUnit("g")->getAmount()->getValue()) {
 					// Snížit energii.
 					$decreasedEnergy = $previousDay->getWeightGoalEnergyExpenditure()->modify($energyDecrement);
@@ -97,7 +97,7 @@ class LowEnergyTransition extends \Fatty\Approach
 
 			$collection[] = $day;
 
-			$dateTime = (clone $dateTime)->modify("+ 1 day");
+			$time = (clone $time)->modify("+ 1 day");
 		}
 
 		return $collection->sortByOldest();

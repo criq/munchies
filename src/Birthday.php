@@ -3,26 +3,25 @@
 namespace Fatty;
 
 use Katu\Errors\Error;
+use Katu\Tools\Calendar\Time;
 use Katu\Tools\Validation\Param;
 use Katu\Tools\Validation\Validation;
 
 class Birthday
 {
-	private $datetime;
+	private $time;
 
-	public function __construct(\DateTime $datetime)
+	public function __construct(Time $time)
 	{
-		$this->datetime = $datetime;
+		$this->time = $time;
 	}
 
 	public static function createFromString(string $value): ?Birthday
 	{
 		try {
-			$datetime = \DateTime::createFromFormat("j.*n.*Y", $value);
+			$time = Time::createFromFormat("j.*n.*Y", $value)->setTime(0, 0, 0);
 
-			$datetime->setTime(0, 0, 0);
-
-			return new static($datetime);
+			return new static($time);
 		} catch (\Throwable $e) {
 			return null;
 		}
@@ -38,30 +37,30 @@ class Birthday
 		}
 	}
 
-	public function getDatetime(): \DateTime
+	public function getTime(): Time
 	{
-		return $this->datetime;
+		return $this->time;
 	}
 
 	public function isInPast(): bool
 	{
-		return $this->getDatetime()->getTimestamp() <= (new \DateTime)->getTimestamp();
+		return $this->getTime()->getTimestamp() <= (new Time)->getTimestamp();
 	}
 
 	public function isInFuture(): bool
 	{
-		return $this->getDatetime()->getTimestamp() > (new \DateTime)->getTimestamp();
+		return $this->getTime()->getTimestamp() > (new Time)->getTimestamp();
 	}
 
 	public function getAge(): float
 	{
-		return $this->getDatetime()->diff(new \DateTime)->y;
+		return $this->getTime()->diff(new Time)->y;
 	}
 
 	public function diff(): ?\DateInterval
 	{
 		try {
-			return $this->getDatetime()->diff(...func_get_args());
+			return $this->getTime()->diff(...func_get_args());
 		} catch (\Throwable $e) {
 			return null;
 		}

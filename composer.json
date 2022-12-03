@@ -10,7 +10,7 @@
 		}
 	],
 	"require" : {
-		"criq/katu": "^4.20221013.1",
+		"criq/katu": "^4",
 		"criq/effekt": "^4"
 	},
 	"autoload": {

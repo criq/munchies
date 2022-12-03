@@ -2,34 +2,36 @@
 
 namespace Fatty;
 
+use Katu\Tools\Calendar\Time;
+
 class WeightHistory extends \ArrayObject
 {
-	public function filterByDate(\DateTime $dateTime): WeightHistory
+	public function filterByDate(Time $time): WeightHistory
 	{
-		return new static(array_values(array_filter($this->getArrayCopy(), function (DateTimeWeight $dateTimeWeight) use ($dateTime) {
-			return $dateTimeWeight->getDateTime()->format("Ymd") == $dateTime->format("Ymd");
+		return new static(array_values(array_filter($this->getArrayCopy(), function (TimeWeight $timeWeight) use ($time) {
+			return $timeWeight->getTime()->format("Ymd") == $time->format("Ymd");
 		})));
 	}
 
-	public function filterForDate(\DateTime $dateTime): WeightHistory
+	public function filterForDate(Time $time): WeightHistory
 	{
-		return new static(array_values(array_filter($this->getArrayCopy(), function (DateTimeWeight $dateTimeWeight) use ($dateTime) {
-			return $dateTimeWeight->getDateTime()->format("Ymd") <= $dateTime->format("Ymd");
+		return new static(array_values(array_filter($this->getArrayCopy(), function (TimeWeight $timeWeight) use ($time) {
+			return $timeWeight->getTime()->format("Ymd") <= $time->format("Ymd");
 		})));
 	}
 
 	public function sortByNewest(): WeightHistory
 	{
 		$array = $this->getArrayCopy();
-		usort($array, function (DateTimeWeight $a, DateTimeWeight $b) {
-			return $a->getDateTime()->format("Ymd") < $b->getDateTime()->format("Ymd") ? 1 : -1;
+		usort($array, function (TimeWeight $a, TimeWeight $b) {
+			return $a->getTime()->format("Ymd") < $b->getTime()->format("Ymd") ? 1 : -1;
 		});
 
 		return new static($array);
 	}
 
-	public function getForDate(\DateTime $dateTime): ?DateTimeWeight
+	public function getForDate(Time $time): ?TimeWeight
 	{
-		return $this->filterForDate($dateTime)->sortByNewest()[0] ?? null;
+		return $this->filterForDate($time)->sortByNewest()[0] ?? null;
 	}
 }

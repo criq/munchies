@@ -7,6 +7,7 @@ use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Katu\Errors\Error;
+use Katu\Tools\Calendar\Time;
 use Katu\Tools\Rest\RestResponse;
 use Katu\Tools\Rest\RestResponseInterface;
 use Katu\Tools\Validation\Param;
@@ -265,16 +266,16 @@ class Calculator implements RestResponseInterface
 	/****************************************************************************
 	 * Reference date.
 	 */
-	public function setReferenceDate(?\DateTime $value): Calculator
+	public function setReferenceDate(?Time $value): Calculator
 	{
 		$this->referenceDate = $value;
 
 		return $this;
 	}
 
-	public function getReferenceDate(): \DateTime
+	public function getReferenceDate(): Time
 	{
-		return $this->referenceDate ?: new \DateTime;
+		return $this->referenceDate ?: new Time;
 	}
 
 	/*****************************************************************************
@@ -1167,7 +1168,7 @@ class Calculator implements RestResponseInterface
 		 * Input.
 		 */
 		$res["input"]["gender"] = $this->getGender() ? $this->getGender()->getCode() : null;
-		$res["input"]["birthday"] = $this->getBirthday() ? $this->getBirthday()->getDatetime()->format("Y-m-d") : null;
+		$res["input"]["birthday"] = $this->getBirthday() ? $this->getBirthday()->getTime()->format("Y-m-d") : null;
 		$res["input"]["weight"] = $this->getWeight() ? $this->getWeight()->getAmount()->getValue() : null;
 		$res["input"]["proportions_height"] = $this->getProportions()->getHeight() ? $this->getProportions()->getHeight()->getAmount()->getValue() : null;
 		$res["input"]["proportions_waist"] = $this->getProportions()->getWaist() ? $this->getProportions()->getWaist()->getAmount()->getValue() : null;

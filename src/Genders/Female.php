@@ -22,9 +22,13 @@ use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Percentage;
 use Fatty\Pregnancy;
+use Katu\Tools\Calendar\Time;
+use Katu\Tools\Calendar\Timeout;
 
 class Female extends \Fatty\Gender
 {
+	const BASAL_METABOLIC_RATE_STRATEGY_SIMPLIFIED = "simplified";
+	const BASAL_METABOLIC_RATE_STRATEGY_STANDARD = "standard";
 	const ESSENTIAL_FAT_PERCENTAGE = 0.13;
 	const FIT_BODY_FAT_PERCENTAGE = 0.25;
 	const SPORT_PROTEIN_COEFFICIENT = 1.4;
@@ -55,27 +59,20 @@ class Female extends \Fatty\Gender
 	/****************************************************************************
 	 * Basal metabolic rate.
 	 */
+	public function getBasalMetabolicRateStrategy(): string
+	{
+		return static::BASAL_METABOLIC_RATE_STRATEGY_STANDARD;
+	}
+
 	public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric
 	{
-		var_dump("A");die;
+		var_dump($this->getIsPregnant());
+		var_dump($this->getChildren()->filterYoungerThan(new Timeout("6 months")));
+		// Ženy těhotné nebo do 6 měsíců po porodu:
 
-		$fatFreeMass = $calculator->calcFatFreeMass();
-		$fatFreeMassValue = $fatFreeMass->getResult()->getAmount()->getValue();
+		var_dump($this);die;
 
-		$resultValue = 370 + (21.6 * $fatFreeMassValue);
-		$result = (new Energy(
-			new Amount($resultValue),
-			"kcal",
-		))->getInUnit($calculator->getUnits());
-
-		$formula = "
-			370 + (21.6 * fatFreeMass[{$fatFreeMassValue}])
-			= 370 + " . (21.6 * $fatFreeMassValue) . "
-			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
-			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
-		";
-
-		return new QuantityMetric("basalMetabolicRate", $result, $formula);
+		return parent::calcBasalMetabolicRate($calculator);
 	}
 
 	/*****************************************************************************
@@ -88,9 +85,20 @@ class Female extends \Fatty\Gender
 		return $this;
 	}
 
+	public function getPregnancy(): ?Pregnancy
+	{
+		return $this->pregnancy;
+	}
+
 	public function getIsPregnant(): bool
 	{
-		return (bool)$this->isPregnant;
+		try {
+			return $this->getPregnancy()->getIsPregnant();
+		} catch (\Throwable $e) {
+			// Nevermind.
+		}
+
+		return false;
 	}
 
 	/*****************************************************************************
@@ -101,6 +109,15 @@ class Female extends \Fatty\Gender
 		$this->children = $children;
 
 		return $this;
+	}
+
+	public function getChildren(): ChildCollection
+	{
+		if (!$this->children) {
+			$this->children = new ChildCollection;
+		}
+
+		return $this->children;
 	}
 
 	/*****************************************************************************
@@ -146,7 +163,7 @@ class Female extends \Fatty\Gender
 			throw new MissingPregnancyChildbirthDateException;
 		}
 
-		$diff = $this->getChildbirthDate()->diff(new \DateTime);
+		$diff = $this->getChildbirthDate()->diff(new Time);
 		if ($diff->days <= 90) {
 			$change = 85;
 		} elseif ($diff->days <= 180) {
@@ -178,7 +195,7 @@ class Female extends \Fatty\Gender
 			throw $exceptions;
 		}
 
-		$diff = $this->getBreastfeedingChildbirthDate()->diff(new \DateTime);
+		$diff = $this->getBreastfeedingChildbirthDate()->diff(new Time);
 		if ($diff->days <= 365 / 12 * 3) {
 			$change = 650;
 		} elseif ($this->getBreastfeedingMode() instanceof Full && $diff->days <= 365 / 12 * 6) {

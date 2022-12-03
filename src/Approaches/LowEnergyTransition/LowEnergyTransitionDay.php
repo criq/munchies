@@ -4,22 +4,23 @@ namespace Fatty\Approaches\LowEnergyTransition;
 
 use Fatty\Energy;
 use Fatty\Weight;
+use Katu\Tools\Calendar\Time;
 
 class LowEnergyTransitionDay
 {
-	protected $dateTime;
 	protected $daysToIncrease;
+	protected $time;
 	protected $weight;
 	protected $weightGoalEnergyExpenditure;
 
-	public function __construct(\DateTime $dateTime)
+	public function __construct(Time $time)
 	{
-		$this->dateTime = $dateTime;
+		$this->time = $time;
 	}
 
-	public function getDateTime(): \DateTime
+	public function getTime(): Time
 	{
-		return $this->dateTime;
+		return $this->time;
 	}
 
 	public function setWeight(Weight $value): LowEnergyTransitionDay

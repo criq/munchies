@@ -7,6 +7,7 @@ use Fatty\Exceptions\MissingDietApproachException;
 use Fatty\Metrics\StringMetric;
 use Fatty\Nutrients\Carbs;
 use Katu\Errors\Error;
+use Katu\Tools\Calendar\Time;
 use Katu\Tools\Validation\Param;
 use Katu\Tools\Validation\Validation;
 
@@ -14,7 +15,7 @@ class Diet
 {
 	protected $approach;
 	protected $carbs;
-	protected $dateTimeStart;
+	protected $timeStart;
 
 	public function __construct(?Approach $approach = null)
 	{
@@ -88,22 +89,22 @@ class Diet
 		return new StringMetric("dietApproach", $approach->getCode(), $approach->getDeclinatedLabel());
 	}
 
-	public function setDateTimeStart(?\DateTime $value): Diet
+	public function setTimeStart(?Time $timeStart): Diet
 	{
-		$this->dateTimeStart = $value;
+		$this->timeStart = $timeStart;
 
 		return $this;
 	}
 
-	public function getDateTimeStart(): ?\DateTime
+	public function getTimeStart(): ?Time
 	{
-		return $this->dateTimeStart;
+		return $this->timeStart;
 	}
 
 	public function getDayIndex(Calculator $calculator): ?int
 	{
 		try {
-			$diff = $calculator->getDiet()->getDateTimeStart()->diff($calculator->getReferenceDate());
+			$diff = $calculator->getDiet()->getTimeStart()->diff($calculator->getReferenceDate());
 			if ($diff->invert) {
 				return null;
 			}
