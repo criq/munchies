@@ -42,14 +42,40 @@ class Female extends \Fatty\Gender
 		$heightValue = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
 		$hipsValue = $calculator->getProportions()->getHips()->getInUnit("cm")->getAmount()->getValue();
 
-		// $result = new Percentage(((495 / (1.0324 - (0.19077 * log10($waistValue - $neckValue)) + (0.15456 * log10($heightValue)))) - 450) * .01);
-		// $formula = "((495 / (1.0324 - (0.19077 * log10(waist[{$waistValue}] - neck[{$neckValue}])) + (0.15456 * log10(height[{$heightValue}])))) - 450) * .01 = {$result->getValue()}";
-
 		$resultValue = ((495 / (1.29579 - (0.35004 * log10($waistValue + $hipsValue - $neckValue)) + (0.22100 * log10($heightValue)))) - 450) * 0.01;
 		$result = new Percentage($resultValue);
-		$formula = "((495 / (1.29579 - (0.35004 * log10(waist[{$waistValue}] + hips[{$hipsValue}] - neck[{$neckValue}])) + (0.22100 * log10(height[{$heightValue}])))) - 450) * 0.01 = {$resultValue}";
+		$formula = "
+			((495 / (1.29579 - (0.35004 * log10(waist[{$waistValue}] + hips[{$hipsValue}] - neck[{$neckValue}])) + (0.22100 * log10(height[{$heightValue}])))) - 450) * 0.01
+			= {$resultValue}
+			";
 
 		return new AmountMetric("bodyFatPercentage", $result, $formula);
+	}
+
+	/****************************************************************************
+	 * Basal metabolic rate.
+	 */
+	public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric
+	{
+		var_dump("A");die;
+
+		$fatFreeMass = $calculator->calcFatFreeMass();
+		$fatFreeMassValue = $fatFreeMass->getResult()->getAmount()->getValue();
+
+		$resultValue = 370 + (21.6 * $fatFreeMassValue);
+		$result = (new Energy(
+			new Amount($resultValue),
+			"kcal",
+		))->getInUnit($calculator->getUnits());
+
+		$formula = "
+			370 + (21.6 * fatFreeMass[{$fatFreeMassValue}])
+			= 370 + " . (21.6 * $fatFreeMassValue) . "
+			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
+			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
+		";
+
+		return new QuantityMetric("basalMetabolicRate", $result, $formula);
 	}
 
 	/*****************************************************************************

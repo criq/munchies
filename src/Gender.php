@@ -52,45 +52,45 @@ abstract class Gender
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
 	 */
-	public function getBodyFatPercentageStrategy(Calculator $calculator)
+	public function getBodyFatPercentageStrategy(Calculator $calculator): ?string
 	{
 		try {
 			$bodyFatPercentage = $calculator->getBodyFatPercentage();
 		} catch (\Throwable $e) {
-			$bodyFatPercentage = false;
+			// Nevermind.
 		}
 
 		try {
 			$height = $calculator->getProportions()->getHeight();
 		} catch (\Throwable $e) {
-			$height = false;
+			// Nevermind.
 		}
 
 		try {
 			$neck = $calculator->getProportions()->getNeck();
 		} catch (\Throwable $e) {
-			$neck = false;
+			// Nevermind.
 		}
 
 		try {
 			$waist = $calculator->getProportions()->getWaist();
 		} catch (\Throwable $e) {
-			$waist = false;
+			// Nevermind.
 		}
 
 		try {
 			$hips = $calculator->getProportions()->getHips();
 		} catch (\Throwable $e) {
-			$hips = false;
+			// Nevermind.
 		}
 
-		if ($bodyFatPercentage) {
+		if ($bodyFatPercentage ?? null) {
 			return static::BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT;
-		} elseif ($height && $neck && $waist && $hips) {
+		} elseif (($height ?? null) && ($neck ?? null) && ($waist ?? null) && ($hips ?? null)) {
 			return static::BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS;
-		} else {
-			return false;
 		}
+
+		return null;
 	}
 
 	public function calcBodyFatPercentage(Calculator $calculator): AmountMetric
@@ -123,6 +123,30 @@ abstract class Gender
 	public function getSportProteinCoefficient(): float
 	{
 		return (float)static::SPORT_PROTEIN_COEFFICIENT;
+	}
+
+	/****************************************************************************
+	 * Basal metabolic rate.
+	 */
+	public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric
+	{
+		$fatFreeMass = $calculator->calcFatFreeMass();
+		$fatFreeMassValue = $fatFreeMass->getResult()->getAmount()->getValue();
+
+		$resultValue = 370 + (21.6 * $fatFreeMassValue);
+		$result = (new Energy(
+			new Amount($resultValue),
+			"kcal",
+		))->getInUnit($calculator->getUnits());
+
+		$formula = "
+			370 + (21.6 * fatFreeMass[{$fatFreeMassValue}])
+			= 370 + " . (21.6 * $fatFreeMassValue) . "
+			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
+			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
+		";
+
+		return new QuantityMetric("basalMetabolicRate", $result, $formula);
 	}
 
 	/*****************************************************************************

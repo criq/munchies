@@ -2,6 +2,7 @@
 
 namespace Fatty;
 
+use Fatty\Exceptions\MissingGenderException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
@@ -1054,23 +1055,11 @@ class Calculator implements RestResponseInterface
 	 */
 	public function calcBasalMetabolicRate(): QuantityMetric
 	{
-		$fatFreeMass = $this->calcFatFreeMass();
-		$fatFreeMassValue = $fatFreeMass->getResult()->getAmount()->getValue();
+		if (!$this->getGender()) {
+			throw new MissingGenderException;
+		}
 
-		$resultValue = 370 + (21.6 * $fatFreeMassValue);
-		$result = (new Energy(
-			new Amount($resultValue),
-			"kcal",
-		))->getInUnit($this->getUnits());
-
-		$formula = "
-			370 + (21.6 * fatFreeMass[{$fatFreeMassValue}])
-			= 370 + " . (21.6 * $fatFreeMassValue) . "
-			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
-			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
-		";
-
-		return new QuantityMetric("basalMetabolicRate", $result, $formula);
+		return $this->getGender()->calcBasalMetabolicRate($this);
 	}
 
 	/*****************************************************************************

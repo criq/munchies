@@ -28,7 +28,10 @@ class Male extends \Fatty\Gender
 
 		$resultValue = ((495 / (1.0324 - (0.19077 * log10($waistValue - $neckValue)) + (0.15456 * log10($heightValue)))) - 450) * .01;
 		$result = new Percentage($resultValue);
-		$formula = "((495 / (1.0324 - (0.19077 * log10(waist[{$waistValue}] - neck[{$neckValue}])) + (0.15456 * log10(height[{$heightValue}])))) - 450) * .01 = {$resultValue}";
+		$formula = "
+			((495 / (1.0324 - (0.19077 * log10(waist[{$waistValue}] - neck[{$neckValue}])) + (0.15456 * log10(height[{$heightValue}])))) - 450) * .01
+			= {$resultValue}
+			";
 
 		return new AmountMetric("bodyFatPercentage", $result, $formula);
 	}
