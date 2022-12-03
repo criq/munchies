@@ -34,6 +34,11 @@ class Pregnancy
 		return $this;
 	}
 
+	public function getWeightBeforePregnancy(): ?Weight
+	{
+		return $this->weightBeforePregnancy;
+	}
+
 	public function getIsPregnant(): bool
 	{
 		try {

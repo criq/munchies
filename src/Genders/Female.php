@@ -59,15 +59,22 @@ class Female extends \Fatty\Gender
 	/****************************************************************************
 	 * Basal metabolic rate.
 	 */
-	public function getBasalMetabolicRateStrategy(): string
+	public function getBasalMetabolicRateStrategy(Calculator $calculator): string
 	{
+		// Lze použít zjednodušený výpočet?
+		if ($this->getIsPregnant() && $this->getChildren()->filterYoungerThan(new Timeout("6 months"))) {
+			var_dump($this->getPregnancy()->getWeightBeforePregnancy());
+			var_dump($calculator->getProportions()->getHeight());
+			var_dump($calculator->getBirthday()->getAge());
+			die;
+		}
+
 		return static::BASAL_METABOLIC_RATE_STRATEGY_STANDARD;
 	}
 
 	public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric
 	{
-		var_dump($this->getIsPregnant());
-		var_dump($this->getChildren()->filterYoungerThan(new Timeout("6 months")));
+		var_dump($this->getBasalMetabolicRateStrategy($calculator));die;
 		// Ženy těhotné nebo do 6 měsíců po porodu:
 
 		var_dump($this);die;
