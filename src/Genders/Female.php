@@ -27,7 +27,7 @@ use Katu\Tools\Calendar\Timeout;
 
 class Female extends \Fatty\Gender
 {
-	const BASAL_METABOLIC_RATE_STRATEGY_SIMPLIFIED = "simplified";
+	const BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR = "msj";
 	const BASAL_METABOLIC_RATE_STRATEGY_STANDARD = "standard";
 	const ESSENTIAL_FAT_PERCENTAGE = 0.13;
 	const FIT_BODY_FAT_PERCENTAGE = 0.25;
@@ -59,10 +59,17 @@ class Female extends \Fatty\Gender
 	/****************************************************************************
 	 * Basal metabolic rate.
 	 */
-	public function getBasalMetabolicRateStrategy(Calculator $calculator): ?string
+	public function getBasalMetabolicRateStrategy(Calculator $calculator): string
 	{
 		// Lze použít standardní výpočet?
-		// return static::BASAL_METABOLIC_RATE_STRATEGY_STANDARD;
+		try {
+			// Zkusme použít standardní výpočet...
+			parent::calcBasalMetabolicRate($calculator);
+
+			return static::BASAL_METABOLIC_RATE_STRATEGY_STANDARD;
+		} catch (\Throwable $e) {
+			// Nevermind.
+		}
 
 		// Lze použít zjednodušený výpočet?
 		if ($this->getIsPregnant() && count($this->getChildren()->filterYoungerThan(new Timeout("6 months")))) {
@@ -85,21 +92,59 @@ class Female extends \Fatty\Gender
 			}
 
 			if (($weightBeforePregnancy ?? null) && ($height ?? null) && ($age ?? null)) {
-				return static::BASAL_METABOLIC_RATE_STRATEGY_SIMPLIFIED;
+				return static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR;
 			}
 		}
 
-		return null;
+		return static::BASAL_METABOLIC_RATE_STRATEGY_STANDARD;
 	}
 
 	public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric
 	{
-		var_dump($this->getBasalMetabolicRateStrategy($calculator));die;
-		// Ženy těhotné nebo do 6 měsíců po porodu:
+		switch ($this->getBasalMetabolicRateStrategy($calculator)) {
+			// Ženy těhotné nebo do 6 měsíců po porodu:
+			case static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR:
+				return $this->calcBasalMetabolicRateSimplified($calculator);
+				break;
+			default:
+				return $this->calcBasalMetabolicRateStandard($calculator);
+				break;
+		}
+	}
 
-		var_dump($this);die;
-
+	public function calcBasalMetabolicRateStandard(Calculator $calculator): QuantityMetric
+	{
 		return parent::calcBasalMetabolicRate($calculator);
+	}
+
+	public function calcBasalMetabolicRateSimplified(Calculator $calculator): QuantityMetric
+	{
+		$weightBeforePregnancyAmount = $this->getPregnancy()->getWeightBeforePregnancy()->getInUnit("kg")->getAmount()->getValue();
+		$heightAmount = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
+		$ageAmount = $calculator->getBirthday()->getAge();
+
+		$result = (new Energy(
+			new Amount(
+				(10 * $weightBeforePregnancyAmount)
+				+ (6.25 * $heightAmount)
+				- (5 * $ageAmount)
+				- 161
+			),
+			"kcal",
+		))->getInUnit($calculator->getUnits());
+
+		$formula = "
+			(10 * $weightBeforePregnancyAmount) + (6.25 * $heightAmount) - (5 * $ageAmount) - 161
+			= " . (10 * $weightBeforePregnancyAmount) . " + " . (6.25 * $heightAmount) . " - " . (5 * $ageAmount) . " - 161
+			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
+			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
+		";
+
+		return new QuantityMetric(
+			"basalMetabolicRate",
+			$result,
+			$formula
+		);
 	}
 
 	/*****************************************************************************
