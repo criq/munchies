@@ -3,26 +3,18 @@
 namespace Fatty\Genders;
 
 use Fatty\Amount;
-use Fatty\Birthday;
 use Fatty\BodyTypes\Apple;
 use Fatty\BodyTypes\AppleWithHigherRisk;
 use Fatty\BodyTypes\Balanced;
 use Fatty\BodyTypes\PearOrHourglass;
-use Fatty\BreastfeedingMode;
-use Fatty\BreastfeedingModes\Full;
-use Fatty\BreastfeedingModes\Partial;
 use Fatty\Calculator;
 use Fatty\ChildCollection;
 use Fatty\Energy;
-use Fatty\Exceptions\MissingBreastfeedingChildbirthDateException;
-use Fatty\Exceptions\MissingBreastfeedingModeException;
-use Fatty\Exceptions\MissingPregnancyChildbirthDateException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Percentage;
 use Fatty\Pregnancy;
-use Katu\Tools\Calendar\Time;
 use Katu\Tools\Calendar\Timeout;
 
 class Female extends \Fatty\Gender
@@ -134,7 +126,7 @@ class Female extends \Fatty\Gender
 		))->getInUnit($calculator->getUnits());
 
 		$formula = "
-			(10 * $weightBeforePregnancyAmount) + (6.25 * $heightAmount) - (5 * $ageAmount) - 161
+			(10 * weight[$weightBeforePregnancyAmount]) + (6.25 * height[$heightAmount]) - (5 * age[$ageAmount]) - 161
 			= " . (10 * $weightBeforePregnancyAmount) . " + " . (6.25 * $heightAmount) . " - " . (5 * $ageAmount) . " - 161
 			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
 			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
