@@ -59,17 +59,37 @@ class Female extends \Fatty\Gender
 	/****************************************************************************
 	 * Basal metabolic rate.
 	 */
-	public function getBasalMetabolicRateStrategy(Calculator $calculator): string
+	public function getBasalMetabolicRateStrategy(Calculator $calculator): ?string
 	{
+		// Lze použít standardní výpočet?
+		// return static::BASAL_METABOLIC_RATE_STRATEGY_STANDARD;
+
 		// Lze použít zjednodušený výpočet?
-		if ($this->getIsPregnant() && $this->getChildren()->filterYoungerThan(new Timeout("6 months"))) {
-			var_dump($this->getPregnancy()->getWeightBeforePregnancy());
-			var_dump($calculator->getProportions()->getHeight());
-			var_dump($calculator->getBirthday()->getAge());
-			die;
+		if ($this->getIsPregnant() && count($this->getChildren()->filterYoungerThan(new Timeout("6 months")))) {
+			try {
+				$weightBeforePregnancy = $this->getPregnancy()->getWeightBeforePregnancy();
+			} catch (\Throwable $e) {
+				// Nevermind.
+			}
+
+			try {
+				$height = $calculator->getProportions()->getHeight();
+			} catch (\Throwable $e) {
+				// Nevermind.
+			}
+
+			try {
+				$age = $calculator->getBirthday()->getAge();
+			} catch (\Throwable $e) {
+				// Nevermind.
+			}
+
+			if (($weightBeforePregnancy ?? null) && ($height ?? null) && ($age ?? null)) {
+				return static::BASAL_METABOLIC_RATE_STRATEGY_SIMPLIFIED;
+			}
 		}
 
-		return static::BASAL_METABOLIC_RATE_STRATEGY_STANDARD;
+		return null;
 	}
 
 	public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric
