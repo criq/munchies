@@ -6,6 +6,7 @@ use Fatty\Exceptions\MissingGenderException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
+use Fatty\Strategies\Zivot20;
 use Katu\Errors\Error;
 use Katu\Tools\Calendar\Time;
 use Katu\Tools\Rest\RestResponse;
@@ -268,7 +269,7 @@ class Calculator implements RestResponseInterface
 
 	public function getStrategy(): Strategy
 	{
-		return $this->strategy;
+		return $this->strategy ?: new Zivot20;
 	}
 
 	/****************************************************************************
@@ -1105,11 +1106,7 @@ class Calculator implements RestResponseInterface
 	 */
 	public function calcWeightGoalEnergyExpenditure(): QuantityMetric
 	{
-		if (!$this->getDiet()->getApproach()) {
-			throw new \Fatty\Exceptions\MissingDietApproachException;
-		}
-
-		return $this->getDiet()->getApproach()->calcWeightGoalEnergyExpenditure($this);
+		return $this->getStrategy()->calcWeightGoalEnergyExpenditure($this);
 	}
 
 	/*****************************************************************************

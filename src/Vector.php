@@ -37,9 +37,9 @@ abstract class Vector
 		return static::CODE;
 	}
 
-	public function calcTdeeQuotient(Calculator $calculator): AmountMetric
+	public function calcWeightGoalQuotient(Calculator $calculator): AmountMetric
 	{
-		return new AmountMetric("tdeeQuotient", new Amount((float)static::TDEE_QUOTIENT));
+		return new AmountMetric("weightGoalQuotient", new Amount((float)static::TDEE_QUOTIENT));
 	}
 
 	public function getChangePerWeek()

@@ -28,10 +28,10 @@ class StringMetric extends Metric
 	public function getResponse(?Locale $locale = null): array
 	{
 		return [
-			'name' => $this->getName(),
-			'result' => $this->getResult(),
-			'formatted' => $this->getFormatted($locale),
-			'formula' => $this->getFormula(),
+			"name" => $this->getName(),
+			"result" => $this->getResult(),
+			"formatted" => $this->getFormatted($locale),
+			"formula" => $this->getFormula(),
 		];
 	}
 }

@@ -23,10 +23,10 @@ class AmountMetric extends Metric
 	public function getResponse(?Locale $locale = null): array
 	{
 		return [
-			'name' => $this->getName(),
-			'result' => $this->getResult()->getValue(),
-			'formatted' => $this->getResult()->getFormatted($locale),
-			'formula' => $this->getFormula(),
+			"name" => $this->getName(),
+			"result" => $this->getResult()->getValue(),
+			"formatted" => $this->getResult()->getFormatted($locale),
+			"formula" => $this->getFormula(),
 		];
 	}
 }

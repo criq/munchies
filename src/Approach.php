@@ -91,15 +91,17 @@ abstract class Approach
 
 		$totalDailyEnergyExpenditure = $calculator->calcTotalDailyEnergyExpenditure()->getResult();
 		$totalDailyEnergyExpenditureValue = $totalDailyEnergyExpenditure->getAmount()->getValue();
-		$tdeeQuotientValue = $calculator->getGoal()->getVector()->calcTdeeQuotient($calculator)->getResult()->getValue();
+
+		$weightGoalQuotient = $calculator->getGoal()->getVector()->calcWeightGoalQuotient($calculator)->getResult();
+		$weightGoalQuotientValue = $weightGoalQuotient->getValue();
 
 		$result = (new Energy(
-			new Amount($totalDailyEnergyExpenditureValue * $tdeeQuotientValue),
+			new Amount($totalDailyEnergyExpenditureValue * $weightGoalQuotientValue),
 			$totalDailyEnergyExpenditure->getUnit(),
 		))->getInUnit($calculator->getUnits());
 
 		$formula = "
-			totalDailyEnergyExpenditure[{$totalDailyEnergyExpenditure}] * weightGoalQuotient[{$tdeeQuotientValue}]
+			totalDailyEnergyExpenditure[{$totalDailyEnergyExpenditure}] * weightGoalQuotient[{$weightGoalQuotientValue}]
 			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
 			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
 		";
