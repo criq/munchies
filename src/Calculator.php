@@ -27,7 +27,8 @@ class Calculator implements RestResponseInterface
 	protected $proportions;
 	protected $referenceDate;
 	protected $sportDurations;
-	protected $units = "kJ";
+	protected $strategy;
+	protected $units = "kcal";
 	protected $weight;
 	protected $weightHistory;
 
@@ -258,9 +259,16 @@ class Calculator implements RestResponseInterface
 		}
 	}
 
-	public function getIsOverweight(): bool
+	public function setStrategy(Strategy $strategy): Calculator
 	{
-		return (bool)$this->calcFatOverOptimalWeight()->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getAmount()->getValue();
+		$this->strategy = $strategy;
+
+		return $this;
+	}
+
+	public function getStrategy(): Strategy
+	{
+		return $this->strategy;
 	}
 
 	/****************************************************************************
@@ -588,6 +596,11 @@ class Calculator implements RestResponseInterface
 	/*****************************************************************************
 	 * Body mass index - BMI.
 	 */
+	public function getIsOverweight(): bool
+	{
+		return (bool)$this->calcFatOverOptimalWeight()->filterByName("fatOverOptimalWeightMax")[0]->getResult()->getAmount()->getValue();
+	}
+
 	public function calcBodyMassIndex(): AmountMetric
 	{
 		$exceptions = new \Fatty\Exceptions\FattyExceptionCollection;
