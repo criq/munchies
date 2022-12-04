@@ -8,7 +8,7 @@ abstract class Vector
 {
 	const CODE = "";
 	const LABEL_INFINITIVE = "";
-	const TDEE_QUOTIENT = null;
+	const WEIGHT_GOAL_QUOTIENT = null;
 	const WEIGHT_CHANGE_PER_WEEK = "";
 
 	public function __toString()
@@ -39,7 +39,7 @@ abstract class Vector
 
 	public function calcWeightGoalQuotient(Calculator $calculator): AmountMetric
 	{
-		return new AmountMetric("weightGoalQuotient", new Amount((float)static::TDEE_QUOTIENT));
+		return new AmountMetric("weightGoalQuotient", new Amount((float)static::WEIGHT_GOAL_QUOTIENT));
 	}
 
 	public function getChangePerWeek()
