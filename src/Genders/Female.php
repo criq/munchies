@@ -170,13 +170,13 @@ class Female extends \Fatty\Gender
 		var_dump($referenceDate);
 
 		var_dump($this->getPregnancy());
-		var_dump($this->getPregnancy()->getConceptionDate());
-		var_dump($this->getPregnancy()->getWeeks());
-		var_dump($this->getPregnancy()->getTrimesters());
-		var_dump($this->getPregnancy()->getChildbirthDate());
+		// var_dump($this->getPregnancy()->getConceptionDate());
+		// var_dump($this->getPregnancy()->getWeeks());
+		// var_dump($this->getPregnancy()->getTrimesters());
+		// var_dump($this->getPregnancy()->getChildbirthDate());
 
-		// var_dump($this->getPregnancy()->getCurrentWeek($referenceDate)); // : Week (key, start, end)
-		// var_dump($this->getPregnancy()->getCurrentTrimester($referenceDate)); // : Trimester (key, start, end)
+		var_dump($this->getPregnancy()->getCurrentWeek($referenceDate));
+		var_dump($this->getPregnancy()->getCurrentTrimester($referenceDate));
 
 		return new QuantityMetric("referenceDailyIntakeBonus", new Energy(new Amount(0), "kJ"));
 	}

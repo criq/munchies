@@ -7,6 +7,7 @@ use Fatty\Pregnancy\Week;
 use Fatty\Pregnancy\WeekCollection;
 use Fatty\Pregnancy\Trimester;
 use Fatty\Pregnancy\TrimesterCollection;
+use Google\Cloud\Security\PrivateCA\V1beta1\ReusableConfig;
 use Katu\Tools\Calendar\Interval;
 use Katu\Tools\Calendar\Time;
 
@@ -90,5 +91,35 @@ class Pregnancy
 				(clone $this->getConceptionDate())->modify("+ 280 days"),
 			)),
 		]);
+	}
+
+	public function getCurrentWeek(?Time $referenceDate): ?Week
+	{
+		if (!$referenceDate) {
+			$referenceDate = new Time;
+		}
+
+		foreach ($this->getWeeks() as $week) {
+			if ($week->getInterval()->fitsTime($referenceDate)) {
+				return $week;
+			}
+		}
+
+		return null;
+	}
+
+	public function getCurrentTrimester(?Time $referenceDate): ?Trimester
+	{
+		if (!$referenceDate) {
+			$referenceDate = new Time;
+		}
+
+		foreach ($this->getTrimesters() as $trimester) {
+			if ($trimester->getInterval()->fitsTime($referenceDate)) {
+				return $trimester;
+			}
+		}
+
+		return null;
 	}
 }
