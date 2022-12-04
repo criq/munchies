@@ -98,7 +98,11 @@ abstract class Approach
 			$totalDailyEnergyExpenditure->getUnit(),
 		))->getInUnit($calculator->getUnits());
 
-		$formula = "totalDailyEnergyExpenditure[{$totalDailyEnergyExpenditure}] * weightGoalQuotient[{$tdeeQuotientValue}] = {$result}";
+		$formula = "
+			totalDailyEnergyExpenditure[{$totalDailyEnergyExpenditure}] * weightGoalQuotient[{$tdeeQuotientValue}]
+			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
+			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
+		";
 
 		return new QuantityMetric("weightGoalEnergyExpenditure", $result, $formula);
 	}
