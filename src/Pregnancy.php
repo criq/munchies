@@ -7,7 +7,6 @@ use Fatty\Pregnancy\Week;
 use Fatty\Pregnancy\WeekCollection;
 use Fatty\Pregnancy\Trimester;
 use Fatty\Pregnancy\TrimesterCollection;
-use Google\Cloud\Security\PrivateCA\V1beta1\ReusableConfig;
 use Katu\Tools\Calendar\Interval;
 use Katu\Tools\Calendar\Time;
 
@@ -88,7 +87,7 @@ class Pregnancy
 			)),
 			new Trimester(3, new Interval(
 				(clone $this->getConceptionDate())->modify("+ 187 days"),
-				(clone $this->getConceptionDate())->modify("+ 280 days"),
+				(clone $this->getConceptionDate())->modify("+ 294 days"),
 			)),
 		]);
 	}
