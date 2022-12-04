@@ -140,6 +140,48 @@ class Female extends \Fatty\Gender
 	}
 
 	/*****************************************************************************
+	 * Doporučený denní příjem - bonusy.
+	 */
+	public function calcReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
+	{
+		// Referece Daily Intake (RDI): K doporučenému příjmu se následně mohou přidat energetické bonusy za:
+		// a) kojení - pokud žena kojí, viz. tabulka výše
+		// b) těhotenství - v závislosti na pokročilosti těhotenství…
+
+		// 1. trimestr - bonus 0 Kcal
+		// 2. trimestr - bonus 300 Kcal
+		// 3. trimestr - bonus 300 Kcal
+
+		// Kdy rozdělení do trimestrů je následovné…
+		// 1. trimestr je 1 - 13. týden těhotenství (počítáme 94 dní)
+		// 2. trimestr je 14 - 27. týden (93 dní)
+		// 3. trimestr je 28 - 42. týden (93 dní)
+
+		// !!! předpokládaným termínem porodu je poslední den 40. týdne těhotenství (takže + 14 dní je konec 42. týdne)
+		// 2023-05-05 - poslední den 40. týdne těhotenství
+		// 2023-05-19 - poslední den 42. týdne těhotenství, konec 3. trimestru
+		// 40 týdnů je 280 dní, 42 týdnů je 294 dní
+
+		// => udělat si prostě knihovnu, která vrátí weekCollection + trimestrCollection s termínama...?
+		// Bonus pak podle referenceDate kalkulačky
+
+		// var_dump($this);
+		$referenceDate = $calculator->getReferenceDate();
+		var_dump($referenceDate);
+
+		var_dump($this->getPregnancy());
+		var_dump($this->getPregnancy()->getConceptionDate());
+		var_dump($this->getPregnancy()->getWeeks());
+		var_dump($this->getPregnancy()->getTrimesters());
+		var_dump($this->getPregnancy()->getChildbirthDate());
+
+		// var_dump($this->getPregnancy()->getCurrentWeek($referenceDate)); // : Week (key, start, end)
+		// var_dump($this->getPregnancy()->getCurrentTrimester($referenceDate)); // : Trimester (key, start, end)
+
+		return new QuantityMetric("referenceDailyIntakeBonus", new Energy(new Amount(0), "kJ"));
+	}
+
+	/*****************************************************************************
 	 * Těhotenství.
 	 */
 	public function setPregnancy(?Pregnancy $pregnancy): Female

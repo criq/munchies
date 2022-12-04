@@ -152,7 +152,7 @@ abstract class Gender
 	/*****************************************************************************
 	 * Doporučený denní příjem - bonusy.
 	 */
-	public function calcReferenceDailyIntakeBonus(): QuantityMetric
+	public function calcReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
 	{
 		return new QuantityMetric("referenceDailyIntakeBonus", new Energy(new Amount(0), "kJ"));
 	}

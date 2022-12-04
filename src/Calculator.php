@@ -1128,7 +1128,7 @@ class Calculator implements RestResponseInterface
 				throw new \Fatty\Exceptions\MissingGenderException;
 			}
 
-			$referenceDailyIntakeBonus = $gender->calcReferenceDailyIntakeBonus();
+			$referenceDailyIntakeBonus = $gender->calcReferenceDailyIntakeBonus($this);
 		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptions->addException($e);
 		}
@@ -1138,6 +1138,7 @@ class Calculator implements RestResponseInterface
 		}
 
 		$weightGoalEnergyExpenditureValue = $weightGoalEnergyExpenditure->getAmount()->getValue();
+
 		$referenceDailyIntakeBonus = $referenceDailyIntakeBonus->getResult()->getInUnit("kcal");
 		$referenceDailyIntakeBonusValue = $referenceDailyIntakeBonus->getAmount()->getValue();
 
