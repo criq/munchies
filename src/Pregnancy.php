@@ -83,11 +83,11 @@ class Pregnancy
 			)),
 			new Trimester(2, new Interval(
 				(clone $this->getConceptionDate())->modify("+ 94 days"),
-				(clone $this->getConceptionDate())->modify("+ 94 days")->modify("+ 93 days"),
+				(clone $this->getConceptionDate())->modify("+ 187 days"),
 			)),
 			new Trimester(3, new Interval(
-				(clone $this->getConceptionDate())->modify("+ 94 days")->modify("+ 93 days"),
-				(clone $this->getConceptionDate())->modify("+ 94 days")->modify("+ 93 days")->modify("+ 93 days"),
+				(clone $this->getConceptionDate())->modify("+ 187 days"),
+				(clone $this->getConceptionDate())->modify("+ 280 days"),
 			)),
 		]);
 	}
