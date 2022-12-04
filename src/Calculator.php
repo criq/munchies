@@ -1064,7 +1064,7 @@ class Calculator implements RestResponseInterface
 	}
 
 	/*****************************************************************************
-	 * Total Energy Expenditure - Termický efekt pohybu - TEE.
+	 * Total (Daily) Energy Expenditure - Termický efekt pohybu - TEE.
 	 */
 	public function calcTotalDailyEnergyExpenditure(): QuantityMetric
 	{
