@@ -145,6 +145,7 @@ class Female extends \Fatty\Gender
 	public function calcReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
 	{
 		$energy = new Energy(new Amount(0), "kcal");
+		$referenceDate = $calculator->getReferenceDate();
 
 		// Referece Daily Intake (RDI): K doporučenému příjmu se následně mohou přidat energetické bonusy za:
 
@@ -156,11 +157,12 @@ class Female extends \Fatty\Gender
 		// 1. trimestr - bonus 0 Kcal
 		// 2. trimestr - bonus 300 Kcal
 		// 3. trimestr - bonus 300 Kcal
-
-		$referenceDate = $calculator->getReferenceDate();
-		$trimester = $this->getPregnancy()->getCurrentTrimester($referenceDate);
-		if (in_array($trimester->getIndex(), [2, 3])) {
-			$energy = $energy->modify(new Energy(new Amount(300), "kcal"));
+		$pregnancy = $this->getPregnancy();
+		if ($pregnancy) {
+			$trimester = $pregnancy->getCurrentTrimester($referenceDate);
+			if ($trimester && in_array($trimester->getIndex(), [2, 3])) {
+				$energy = $energy->modify(new Energy(new Amount(300), "kcal"));
+			}
 		}
 
 		return new QuantityMetric("referenceDailyIntakeBonus", $energy);
