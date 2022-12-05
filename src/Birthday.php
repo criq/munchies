@@ -59,6 +59,11 @@ class Birthday
 		return $diff->days / 365.24;
 	}
 
+	public function getAgeInMonths(Time $referenceTime): float
+	{
+		return $this->getAge($referenceTime) * 12;
+	}
+
 	public function getWholeAge(Time $referenceTime): int
 	{
 		return floor($this->getAge($referenceTime));
