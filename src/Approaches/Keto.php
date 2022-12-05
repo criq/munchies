@@ -24,24 +24,18 @@ class Keto extends \Fatty\Approach
 
 		$wgee = $calculator->calcWeightGoalEnergyExpenditure();
 
-		// TODO
-		if (false && $calculator->getGender() instanceof Female && $calculator->getGender()->getIsPregnant()) {
-		// TODO
-		} elseif (false && $calculator->getGender() instanceof Female && $calculator->getGender()->isBreastfeeding()) {
-		} else {
-			$dietCarbs = $calculator->getDiet()->getCarbs();
-			$nutrients->setCarbs($dietCarbs);
-			$nutrients->setFats(
-				Fats::createFromEnergy(
-					new Energy(
-						new Amount(
-							$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
-						),
-						Energy::getBaseUnit(),
+		$dietCarbs = $calculator->getDiet()->getCarbs();
+		$nutrients->setCarbs($dietCarbs);
+		$nutrients->setFats(
+			Fats::createFromEnergy(
+				new Energy(
+					new Amount(
+						$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 					),
+					Energy::getBaseUnit(),
 				),
-			);
-		}
+			),
+		);
 
 		return $nutrients;
 	}

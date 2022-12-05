@@ -254,9 +254,9 @@ class Calculator implements RestResponseInterface
 
 			return new Amount($res);
 		} catch (\Fatty\Exceptions\FattyException $e) {
-			return new Amount(0);
+			return new Amount;
 		} catch (\Throwable $e) {
-			return new Amount(0);
+			return new Amount;
 		}
 	}
 
@@ -1020,7 +1020,7 @@ class Calculator implements RestResponseInterface
 		$isOverweight = $this->getIsOverweight();
 
 		if ($gender instanceof Genders\Male && $bodyMassIndex->getResult()->getValue() >= .95 && !$isOverweight) {
-			return new AmountMetric("bodyFatDeviation", new Amount(0));
+			return new AmountMetric("bodyFatDeviation", new Amount);
 		}
 
 		$result = $bodyMassIndexDeviation->getResult();

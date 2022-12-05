@@ -14,8 +14,8 @@ abstract class Quantity implements \Effekt\QuantityInterface
 
 	public function __construct(Amount $amount, string $unit = null)
 	{
-		$this->amount = $amount;
-		$this->unit = $unit;
+		$this->setAmount($amount);
+		$this->setUnit($unit);
 	}
 
 	public function __toString(): string
@@ -40,7 +40,14 @@ abstract class Quantity implements \Effekt\QuantityInterface
 		}
 	}
 
-	public function getAmount(): ?Amount
+	public function setAmount(Amount $amount): Quantity
+	{
+		$this->amount = $amount;
+
+		return $this;
+	}
+
+	public function getAmount(): Amount
 	{
 		return $this->amount;
 	}
@@ -55,6 +62,13 @@ abstract class Quantity implements \Effekt\QuantityInterface
 		return (string)static::BASE_UNIT;
 	}
 
+	public function setUnit(?string $unit): Quantity
+	{
+		$this->unit = $unit;
+
+		return $this;
+	}
+
 	public function getUnit(): ?string
 	{
 		return $this->unit;
@@ -63,17 +77,6 @@ abstract class Quantity implements \Effekt\QuantityInterface
 	public function getUnitString(): string
 	{
 		return $this->getUnit();
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public function getArray(): array
-	{
-		return [
-			"amount" => $this->getAmount()->getValue(),
-			"unit" => $this->getUnit(),
-		];
 	}
 
 	public function getFormatted(?Locale $locale = null): string
@@ -89,8 +92,17 @@ abstract class Quantity implements \Effekt\QuantityInterface
 		]);
 	}
 
+	// Mutable.
 	public function modify(Quantity $modifier): Quantity
 	{
-		return new static(new Amount($this->getAmount()->getValue() + $modifier->getInUnit($this->getUnit())->getAmount()->getValue()), $this->getUnit());
+		$this->setAmount(new Amount($this->getAmount()->getValue() + $modifier->getInUnit($this->getUnit())->getAmount()->getValue()));
+
+		return $this;
+	}
+
+	// Immutable.
+	public function getModified(Quantity $modifier): Quantity
+	{
+		return (clone $this)->modify($modifier);
 	}
 }

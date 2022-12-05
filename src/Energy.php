@@ -7,9 +7,9 @@ class Energy extends Quantity
 	const BASE_UNIT = "J";
 	const CAL_TO_J_RATIO = 4.128;
 
-	public function __construct(Amount $amount, string $unit)
+	public function __construct(?Amount $amount = null, string $unit = "kcal")
 	{
-		return parent::__construct($amount, $unit);
+		return parent::__construct($amount ?: new Amount, $unit);
 	}
 
 	public function getInBaseUnit(): Energy

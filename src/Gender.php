@@ -216,7 +216,7 @@ abstract class Gender
 	 */
 	public function calcReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
 	{
-		return new QuantityMetric("referenceDailyIntakeBonus", new Energy(new Amount(0), "kJ"));
+		return new QuantityMetric("referenceDailyIntakeBonus", new Energy);
 	}
 
 	/****************************************************************************

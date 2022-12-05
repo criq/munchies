@@ -39,28 +39,6 @@ class Standard extends \Fatty\Approach
 					Energy::getBaseUnit(),
 				),
 			));
-		} elseif ($calculator->getGender() instanceof Female && ($calculator->getGender()->getIsPregnant() || $calculator->getGender()->isBreastfeeding())) {
-			$nutrients->setFats(
-				Fats::createFromEnergy(
-					new Energy(
-						new Amount(
-							$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() * .35
-						),
-						Energy::getBaseUnit(),
-					),
-				),
-			);
-
-			$nutrients->setCarbs(
-				Carbs::createFromEnergy(
-					new Energy(
-						new Amount(
-							$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
-						),
-						Energy::getBaseUnit(),
-					),
-				),
-			);
 		} else {
 			$nutrients->setCarbs(
 				Carbs::createFromEnergy(

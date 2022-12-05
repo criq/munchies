@@ -59,7 +59,7 @@ class LowEnergyTransition extends \Fatty\Approach
 					&& $previousDay->getTime()->format("Ymd") == $previousWeightDay->getTime()->format("Ymd")
 					&& $day->getWeight()->getInUnit("g")->getAmount()->getValue() > $previousWeightDay->getWeight()->getInUnit("g")->getAmount()->getValue()) {
 					// Snížit energii.
-					$decreasedEnergy = $previousDay->getWeightGoalEnergyExpenditure()->modify($energyDecrement);
+					$decreasedEnergy = $previousDay->getWeightGoalEnergyExpenditure()->getModified($energyDecrement);
 					$day->setWeightGoalEnergyExpenditure($decreasedEnergy);
 
 					// Nastavit na 14 dní.
@@ -68,7 +68,7 @@ class LowEnergyTransition extends \Fatty\Approach
 				// Jde o den, kdy by se mělo navyšovat?
 				} elseif ($day->getDaysToIncrease() <= 0) {
 					// Navýšit energii.
-					$increasedEnergy = $previousDay->getWeightGoalEnergyExpenditure()->modify($energyIncrement);
+					$increasedEnergy = $previousDay->getWeightGoalEnergyExpenditure()->getModified($energyIncrement);
 					$day->setWeightGoalEnergyExpenditure($increasedEnergy);
 
 					// Prodloužit na dalších 7 dní.
@@ -138,24 +138,19 @@ class LowEnergyTransition extends \Fatty\Approach
 		$nutrients->setProteins($proteins);
 
 		// Tuky a sacharidy.
-		// TODO
-		if (false && $calculator->getGender() instanceof Female && $calculator->getGender()->getIsPregnant()) {
-		// TODO
-		} elseif (false && $calculator->getGender() instanceof Female && $calculator->getGender()->isBreastfeeding()) {
-		} else {
-			$dietCarbs = $calculator->getDiet()->getCarbs();
-			$nutrients->setCarbs($dietCarbs);
-			$nutrients->setFats(
-				Fats::createFromEnergy(
-					new Energy(
-						new Amount(
-							$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
-						),
-						Energy::getBaseUnit(),
+		$dietCarbs = $calculator->getDiet()->getCarbs();
+		$nutrients->setCarbs($dietCarbs);
+		$nutrients->setFats(
+			Fats::createFromEnergy(
+				new Energy(
+					new Amount(
+						$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 					),
+					Energy::getBaseUnit(),
 				),
-			);
-		}
+			),
+		);
+
 		return $nutrients;
 	}
 }

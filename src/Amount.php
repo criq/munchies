@@ -8,7 +8,7 @@ class Amount
 {
 	protected $value;
 
-	public function __construct(float $value)
+	public function __construct(float $value = 0)
 	{
 		$this->value = $value;
 	}

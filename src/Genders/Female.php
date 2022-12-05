@@ -85,16 +85,17 @@ class Female extends \Fatty\Gender
 	 */
 	public function calcReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
 	{
-		$energy = new Energy(new Amount(0), "kcal");
-		$energy = $energy->modify($this->calcBreastfeedingReferenceDailyIntakeBonus($calculator)->getResult());
-		$energy = $energy->modify($this->calcPregnancyReferenceDailyIntakeBonus($calculator)->getResult());
+		$energy = (new Energy)
+			->modify($this->calcBreastfeedingReferenceDailyIntakeBonus($calculator)->getResult())
+			->modify($this->calcPregnancyReferenceDailyIntakeBonus($calculator)->getResult())
+			;
 
 		return new QuantityMetric("referenceDailyIntakeBonus", $energy);
 	}
 
 	public function calcBreastfeedingReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
 	{
-		$energy = new Energy(new Amount(0), "kcal");
+		$energy = new Energy;
 		$referenceDate = $calculator->getReferenceDate();
 
 		return new QuantityMetric("breastfeedingReferenceDailyIntakeBonus", $energy);
@@ -102,14 +103,14 @@ class Female extends \Fatty\Gender
 
 	public function calcPregnancyReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
 	{
-		$energy = new Energy(new Amount(0), "kcal");
+		$energy = new Energy;
 		$referenceDate = $calculator->getReferenceDate();
 
 		$pregnancy = $this->getPregnancy();
 		if ($pregnancy) {
 			$trimester = $pregnancy->getCurrentTrimester($referenceDate);
 			if ($trimester && in_array($trimester->getIndex(), [2, 3])) {
-				$energy = $energy->modify(new Energy(new Amount(300), "kcal"));
+				$energy->modify(new Energy(new Amount(300), "kcal"));
 			}
 		}
 

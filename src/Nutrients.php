@@ -53,17 +53,17 @@ class Nutrients
 		$amount = 0;
 
 		if ($this->getCarbs() instanceof Nutrients\Carbs) {
-			$amount += $this->getCarbs()->getEnergy()->getInUnit('kJ')->getAmount()->getValue();
+			$amount += $this->getCarbs()->getEnergy()->getInUnit("kJ")->getAmount()->getValue();
 		}
 
 		if ($this->getProteins() instanceof Nutrients\Proteins) {
-			$amount += $this->getProteins()->getEnergy()->getInUnit('kJ')->getAmount()->getValue();
+			$amount += $this->getProteins()->getEnergy()->getInUnit("kJ")->getAmount()->getValue();
 		}
 
 		if ($this->getFats() instanceof Nutrients\Fats) {
-			$amount += $this->getFats()->getEnergy()->getInUnit('kJ')->getAmount()->getValue();
+			$amount += $this->getFats()->getEnergy()->getInUnit("kJ")->getAmount()->getValue();
 		}
 
-		return new Energy(new Amount($amount), 'kJ');
+		return new Energy(new Amount($amount), "kJ");
 	}
 }
