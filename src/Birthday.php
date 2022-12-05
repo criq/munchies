@@ -52,9 +52,16 @@ class Birthday
 		return $this->getTime()->getTimestamp() > (new Time)->getTimestamp();
 	}
 
-	public function getAge(): float
+	public function getAge(Time $referenceTime): float
 	{
-		return $this->getTime()->diff(new Time)->y;
+		$diff = $this->getTime()->diff($referenceTime);
+
+		return $diff->days / 365.24;
+	}
+
+	public function getWholeAge(Time $referenceTime): int
+	{
+		return floor($this->getAge($referenceTime));
 	}
 
 	public function diff(): ?\DateInterval

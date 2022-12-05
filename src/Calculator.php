@@ -26,7 +26,7 @@ class Calculator implements RestResponseInterface
 	protected $goal;
 	protected $params;
 	protected $proportions;
-	protected $referenceDate;
+	protected $referenceTime;
 	protected $sportDurations;
 	protected $strategy;
 	protected $units = "kcal";
@@ -275,16 +275,16 @@ class Calculator implements RestResponseInterface
 	/****************************************************************************
 	 * Reference date.
 	 */
-	public function setReferenceDate(?Time $value): Calculator
+	public function setReferenceTime(?Time $value): Calculator
 	{
-		$this->referenceDate = $value;
+		$this->referenceTime = $value;
 
 		return $this;
 	}
 
-	public function getReferenceDate(): Time
+	public function getReferenceTime(): Time
 	{
-		return $this->referenceDate ?: new Time;
+		return $this->referenceTime ?: new Time;
 	}
 
 	/*****************************************************************************
@@ -810,7 +810,7 @@ class Calculator implements RestResponseInterface
 		if (!$this->getBirthday()) {
 			throw new \Fatty\Exceptions\MissingBirthdayException;
 		}
-		$age = $this->getBirthday()->getAge();
+		$age = $this->getBirthday()->getAge($this->getReferenceTime());
 
 		if ($gender instanceof Genders\Male) {
 			if ($age < 18) {

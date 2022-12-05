@@ -174,7 +174,7 @@ abstract class Gender
 		$weight = $this->calcBasalMetabolicRateMifflinStJeorWeight($calculator)->getResult();
 		$weightValue = $weight->getInUnit("kg")->getAmount()->getValue();
 		$heightValue = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
-		$ageValue = $calculator->getBirthday()->getAge();
+		$ageValue = $calculator->getBirthday()->getAge($calculator->getReferenceTime());
 
 		$basalMetabolicRateMifflinStJeorAdjustment = $this->calcBasalMetabolicRateMifflinStJeorAdjustment()->getResult();
 		$basalMetabolicRateMifflinStJeorAdjustmentValue = $basalMetabolicRateMifflinStJeorAdjustment->getAmount()->getValue();

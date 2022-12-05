@@ -104,7 +104,7 @@ class Diet
 	public function getDayIndex(Calculator $calculator): ?int
 	{
 		try {
-			$diff = $calculator->getDiet()->getTimeStart()->diff($calculator->getReferenceDate());
+			$diff = $calculator->getDiet()->getTimeStart()->diff($calculator->getReferenceTime());
 			if ($diff->invert) {
 				return null;
 			}

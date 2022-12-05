@@ -2,6 +2,8 @@
 
 namespace Fatty;
 
+use Fatty\Metrics\QuantityMetric;
+
 class Child
 {
 	protected $birthday;
@@ -29,5 +31,12 @@ class Child
 		$this->breastfeedingMode = $breastfeedingMode;
 
 		return $this;
+	}
+
+	public function getReferenceDailyIntakeBonus(Calculator $calculator)//: QuantityMetric
+	{
+		$weightGoalQuotientValue = $calculator->calcWeightGoalQuotient($calculator)->getResult()->getValue();
+
+		var_dump($this->getBirthday()->getAge($calculator->getReferenceTime()));
 	}
 }

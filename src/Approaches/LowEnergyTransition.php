@@ -33,7 +33,7 @@ class LowEnergyTransition extends \Fatty\Approach
 		$energyStart = new Energy(new Amount(static::ENERGY_DEFAULT), static::ENERGY_UNIT);
 
 		$timeStart = $calculator->getDiet()->getTimeStart();
-		$timeEnd = $calculator->getReferenceDate();
+		$timeEnd = $calculator->getReferenceTime();
 		$time = clone $timeStart;
 
 		$collection = new LowEnergyTransitionDayCollection;
@@ -105,7 +105,7 @@ class LowEnergyTransition extends \Fatty\Approach
 
 	public function getWeightGoalEnergyExpenditure(Calculator $calculator): Energy
 	{
-		return $this->calcDays($calculator)->filterByDate($calculator->getReferenceDate())[0]->getWeightGoalEnergyExpenditure();
+		return $this->calcDays($calculator)->filterByDate($calculator->getReferenceTime())[0]->getWeightGoalEnergyExpenditure();
 	}
 
 	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetric

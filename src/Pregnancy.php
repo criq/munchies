@@ -50,9 +50,9 @@ class Pregnancy
 		return $this->weightBeforePregnancy;
 	}
 
-	public function getIsPregnant(Time $referenceDate): bool
+	public function getIsPregnant(Time $referenceTime): bool
 	{
-		return $this->getInterval()->fitsTime($referenceDate);
+		return $this->getInterval()->fitsTime($referenceTime);
 	}
 
 	public function getWeeks(): WeekCollection
@@ -87,10 +87,10 @@ class Pregnancy
 		]);
 	}
 
-	public function getCurrentWeek(Time $referenceDate): ?Week
+	public function getCurrentWeek(Time $referenceTime): ?Week
 	{
 		foreach ($this->getWeeks() as $week) {
-			if ($week->getInterval()->fitsTime($referenceDate)) {
+			if ($week->getInterval()->fitsTime($referenceTime)) {
 				return $week;
 			}
 		}
@@ -98,10 +98,10 @@ class Pregnancy
 		return null;
 	}
 
-	public function getCurrentTrimester(Time $referenceDate): ?Trimester
+	public function getCurrentTrimester(Time $referenceTime): ?Trimester
 	{
 		foreach ($this->getTrimesters() as $trimester) {
-			if ($trimester->getInterval()->fitsTime($referenceDate)) {
+			if ($trimester->getInterval()->fitsTime($referenceTime)) {
 				return $trimester;
 			}
 		}
