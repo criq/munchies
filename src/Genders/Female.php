@@ -115,7 +115,7 @@ class Female extends \Fatty\Gender
 		$referenceDate = $calculator->getReferenceDate();
 
 		var_dump($this->getChildren());
-		var_dump($calculator->getStrategy()->calcWeightGoalQuotient($calculator));
+		var_dump($calculator->calcWeightGoalQuotient($calculator));
 
 		return new QuantityMetric("breastfeedingReferenceDailyIntakeBonus", $energy);
 	}

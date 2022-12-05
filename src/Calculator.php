@@ -1104,6 +1104,11 @@ class Calculator implements RestResponseInterface
 	/*****************************************************************************
 	 * Total Daily Energy Expenditure - Celkový doporučený denní příjem - TDEE.
 	 */
+	public function calcWeightGoalQuotient(): AmountMetric
+	{
+		return $this->getStrategy()->calcWeightGoalQuotient($this);
+	}
+
 	public function calcWeightGoalEnergyExpenditure(): QuantityMetric
 	{
 		return $this->getStrategy()->calcWeightGoalEnergyExpenditure($this);
