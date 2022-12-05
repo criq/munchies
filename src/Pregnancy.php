@@ -2,7 +2,6 @@
 
 namespace Fatty;
 
-use Fatty\Exceptions\PregnancyChildbirthDateInPastException;
 use Fatty\Pregnancy\Week;
 use Fatty\Pregnancy\WeekCollection;
 use Fatty\Pregnancy\Trimester;
@@ -12,19 +11,20 @@ use Katu\Tools\Calendar\Time;
 
 class Pregnancy
 {
-	public function setChildbirthDate(?Time $date): Pregnancy
+	public function setChildbirthDate(?Time $time): Pregnancy
 	{
-		if (is_null($date)) {
+		if (is_null($time)) {
 			$this->childbirthDate = null;
 		} else {
-			if ($date < new Time()) {
-				throw new PregnancyChildbirthDateInPastException;
-			}
-
-			$this->childbirthDate = $date;
+			$this->childbirthDate = $time;
 		}
 
 		return $this;
+	}
+
+	public function getConceptionDate(): ?Time
+	{
+		return (clone $this->getChildbirthDate())->modify("- 280 days")->setTime(0, 0, 0, 0);
 	}
 
 	public function getChildbirthDate(): ?Time
@@ -32,9 +32,15 @@ class Pregnancy
 		return $this->childbirthDate;
 	}
 
-	public function getConceptionDate(): ?Time
+	public function getInterval(): ?Interval
 	{
-		return (clone $this->getChildbirthDate())->modify("- 280 days")->setTime(0, 0, 0, 0);
+		try {
+			return new Interval($this->getConceptionDate(), $this->getChildbirthDate());
+		} catch (\Throwable $e) {
+			// Nevermind.
+		}
+
+		return null;
 	}
 
 	public function setWeightBeforePregnancy(?Weight $weight): Pregnancy
@@ -49,10 +55,10 @@ class Pregnancy
 		return $this->weightBeforePregnancy;
 	}
 
-	public function getIsPregnant(): bool
+	public function getIsPregnant(Time $referenceDate): bool
 	{
 		try {
-			return $this->getChildbirthDate() > new Time;
+			return $this->getInterval()->fitsTime($referenceDate);
 		} catch (\Throwable $e) {
 			// Nevermind.
 		}
@@ -92,12 +98,8 @@ class Pregnancy
 		]);
 	}
 
-	public function getCurrentWeek(?Time $referenceDate): ?Week
+	public function getCurrentWeek(Time $referenceDate): ?Week
 	{
-		if (!$referenceDate) {
-			$referenceDate = new Time;
-		}
-
 		foreach ($this->getWeeks() as $week) {
 			if ($week->getInterval()->fitsTime($referenceDate)) {
 				return $week;
@@ -107,12 +109,8 @@ class Pregnancy
 		return null;
 	}
 
-	public function getCurrentTrimester(?Time $referenceDate): ?Trimester
+	public function getCurrentTrimester(Time $referenceDate): ?Trimester
 	{
-		if (!$referenceDate) {
-			$referenceDate = new Time;
-		}
-
 		foreach ($this->getTrimesters() as $trimester) {
 			if ($trimester->getInterval()->fitsTime($referenceDate)) {
 				return $trimester;

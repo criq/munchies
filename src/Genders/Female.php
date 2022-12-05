@@ -51,7 +51,7 @@ class Female extends \Fatty\Gender
 	public function getBasalMetabolicRateStrategy(Calculator $calculator): string
 	{
 		// Při těhotenství je zapotřebí použít Mifflin-StJeor kvůli rostoucímu břichu.
-		if ($this->getIsPregnant()) {
+		if ($this->getIsPregnant($calculator)) {
 			return static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR;
 		}
 
@@ -131,10 +131,10 @@ class Female extends \Fatty\Gender
 		return $this->pregnancy;
 	}
 
-	public function getIsPregnant(): bool
+	public function getIsPregnant(Calculator $calculator): bool
 	{
 		try {
-			return $this->getPregnancy()->getIsPregnant();
+			return $this->getPregnancy()->getIsPregnant($calculator->getReferenceDate());
 		} catch (\Throwable $e) {
 			// Nevermind.
 		}
