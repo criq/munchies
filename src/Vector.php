@@ -8,8 +8,8 @@ abstract class Vector
 {
 	const CODE = "";
 	const LABEL_INFINITIVE = "";
-	const WEIGHT_GOAL_QUOTIENT = null;
 	const WEIGHT_CHANGE_PER_WEEK = "";
+	const WEIGHT_GOAL_QUOTIENT = null;
 
 	public function __toString()
 	{

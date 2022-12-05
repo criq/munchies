@@ -31,7 +31,6 @@ class DiaMama extends Strategy
 		return new AmountMetric("weightGoalQuotient", new Amount($weightGoalQuotient));
 	}
 
-
 	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetric
 	{
 		$weightGoalQuotient = $this->calcWeightGoalQuotient($calculator)->getResult();
