@@ -19,8 +19,8 @@ use Katu\Tools\Calendar\Timeout;
 
 class Female extends \Fatty\Gender
 {
+	const BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE = "kma";
 	const BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR = "msj";
-	const BASAL_METABOLIC_RATE_STRATEGY_STANDARD = "standard";
 	const ESSENTIAL_FAT_PERCENTAGE = 0.13;
 	const FIT_BODY_FAT_PERCENTAGE = 0.25;
 	const SPORT_PROTEIN_COEFFICIENT = 1.4;
@@ -58,7 +58,7 @@ class Female extends \Fatty\Gender
 			// Zkusme použít standardní výpočet...
 			parent::calcBasalMetabolicRate($calculator);
 
-			return static::BASAL_METABOLIC_RATE_STRATEGY_STANDARD;
+			return static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE;
 		} catch (\Throwable $e) {
 			// Nevermind.
 		}
@@ -88,7 +88,7 @@ class Female extends \Fatty\Gender
 			}
 		}
 
-		return static::BASAL_METABOLIC_RATE_STRATEGY_STANDARD;
+		return static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE;
 	}
 
 	public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric
@@ -96,20 +96,20 @@ class Female extends \Fatty\Gender
 		switch ($this->getBasalMetabolicRateStrategy($calculator)) {
 			// Ženy těhotné nebo do 6 měsíců po porodu:
 			case static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR:
-				return $this->calcBasalMetabolicRateSimplified($calculator);
+				return $this->calcBasalMetabolicRateMifflinStJeor($calculator);
 				break;
 			default:
-				return $this->calcBasalMetabolicRateStandard($calculator);
+				return $this->calcBasalMetabolicRateKatchMcArdle($calculator);
 				break;
 		}
 	}
 
-	public function calcBasalMetabolicRateStandard(Calculator $calculator): QuantityMetric
+	public function calcBasalMetabolicRateKatchMcArdle(Calculator $calculator): QuantityMetric
 	{
 		return parent::calcBasalMetabolicRate($calculator);
 	}
 
-	public function calcBasalMetabolicRateSimplified(Calculator $calculator): QuantityMetric
+	public function calcBasalMetabolicRateMifflinStJeor(Calculator $calculator): QuantityMetric
 	{
 		$weightBeforePregnancyAmount = $this->getPregnancy()->getWeightBeforePregnancy()->getInUnit("kg")->getAmount()->getValue();
 		$heightAmount = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
