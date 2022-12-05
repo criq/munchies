@@ -11,36 +11,31 @@ use Katu\Tools\Calendar\Time;
 
 class Pregnancy
 {
-	public function setChildbirthDate(?Time $time): Pregnancy
+	public function __construct(Time $childbirthDate)
 	{
-		if (is_null($time)) {
-			$this->childbirthDate = null;
-		} else {
-			$this->childbirthDate = $time;
-		}
+		$this->setChildbirthDate($childbirthDate);
+	}
+
+	public function setChildbirthDate(Time $time): Pregnancy
+	{
+		$this->childbirthDate = $time;
 
 		return $this;
 	}
 
-	public function getConceptionDate(): ?Time
-	{
-		return (clone $this->getChildbirthDate())->modify("- 280 days")->setTime(0, 0, 0, 0);
-	}
-
-	public function getChildbirthDate(): ?Time
+	public function getChildbirthDate(): Time
 	{
 		return $this->childbirthDate;
 	}
 
-	public function getInterval(): ?Interval
+	public function getConceptionDate(): Time
 	{
-		try {
-			return new Interval($this->getConceptionDate(), $this->getChildbirthDate());
-		} catch (\Throwable $e) {
-			// Nevermind.
-		}
+		return (clone $this->getChildbirthDate())->modify("- 280 days")->setTime(0, 0, 0, 0);
+	}
 
-		return null;
+	public function getInterval(): Interval
+	{
+		return new Interval($this->getConceptionDate(), $this->getChildbirthDate());
 	}
 
 	public function setWeightBeforePregnancy(?Weight $weight): Pregnancy
@@ -57,13 +52,7 @@ class Pregnancy
 
 	public function getIsPregnant(Time $referenceDate): bool
 	{
-		try {
-			return $this->getInterval()->fitsTime($referenceDate);
-		} catch (\Throwable $e) {
-			// Nevermind.
-		}
-
-		return false;
+		return $this->getInterval()->fitsTime($referenceDate);
 	}
 
 	public function getWeeks(): WeekCollection
