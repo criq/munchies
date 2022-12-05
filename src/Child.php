@@ -3,7 +3,6 @@
 namespace Fatty;
 
 use Fatty\Metrics\QuantityMetric;
-use Google\Cloud\Security\PrivateCA\V1beta1\ReusableConfig;
 
 class Child
 {

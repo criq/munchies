@@ -111,11 +111,7 @@ class Female extends \Fatty\Gender
 
 	public function calcBreastfeedingReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
 	{
-		$energy = new Energy;
-
-		foreach ($this->getChildren() as $child) {
-			var_dump($child->calcReferenceDailyIntakeBonus($calculator));
-		}
+		$energy = $this->getChildren()->calcReferenceDailyIntakeBonus($calculator)->getResult();
 
 		return new QuantityMetric("breastfeedingReferenceDailyIntakeBonus", $energy);
 	}
