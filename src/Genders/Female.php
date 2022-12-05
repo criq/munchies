@@ -15,12 +15,9 @@ use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Percentage;
 use Fatty\Pregnancy;
-use Katu\Tools\Calendar\Timeout;
 
 class Female extends \Fatty\Gender
 {
-	const BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE = "kma";
-	const BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR = "msj";
 	const ESSENTIAL_FAT_PERCENTAGE = 0.13;
 	const FIT_BODY_FAT_PERCENTAGE = 0.25;
 	const SPORT_PROTEIN_COEFFICIENT = 1.4;
@@ -31,7 +28,7 @@ class Female extends \Fatty\Gender
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
 	 */
-	protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric
+	public function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric
 	{
 		$waistValue = $calculator->getProportions()->getWaist()->getInUnit("cm")->getAmount()->getValue();
 		$neckValue = $calculator->getProportions()->getNeck()->getInUnit("cm")->getAmount()->getValue();
@@ -53,89 +50,33 @@ class Female extends \Fatty\Gender
 	 */
 	public function getBasalMetabolicRateStrategy(Calculator $calculator): string
 	{
-		// Lze použít standardní výpočet?
-		try {
-			// Zkusme použít standardní výpočet...
-			parent::calcBasalMetabolicRate($calculator);
-
-			return static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE;
-		} catch (\Throwable $e) {
-			// Nevermind.
-		}
-
-		// Lze použít zjednodušený výpočet?
-		if ($this->getIsPregnant() && count($this->getChildren()->filterYoungerThan(new Timeout("6 months")))) {
-			try {
-				$weightBeforePregnancy = $this->getPregnancy()->getWeightBeforePregnancy();
-			} catch (\Throwable $e) {
-				// Nevermind.
-			}
-
-			try {
-				$height = $calculator->getProportions()->getHeight();
-			} catch (\Throwable $e) {
-				// Nevermind.
-			}
-
-			try {
-				$age = $calculator->getBirthday()->getAge();
-			} catch (\Throwable $e) {
-				// Nevermind.
-			}
-
-			if (($weightBeforePregnancy ?? null) && ($height ?? null) && ($age ?? null)) {
-				return static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR;
-			}
+		// Při těhotenství je zapotřebí použít Mifflin-StJeor kvůli rostoucímu břichu.
+		if ($this->getIsPregnant()) {
+			return static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR;
 		}
 
 		return static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE;
 	}
 
-	public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric
+	public function calcBasalMetabolicRateMifflinStJeorAdjustment(): QuantityMetric
 	{
-		switch ($this->getBasalMetabolicRateStrategy($calculator)) {
-			// Ženy těhotné nebo do 6 měsíců po porodu:
-			case static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR:
-				return $this->calcBasalMetabolicRateMifflinStJeor($calculator);
-				break;
-			default:
-				return $this->calcBasalMetabolicRateKatchMcArdle($calculator);
-				break;
+		return new QuantityMetric(
+			"basalMetabolicRateMifflinStJeorAdjustment",
+			new Energy(new Amount(-161), "kcal"),
+		);
+	}
+
+	public function calcBasalMetabolicRateMifflinStJeorWeight(Calculator $calculator): QuantityMetric
+	{
+		try {
+			$weight = $this->getPregnancy()->getWeightBeforePregnancy();
+		} catch (\Throwable $e) {
+			$weight = $calculator->getWeight();
 		}
-	}
-
-	public function calcBasalMetabolicRateKatchMcArdle(Calculator $calculator): QuantityMetric
-	{
-		return parent::calcBasalMetabolicRate($calculator);
-	}
-
-	public function calcBasalMetabolicRateMifflinStJeor(Calculator $calculator): QuantityMetric
-	{
-		$weightBeforePregnancyAmount = $this->getPregnancy()->getWeightBeforePregnancy()->getInUnit("kg")->getAmount()->getValue();
-		$heightAmount = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
-		$ageAmount = $calculator->getBirthday()->getAge();
-
-		$result = (new Energy(
-			new Amount(
-				(10 * $weightBeforePregnancyAmount)
-				+ (6.25 * $heightAmount)
-				- (5 * $ageAmount)
-				- 161
-			),
-			"kcal",
-		))->getInUnit($calculator->getUnits());
-
-		$formula = "
-			(10 * weight[$weightBeforePregnancyAmount]) + (6.25 * height[$heightAmount]) - (5 * age[$ageAmount]) - 161
-			= " . (10 * $weightBeforePregnancyAmount) . " + " . (6.25 * $heightAmount) . " - " . (5 * $ageAmount) . " - 161
-			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
-			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
-		";
 
 		return new QuantityMetric(
-			"basalMetabolicRate",
-			$result,
-			$formula
+			"basalMetabolicRateMifflinStJeorWeight",
+			$weight,
 		);
 	}
 

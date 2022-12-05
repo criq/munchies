@@ -12,13 +12,16 @@ use Katu\Tools\Validation\Validation;
 
 abstract class Gender
 {
-	const BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT = "measurement";
-	const BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS = "proportions";
-	const ESSENTIAL_FAT_PERCENTAGE = null;
-	const FIT_BODY_FAT_PERCENTAGE = null;
-	const SPORT_PROTEIN_COEFFICIENT = null;
+	const BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE = "KATCH_MCARDLE";
+	CONST BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR = "MIFFLIN_STJEOR";
+	CONST BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT = "MEASUREMENT";
+	CONST BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS = "PROPORTIONS";
+	CONST ESSENTIAL_FAT_PERCENTAGE = NULL;
+	CONST FIT_BODY_FAT_PERCENTAGE = NULL;
+	CONST SPORT_PROTEIN_COEFFICIENT = NULL;
 
-	abstract protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
+	abstract public function calcBasalMetabolicRateMifflinStJeorAdjustment(): QuantityMetric;
+	abstract public function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
 	abstract public function calcBodyType(Calculator $calculator): StringMetric;
 	abstract public function getSportProteinMatrix(): array;
 
@@ -130,6 +133,23 @@ abstract class Gender
 	 */
 	public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric
 	{
+		switch ($this->getBasalMetabolicRateStrategy($calculator)) {
+			case static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR:
+				return $this->calcBasalMetabolicRateMifflinStJeor($calculator);
+				break;
+			case static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE:
+				return $this->calcBasalMetabolicRateKatchMcArdle($calculator);
+				break;
+		}
+	}
+
+	public function getBasalMetabolicRateStrategy(Calculator $calculator): string
+	{
+		return static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE;
+	}
+
+	public function calcBasalMetabolicRateKatchMcArdle(Calculator $calculator): QuantityMetric
+	{
 		$fatFreeMass = $calculator->calcFatFreeMass();
 		$fatFreeMassValue = $fatFreeMass->getResult()->getAmount()->getValue();
 
@@ -147,6 +167,48 @@ abstract class Gender
 		";
 
 		return new QuantityMetric("basalMetabolicRate", $result, $formula);
+	}
+
+	public function calcBasalMetabolicRateMifflinStJeor(Calculator $calculator): QuantityMetric
+	{
+		$weight = $this->calcBasalMetabolicRateMifflinStJeorWeight($calculator)->getResult();
+		$weightValue = $weight->getInUnit("kg")->getAmount()->getValue();
+		$heightValue = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
+		$ageValue = $calculator->getBirthday()->getAge();
+
+		$basalMetabolicRateMifflinStJeorAdjustment = $this->calcBasalMetabolicRateMifflinStJeorAdjustment()->getResult();
+		$basalMetabolicRateMifflinStJeorAdjustmentValue = $basalMetabolicRateMifflinStJeorAdjustment->getAmount()->getValue();
+
+		$result = (new Energy(
+			new Amount(
+				(10 * $weightValue)
+				+ (6.25 * $heightValue)
+				- (5 * $ageValue)
+				+ $basalMetabolicRateMifflinStJeorAdjustmentValue
+			),
+			"kcal",
+		))->getInUnit($calculator->getUnits());
+
+		$formula = "
+			(10 * weight[$weightValue]) + (6.25 * height[$heightValue]) - (5 * age[$ageValue]) + basalMetabolicRateMifflinStJeorAdjustment[$basalMetabolicRateMifflinStJeorAdjustmentValue]
+			= " . (10 * $weightValue) . " + " . (6.25 * $heightValue) . " - " . (5 * $ageValue) . " + ($basalMetabolicRateMifflinStJeorAdjustmentValue)
+			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
+			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
+		";
+
+		return new QuantityMetric(
+			"basalMetabolicRate",
+			$result,
+			$formula
+		);
+	}
+
+	public function calcBasalMetabolicRateMifflinStJeorWeight(Calculator $calculator): QuantityMetric
+	{
+		return new QuantityMetric(
+			"basalMetabolicRateMifflinStJeorWeight",
+			$calculator->getWeight(),
+		);
 	}
 
 	/*****************************************************************************

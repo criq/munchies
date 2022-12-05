@@ -2,12 +2,15 @@
 
 namespace Fatty\Genders;
 
+use Fatty\Amount;
 use Fatty\BodyTypes\Apple;
 use Fatty\BodyTypes\AppleWithHigherRisk;
 use Fatty\BodyTypes\Balanced;
 use Fatty\BodyTypes\PearOrHourglass;
 use Fatty\Calculator;
+use Fatty\Energy;
 use Fatty\Metrics\AmountMetric;
+use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Percentage;
 
@@ -20,7 +23,7 @@ class Male extends \Fatty\Gender
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
 	 */
-	protected function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric
+	public function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric
 	{
 		$waistValue = $calculator->getProportions()->getWaist()->getInUnit("cm")->getAmount()->getValue();
 		$neckValue = $calculator->getProportions()->getNeck()->getInUnit("cm")->getAmount()->getValue();
@@ -34,6 +37,17 @@ class Male extends \Fatty\Gender
 			";
 
 		return new AmountMetric("bodyFatPercentage", $result, $formula);
+	}
+
+	/****************************************************************************
+	 * Basal metabolic rate.
+	 */
+	public function calcBasalMetabolicRateMifflinStJeorAdjustment(): QuantityMetric
+	{
+		return new QuantityMetric(
+			"basalMetabolicRateMifflinStJeorAdjustment",
+			new Energy(new Amount(5), "kcal"),
+		);
 	}
 
 	/*****************************************************************************
