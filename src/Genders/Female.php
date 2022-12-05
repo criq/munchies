@@ -133,10 +133,9 @@ class Female extends \Fatty\Gender
 
 	public function getIsPregnant(Calculator $calculator): bool
 	{
-		try {
-			return $this->getPregnancy()->getIsPregnant($calculator->getReferenceDate());
-		} catch (\Throwable $e) {
-			// Nevermind.
+		$pregnancy = $this->getPregnancy();
+		if ($pregnancy) {
+			return $pregnancy->getIsPregnant($calculator->getReferenceDate());
 		}
 
 		return false;
