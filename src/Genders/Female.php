@@ -93,14 +93,6 @@ class Female extends \Fatty\Gender
 		return new QuantityMetric("referenceDailyIntakeBonus", $energy);
 	}
 
-	public function calcBreastfeedingReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
-	{
-		$energy = new Energy;
-		$referenceDate = $calculator->getReferenceDate();
-
-		return new QuantityMetric("breastfeedingReferenceDailyIntakeBonus", $energy);
-	}
-
 	public function calcPregnancyReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
 	{
 		$energy = new Energy;
@@ -115,6 +107,16 @@ class Female extends \Fatty\Gender
 		}
 
 		return new QuantityMetric("pregnancyReferenceDailyIntakeBonus", $energy);
+	}
+
+	public function calcBreastfeedingReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
+	{
+		$energy = new Energy;
+		$referenceDate = $calculator->getReferenceDate();
+
+		var_dump($this->getChildren());
+
+		return new QuantityMetric("breastfeedingReferenceDailyIntakeBonus", $energy);
 	}
 
 	/*****************************************************************************

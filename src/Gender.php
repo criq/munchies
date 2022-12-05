@@ -113,7 +113,7 @@ abstract class Gender
 		}
 	}
 
-	protected function calcBodyFatPercentageByMeasurement(Calculator $calculator): AmountMetric
+	public function calcBodyFatPercentageByMeasurement(Calculator $calculator): AmountMetric
 	{
 		return new AmountMetric("bodyFatPercentage", $calculator->getBodyFatPercentage());
 	}
