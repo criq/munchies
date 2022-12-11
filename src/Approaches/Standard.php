@@ -5,7 +5,6 @@ namespace Fatty\Approaches;
 use Fatty\Amount;
 use Fatty\Calculator;
 use Fatty\Energy;
-use Fatty\Genders\Female;
 use Fatty\Nutrients;
 use Fatty\Nutrients\Carbs;
 use Fatty\Nutrients\Fats;

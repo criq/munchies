@@ -7,7 +7,6 @@ use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDay;
 use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDayCollection;
 use Fatty\Calculator;
 use Fatty\Energy;
-use Fatty\Genders\Female;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Nutrients;
 use Fatty\Nutrients\Fats;
