@@ -2,7 +2,6 @@
 
 namespace Fatty\Genders;
 
-use App\Classes\Calendar\Time;
 use Fatty\Amount;
 use Fatty\BodyTypes\Apple;
 use Fatty\BodyTypes\AppleWithHigherRisk;
@@ -20,7 +19,6 @@ use Katu\Tools\Calendar\Timeout;
 
 class Female extends \Fatty\Gender
 {
-	const DEFAULT_SPORT_PROTEIN_COEFFICIENT = 1.4;
 	const ESSENTIAL_FAT_PERCENTAGE = 0.13;
 	const FIT_BODY_FAT_PERCENTAGE = 0.25;
 	const PREGNANCY_SPORT_PROTEIN_COEFFICIENT = 1.8;
@@ -51,7 +49,7 @@ class Female extends \Fatty\Gender
 	/****************************************************************************
 	 * Basal metabolic rate.
 	 */
-	public function getBasalMetabolicRateStrategy(Calculator $calculator): string
+	public function calcBasalMetabolicRateStrategy(Calculator $calculator): string
 	{
 		// Při těhotenství je zapotřebí použít Mifflin-StJeor kvůli rostoucímu břichu.
 		if ($this->getIsPregnant($calculator)) {
@@ -192,13 +190,21 @@ class Female extends \Fatty\Gender
 	/****************************************************************************
 	 * Sport durations.
 	 */
-	public function getDefaultSportProteinCoefficient(Calculator $calculator): float
+	public function calcSportProteinSetKey(Calculator $calculator): StringMetric
 	{
-		if ($this->getIsPregnant($calculator) || $this->getIsNewMother($calculator)) {
-			return static::PREGNANCY_SPORT_PROTEIN_COEFFICIENT;
+		if ($this->getIsPregnant($calculator)) {
+			return new StringMetric(
+				"sportProteinSetKey",
+				"PREGNANT",
+			);
+		} elseif ($this->getIsNewMother($calculator)) {
+			return new StringMetric(
+				"sportProteinSetKey",
+				"NEW_MOTHER",
+			);
 		}
 
-		return parent::getDefaultSportProteinCoefficient($calculator);
+		return parent::calcSportProteinSetKey($calculator);
 	}
 
 	public function getSportProteinMatrix(): array

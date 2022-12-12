@@ -16,7 +16,6 @@ abstract class Gender
 	const BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR = "MIFFLIN_STJEOR";
 	const BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT = "MEASUREMENT";
 	const BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS = "PROPORTIONS";
-	const DEFAULT_SPORT_PROTEIN_COEFFICIENT = NULL;
 	const ESSENTIAL_FAT_PERCENTAGE = NULL;
 	const FIT_BODY_FAT_PERCENTAGE = NULL;
 
@@ -123,17 +122,12 @@ abstract class Gender
 		return new AmountMetric("essentialFatPercentage", new Percentage((float)static::ESSENTIAL_FAT_PERCENTAGE));
 	}
 
-	public function getDefaultSportProteinCoefficient(Calculator $calculator): float
-	{
-		return (float)static::DEFAULT_SPORT_PROTEIN_COEFFICIENT;
-	}
-
 	/****************************************************************************
 	 * Basal metabolic rate.
 	 */
 	public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric
 	{
-		switch ($this->getBasalMetabolicRateStrategy($calculator)) {
+		switch ($this->calcBasalMetabolicRateStrategy($calculator)) {
 			case static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR:
 				return $this->calcBasalMetabolicRateMifflinStJeor($calculator);
 				break;
@@ -143,7 +137,7 @@ abstract class Gender
 		}
 	}
 
-	public function getBasalMetabolicRateStrategy(Calculator $calculator): string
+	public function calcBasalMetabolicRateStrategy(Calculator $calculator): string
 	{
 		return static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE;
 	}
@@ -222,7 +216,7 @@ abstract class Gender
 	/****************************************************************************
 	 * Fitness level.
 	 */
-	public function getFitnessLevel(Calculator $calculator): StringMetric
+	public function calcFitnessLevel(Calculator $calculator): StringMetric
 	{
 		$bodyFatPercentage = $calculator->calcBodyFatPercentage();
 		$bodyFatPercentageValue = $bodyFatPercentage->getResult()->getValue();
@@ -233,6 +227,11 @@ abstract class Gender
 		$formula = "bodyFatPercentage[{$bodyFatPercentageValue}] > {$fitBodyFatPercentage} ? UNFIT : FIT";
 
 		return new StringMetric("fitnessLevel", $string, $string, $formula);
+	}
+
+	public function calcSportProteinSetKey(Calculator $calculator): StringMetric
+	{
+		return new StringMetric("sportProteinSetKey", (string)$calculator->calcFitnessLevel()->getResult());
 	}
 
 	public function calcMaxOptimalWeight(Calculator $calculator): QuantityMetric

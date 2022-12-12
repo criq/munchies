@@ -494,17 +494,20 @@ class Calculator implements RestResponseInterface
 
 	public function getSportProteinMatrix(): array
 	{
-		$gender = $this->getGender();
-		if (!$gender) {
+		if (!$this->getGender()) {
 			throw new \Fatty\Exceptions\MissingGenderException;
 		}
 
-		return $gender->getSportProteinMatrix();
+		return $this->getGender()->getSportProteinMatrix();
 	}
 
 	public function calcSportProteinSetKey(): StringMetric
 	{
-		return new StringMetric("sportProteinSetKey", (string)$this->calcFitnessLevel()->getResult());
+		if (!$this->getGender()) {
+			throw new \Fatty\Exceptions\MissingGenderException;
+		}
+
+		return $this->getGender()->calcSportProteinSetKey($this);
 	}
 
 	public function calcSportProteinCoefficientKey(): StringMetric
@@ -512,7 +515,7 @@ class Calculator implements RestResponseInterface
 		try {
 			$value = $this->getSportDurations()->getMaxProteinSportDuration()->getSportProteinCoefficientKey();
 		} catch (\Throwable $e) {
-			$value = null;
+			$value = "NO_ACTIVITY";
 		}
 
 		return new StringMetric("sportProteinCoefficientKey", (string)$value);
@@ -520,23 +523,10 @@ class Calculator implements RestResponseInterface
 
 	public function calcSportProteinCoefficient(): AmountMetric
 	{
-		$maxSportDuration = $this->getSportDurations()->getMaxProteinSportDuration();
-
-		// Velká fyzická zátěž.
-		if (($maxSportDuration && $maxSportDuration->getAmount()->getValue() >= 60) || $this->calcPhysicalActivityLevel()->getResult()->getValue() >= 1.9) {
-			$fitnessLevel = $this->calcFitnessLevel()->getResult();
-			$sportProteinMatrix = $this->getSportProteinMatrix();
-			$sportProteinCoefficientKey = $this->calcSportProteinCoefficientKey()->getResult() ?: \Fatty\SportDurations\Anaerobic::getCode();
-			$proteinCoefficient = $sportProteinMatrix[$fitnessLevel][$sportProteinCoefficientKey];
-
-		// Normální fyzická zátěž.
-		} else {
-			if (!$this->getGender()) {
-				throw new \Fatty\Exceptions\MissingGenderException;
-			}
-
-			$proteinCoefficient = $this->getGender()->getDefaultSportProteinCoefficient($this);
-		}
+		$sportProteinSetKey = $this->calcSportProteinSetKey()->getResult();
+		$sportProteinCoefficientKey = $this->calcSportProteinCoefficientKey()->getResult();
+		$sportProteinMatrix = $this->getSportProteinMatrix();
+		$proteinCoefficient = $sportProteinMatrix[$sportProteinSetKey][$sportProteinCoefficientKey];
 
 		return new AmountMetric("sportProteinCoefficient", new Amount($proteinCoefficient));
 	}
@@ -1047,7 +1037,7 @@ class Calculator implements RestResponseInterface
 			throw new \Fatty\Exceptions\MissingGenderException;
 		}
 
-		return $this->getGender()->getFitnessLevel($this);
+		return $this->getGender()->calcFitnessLevel($this);
 	}
 
 	public function calcEstimatedFunctionalMass(): QuantityMetric
@@ -1097,6 +1087,15 @@ class Calculator implements RestResponseInterface
 	/*****************************************************************************
 	 * Bazální metabolismus - BMR.
 	 */
+	public function calcBasalMetabolicRateStrategy(): string
+	{
+		if (!$this->getGender()) {
+			throw new MissingGenderException;
+		}
+
+		return $this->getGender()->calcBasalMetabolicRateStrategy($this);
+	}
+
 	public function calcBasalMetabolicRate(): QuantityMetric
 	{
 		if (!$this->getGender()) {

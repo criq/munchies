@@ -16,7 +16,6 @@ use Fatty\Percentage;
 
 class Male extends \Fatty\Gender
 {
-	const DEFAULT_SPORT_PROTEIN_COEFFICIENT = 1.5;
 	const ESSENTIAL_FAT_PERCENTAGE = 0.5;
 	const FIT_BODY_FAT_PERCENTAGE = 0.19;
 
