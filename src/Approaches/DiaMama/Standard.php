@@ -21,20 +21,21 @@ class Standard extends \Fatty\Approaches\Standard
 		$sportProteinCoefficient = $calculator->calcSportProteinCoefficient()->getResult();
 		$sportProteinCoefficientValue = $sportProteinCoefficient->getValue();
 
-		// TODO - bonusy za kojení
-		// var_dump($calculator->getGender()->calcSportProteinBonus());
+		$goalNutrientProteinBonus = $calculator->getGender()->calcGoalNutrientProteinBonus($calculator)->getResult();
+		$goalNutrientProteinBonusValue = $goalNutrientProteinBonus->getAmount()->getValue();
 
-		$resultValue = $estimatedFunctionalMassValue * $sportProteinCoefficientValue;
-		$proteins = new Proteins(new Amount($resultValue), "g");
+		$resultValue = ($estimatedFunctionalMassValue * $sportProteinCoefficientValue) + $goalNutrientProteinBonusValue;
+		$result = new Proteins(new Amount($resultValue), "g");
 
 		$formula = "
-			(estimatedFunctionalMass[$estimatedFunctionalMass] * sportProteinCoefficient[$sportProteinCoefficient])
-			= $proteins
+			(estimatedFunctionalMass[$estimatedFunctionalMassValue] * sportProteinCoefficient[$sportProteinCoefficientValue]) + $goalNutrientProteinBonusValue
+			" . ($estimatedFunctionalMassValue * $sportProteinCoefficientValue) . " + $goalNutrientProteinBonusValue
+			= $resultValue
 		";
 
 		return new QuantityMetric(
 			"goalNutrientsProteins",
-			$proteins,
+			$result,
 			$formula,
 		);
 	}

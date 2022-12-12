@@ -6,6 +6,7 @@ use Fatty\Exceptions\MissingBodyFatPercentageInputException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
+use Fatty\Nutrients\Proteins;
 use Katu\Errors\Error;
 use Katu\Tools\Validation\Param;
 use Katu\Tools\Validation\Validation;
@@ -232,11 +233,6 @@ abstract class Gender
 		return new StringMetric("fitnessLevel", $string, $string, $formula);
 	}
 
-	public function calcSportProteinSetKey(Calculator $calculator): StringMetric
-	{
-		return new StringMetric("sportProteinSetKey", (string)$calculator->calcFitnessLevel()->getResult());
-	}
-
 	public function calcMaxOptimalWeight(Calculator $calculator): QuantityMetric
 	{
 		if ($calculator->calcFitnessLevel()->getResult() == "UNFIT") {
@@ -259,5 +255,18 @@ abstract class Gender
 		}
 
 		return new QuantityMetric("maxOptimalWeight", $weight, $formula);
+	}
+
+	public function calcSportProteinSetKey(Calculator $calculator): StringMetric
+	{
+		return new StringMetric("sportProteinSetKey", (string)$calculator->calcFitnessLevel()->getResult());
+	}
+
+	public function calcGoalNutrientProteinBonus(Calculator $calculator): QuantityMetric
+	{
+		return new QuantityMetric(
+			"goalNutrientProteinBonus",
+			new Proteins(new Amount),
+		);
 	}
 }

@@ -13,6 +13,7 @@ use Fatty\Energy;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
+use Fatty\Nutrients\Proteins;
 use Fatty\Percentage;
 use Fatty\Pregnancy;
 use Katu\Tools\Calendar\Timeout;
@@ -164,7 +165,12 @@ class Female extends \Fatty\Gender
 		return $this->children;
 	}
 
-	public function getIsNewMother(Calculator $calculator)
+	public function getIsBreastfeeding(): bool
+	{
+		return (bool)count($this->getChildren()->filterBreastfed());
+	}
+
+	public function getIsNewMother(Calculator $calculator): bool
 	{
 		return (bool)count($this->getChildren()->filterYoungerThan(new Timeout("6 months", $calculator->getReferenceTime())));
 	}
@@ -246,5 +252,21 @@ class Female extends \Fatty\Gender
 				"ANAEROBIC_LONG" => 2.2,
 			],
 		];
+	}
+
+	public function calcGoalNutrientProteinBonus(Calculator $calculator): QuantityMetric
+	{
+		$proteins = new Proteins(new Amount);
+
+		if ($this->getIsBreastfeeding()) {
+			if ($this->getIsPregnant($calculator) || $this->getIsNewMother($calculator)) {
+				$proteins->modify(new Proteins(new Amount(20), "g"));
+			}
+		}
+
+		return new QuantityMetric(
+			"goalNutrientProteinBonus",
+			$proteins,
+		);
 	}
 }

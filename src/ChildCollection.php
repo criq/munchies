@@ -14,6 +14,13 @@ class ChildCollection extends \ArrayObject
 		})));
 	}
 
+	public function filterBreastfed(): ChildCollection
+	{
+		return new static(array_values(array_filter($this->getArrayCopy(), function (Child $child) {
+			return $child->getIsBreastfed();
+		})));
+	}
+
 	public function calcReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
 	{
 		$energy = new Energy(new Amount, "kJ");

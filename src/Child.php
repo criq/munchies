@@ -38,6 +38,11 @@ class Child
 		return $this->breastfeedingMode;
 	}
 
+	public function getIsBreastfed(): bool
+	{
+		return $this->getBreastfeedingMode() instanceof \Fatty\BreastfeedingModes\Full || $this->getBreastfeedingMode() instanceof \Fatty\BreastfeedingModes\Partial;
+	}
+
 	public function calcReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
 	{
 		$energy = new Energy(new Amount, "kJ");
