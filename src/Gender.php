@@ -13,12 +13,12 @@ use Katu\Tools\Validation\Validation;
 abstract class Gender
 {
 	const BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE = "KATCH_MCARDLE";
-	CONST BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR = "MIFFLIN_STJEOR";
-	CONST BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT = "MEASUREMENT";
-	CONST BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS = "PROPORTIONS";
-	CONST ESSENTIAL_FAT_PERCENTAGE = NULL;
-	CONST FIT_BODY_FAT_PERCENTAGE = NULL;
-	CONST SPORT_PROTEIN_COEFFICIENT = NULL;
+	const BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR = "MIFFLIN_STJEOR";
+	const BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT = "MEASUREMENT";
+	const BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS = "PROPORTIONS";
+	const DEFAULT_SPORT_PROTEIN_COEFFICIENT = NULL;
+	const ESSENTIAL_FAT_PERCENTAGE = NULL;
+	const FIT_BODY_FAT_PERCENTAGE = NULL;
 
 	abstract public function calcBasalMetabolicRateMifflinStJeorAdjustment(): QuantityMetric;
 	abstract public function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
@@ -123,9 +123,9 @@ abstract class Gender
 		return new AmountMetric("essentialFatPercentage", new Percentage((float)static::ESSENTIAL_FAT_PERCENTAGE));
 	}
 
-	public function getSportProteinCoefficient(): float
+	public function getDefaultSportProteinCoefficient(Calculator $calculator): float
 	{
-		return (float)static::SPORT_PROTEIN_COEFFICIENT;
+		return (float)static::DEFAULT_SPORT_PROTEIN_COEFFICIENT;
 	}
 
 	/****************************************************************************

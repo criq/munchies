@@ -2,6 +2,7 @@
 
 namespace Fatty\Genders;
 
+use App\Classes\Calendar\Time;
 use Fatty\Amount;
 use Fatty\BodyTypes\Apple;
 use Fatty\BodyTypes\AppleWithHigherRisk;
@@ -15,12 +16,14 @@ use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Percentage;
 use Fatty\Pregnancy;
+use Katu\Tools\Calendar\Timeout;
 
 class Female extends \Fatty\Gender
 {
+	const DEFAULT_SPORT_PROTEIN_COEFFICIENT = 1.4;
 	const ESSENTIAL_FAT_PERCENTAGE = 0.13;
 	const FIT_BODY_FAT_PERCENTAGE = 0.25;
-	const SPORT_PROTEIN_COEFFICIENT = 1.4;
+	const PREGNANCY_SPORT_PROTEIN_COEFFICIENT = 1.8;
 
 	protected $children;
 	protected $pregnancy;
@@ -160,6 +163,11 @@ class Female extends \Fatty\Gender
 		return $this->children;
 	}
 
+	public function getIsNewMother(Calculator $calculator)
+	{
+		return (bool)count($this->getChildren()->filterYoungerThan(new Timeout("6 months", $calculator->getReferenceTime())));
+	}
+
 	/*****************************************************************************
 	 * Typ postavy.
 	 */
@@ -182,12 +190,22 @@ class Female extends \Fatty\Gender
 	}
 
 	/****************************************************************************
-	 * Sport protein matrix.
+	 * Sport durations.
 	 */
+	public function getDefaultSportProteinCoefficient(Calculator $calculator): float
+	{
+		if ($this->getIsPregnant($calculator) || $this->getIsNewMother($calculator)) {
+			return static::PREGNANCY_SPORT_PROTEIN_COEFFICIENT;
+		}
+
+		return parent::getDefaultSportProteinCoefficient($calculator);
+	}
+
 	public function getSportProteinMatrix(): array
 	{
 		return [
 			"FIT" => [
+				"NO_ACTIVITY" => 1.4,
 				"LOW_FREQUENCY" => 1.4,
 				"AEROBIC" => 1.6,
 				"ANAEROBIC" => 1.8,
@@ -195,11 +213,28 @@ class Female extends \Fatty\Gender
 				"ANAEROBIC_LONG" => 1.8,
 			],
 			"UNFIT" => [
+				"NO_ACTIVITY" => 1.4,
 				"LOW_FREQUENCY" => 1.5,
 				"AEROBIC" => 1.8,
 				"ANAEROBIC" => 1.8,
 				"ANAEROBIC_SHORT" => 1.8,
 				"ANAEROBIC_LONG" => 1.8,
+			],
+			"PREGNANT" => [
+				"NO_ACTIVITY" => 1.8,
+				"LOW_FREQUENCY" => 1.9,
+				"AEROBIC" => 1.9,
+				"ANAEROBIC" => 2.2,
+				"ANAEROBIC_SHORT" => 2.2,
+				"ANAEROBIC_LONG" => 2.2,
+			],
+			"NEW_MOTHER" => [
+				"NO_ACTIVITY" => 1.8,
+				"LOW_FREQUENCY" => 1.9,
+				"AEROBIC" => 1.9,
+				"ANAEROBIC" => 2.2,
+				"ANAEROBIC_SHORT" => 2.2,
+				"ANAEROBIC_LONG" => 2.2,
 			],
 		];
 	}

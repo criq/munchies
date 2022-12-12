@@ -16,9 +16,9 @@ use Fatty\Percentage;
 
 class Male extends \Fatty\Gender
 {
+	const DEFAULT_SPORT_PROTEIN_COEFFICIENT = 1.5;
 	const ESSENTIAL_FAT_PERCENTAGE = 0.5;
 	const FIT_BODY_FAT_PERCENTAGE = 0.19;
-	const SPORT_PROTEIN_COEFFICIENT = 1.5;
 
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
@@ -77,18 +77,20 @@ class Male extends \Fatty\Gender
 	{
 		return [
 			"FIT" => [
-				"LOW_FREQUENCY" => 1.5,
-				"AEROBIC" => 1.8,
-				"ANAEROBIC" => 2.2,
+				"AEROBIC"         => 1.8,
+				"ANAEROBIC_LONG"  => 2.2,
 				"ANAEROBIC_SHORT" => 1.8,
-				"ANAEROBIC_LONG" => 2.2,
+				"ANAEROBIC"       => 2.2,
+				"LOW_FREQUENCY"   => 1.5,
+				"NO_ACTIVITY"     => 1.5,
 			],
 			"UNFIT" => [
-				"LOW_FREQUENCY" => 1.5,
-				"AEROBIC" => 1.7,
-				"ANAEROBIC" => 2,
+				"AEROBIC"         => 1.7,
+				"ANAEROBIC_LONG"  => 2,
 				"ANAEROBIC_SHORT" => 1.7,
-				"ANAEROBIC_LONG" => 2,
+				"ANAEROBIC"       => 2,
+				"LOW_FREQUENCY"   => 1.5,
+				"NO_ACTIVITY"     => 1.5,
 			],
 		];
 	}

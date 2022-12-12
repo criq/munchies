@@ -473,6 +473,13 @@ class Calculator implements RestResponseInterface
 		return new AmountMetric("activity", $activity);
 	}
 
+	public function setSportDurations(?SportDurations $sportDurations): Calculator
+	{
+		$this->sportDurations = $sportDurations;
+
+		return $this;
+	}
+
 	public function getSportDurations(): SportDurations
 	{
 		$this->sportDurations = $this->sportDurations instanceof SportDurations ? $this->sportDurations : new SportDurations;
@@ -493,6 +500,11 @@ class Calculator implements RestResponseInterface
 		}
 
 		return $gender->getSportProteinMatrix();
+	}
+
+	public function calcSportProteinSetKey(): StringMetric
+	{
+		return new StringMetric("sportProteinSetKey", (string)$this->calcFitnessLevel()->getResult());
 	}
 
 	public function calcSportProteinCoefficientKey(): StringMetric
@@ -516,13 +528,14 @@ class Calculator implements RestResponseInterface
 			$sportProteinMatrix = $this->getSportProteinMatrix();
 			$sportProteinCoefficientKey = $this->calcSportProteinCoefficientKey()->getResult() ?: \Fatty\SportDurations\Anaerobic::getCode();
 			$proteinCoefficient = $sportProteinMatrix[$fitnessLevel][$sportProteinCoefficientKey];
+
 		// Normální fyzická zátěž.
 		} else {
 			if (!$this->getGender()) {
 				throw new \Fatty\Exceptions\MissingGenderException;
 			}
 
-			$proteinCoefficient = $this->getGender()->getSportProteinCoefficient();
+			$proteinCoefficient = $this->getGender()->getDefaultSportProteinCoefficient($this);
 		}
 
 		return new AmountMetric("sportProteinCoefficient", new Amount($proteinCoefficient));
@@ -1035,6 +1048,22 @@ class Calculator implements RestResponseInterface
 		}
 
 		return $this->getGender()->getFitnessLevel($this);
+	}
+
+	public function calcEstimatedFunctionalMass(): QuantityMetric
+	{
+		if (!$this->getProportions()->getHeight()) {
+			throw new \Fatty\Exceptions\MissingHeightException;
+		}
+
+		$heightValue = $this->getProportions()->getHeight()->getAmount()->getValue();
+		$resultValue = $heightValue - 105;
+
+		return new QuantityMetric(
+			"estimatedFunctionalMass",
+			new Weight(new Amount($resultValue), "kg"),
+			"height[$heightValue] - 105 = $resultValue",
+		);
 	}
 
 	/*****************************************************************************
