@@ -22,16 +22,15 @@ class Standard extends \Fatty\Approaches\Standard
 		$sportProteinCoefficientValue = $sportProteinCoefficient->getValue();
 
 		// TODO - bonusy za kojení
-		// var_dump($calculator->getGender()->getChildren());die;
+		// var_dump($calculator->getGender()->calcSportProteinBonus());
 
 		$resultValue = $estimatedFunctionalMassValue * $sportProteinCoefficientValue;
+		$proteins = new Proteins(new Amount($resultValue), "g");
 
 		$formula = "
 			(estimatedFunctionalMass[$estimatedFunctionalMass] * sportProteinCoefficient[$sportProteinCoefficient])
-			= $resultValue
+			= $proteins
 		";
-
-		$proteins = new Proteins(new Amount($resultValue), "g");
 
 		return new QuantityMetric(
 			"goalNutrientsProteins",
