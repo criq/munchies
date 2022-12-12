@@ -1087,7 +1087,7 @@ class Calculator implements RestResponseInterface
 	/*****************************************************************************
 	 * Bazální metabolismus - BMR.
 	 */
-	public function calcBasalMetabolicRateStrategy(): string
+	public function calcBasalMetabolicRateStrategy(): StringMetric
 	{
 		if (!$this->getGender()) {
 			throw new MissingGenderException;

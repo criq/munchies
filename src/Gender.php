@@ -127,7 +127,7 @@ abstract class Gender
 	 */
 	public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric
 	{
-		switch ($this->calcBasalMetabolicRateStrategy($calculator)) {
+		switch ($this->calcBasalMetabolicRateStrategy($calculator)->getResult()) {
 			case static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR:
 				return $this->calcBasalMetabolicRateMifflinStJeor($calculator);
 				break;
@@ -137,9 +137,12 @@ abstract class Gender
 		}
 	}
 
-	public function calcBasalMetabolicRateStrategy(Calculator $calculator): string
+	public function calcBasalMetabolicRateStrategy(Calculator $calculator): StringMetric
 	{
-		return static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE;
+		return new StringMetric(
+			"basalMetabolicRateStrategy",
+			static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE,
+		);
 	}
 
 	public function calcBasalMetabolicRateKatchMcArdle(Calculator $calculator): QuantityMetric

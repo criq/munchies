@@ -49,14 +49,17 @@ class Female extends \Fatty\Gender
 	/****************************************************************************
 	 * Basal metabolic rate.
 	 */
-	public function calcBasalMetabolicRateStrategy(Calculator $calculator): string
+	public function calcBasalMetabolicRateStrategy(Calculator $calculator): StringMetric
 	{
 		// Při těhotenství je zapotřebí použít Mifflin-StJeor kvůli rostoucímu břichu.
 		if ($this->getIsPregnant($calculator)) {
-			return static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR;
+			return new StringMetric(
+				"basalMetabolicRateStrategy",
+				static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR,
+			);
 		}
 
-		return static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE;
+		return parent::calcBasalMetabolicRateStrategy($calculator);
 	}
 
 	public function calcBasalMetabolicRateMifflinStJeorAdjustment(): QuantityMetric
