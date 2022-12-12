@@ -15,18 +15,28 @@ class Standard extends \Fatty\Approaches\Standard
 
 	public function calcGoalNutrientProteins(Calculator $calculator): QuantityMetric
 	{
-		$estimatedFunctionalMass = $calculator->calcEstimatedFunctionalMass();
+		$estimatedFunctionalMass = $calculator->calcEstimatedFunctionalMass()->getResult();
+		$estimatedFunctionalMassValue = $estimatedFunctionalMass->getAmount()->getValue();
 
-		var_dump($calculator->getSportDurations()->getMaxProteinSportDuration());
-		die;
-
-		$resultValue = $estimatedFunctionalMass->getResult()->getAmount()->getValue() * $calcSportProteinCoefficient->getResult()->getValue();
+		$sportProteinCoefficient = $calculator->calcSportProteinCoefficient()->getResult();
+		$sportProteinCoefficientValue = $sportProteinCoefficient->getValue();
 
 		// TODO - bonusy za kojení
 		// var_dump($calculator->getGender()->getChildren());die;
 
+		$resultValue = $estimatedFunctionalMassValue * $sportProteinCoefficientValue;
+
+		$formula = "
+			(estimatedFunctionalMass[$estimatedFunctionalMass] * sportProteinCoefficient[$sportProteinCoefficient])
+			= $resultValue
+		";
+
 		$proteins = new Proteins(new Amount($resultValue), "g");
 
-		return new \Fatty\Metrics\QuantityMetric("goalNutrientsProteins", $proteins);
+		return new QuantityMetric(
+			"goalNutrientsProteins",
+			$proteins,
+			$formula,
+		);
 	}
 }
