@@ -523,9 +523,9 @@ class Calculator implements RestResponseInterface
 
 	public function calcSportProteinCoefficient(): AmountMetric
 	{
+		$sportProteinMatrix = $this->getSportProteinMatrix();
 		$sportProteinSetKey = $this->calcSportProteinSetKey()->getResult();
 		$sportProteinCoefficientKey = $this->calcSportProteinCoefficientKey()->getResult();
-		$sportProteinMatrix = $this->getSportProteinMatrix();
 		$proteinCoefficient = $sportProteinMatrix[$sportProteinSetKey][$sportProteinCoefficientKey];
 
 		return new AmountMetric("sportProteinCoefficient", new Amount($proteinCoefficient));
