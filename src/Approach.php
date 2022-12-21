@@ -34,6 +34,9 @@ abstract class Approach
 	public static function getAvailableClasses(): array
 	{
 		return [
+			\Fatty\Approaches\DiaMama\HighCarb::CODE => new \Fatty\Approaches\DiaMama\HighCarb,
+			\Fatty\Approaches\DiaMama\LowCarb::CODE => new \Fatty\Approaches\DiaMama\LowCarb,
+			\Fatty\Approaches\DiaMama\Standard::CODE => new \Fatty\Approaches\DiaMama\Standard,
 			\Fatty\Approaches\Keto::CODE => new \Fatty\Approaches\Keto,
 			\Fatty\Approaches\LowCarb::CODE => new \Fatty\Approaches\LowCarb,
 			\Fatty\Approaches\LowEnergy::CODE => new \Fatty\Approaches\LowEnergy,
