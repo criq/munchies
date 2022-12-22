@@ -8,6 +8,7 @@ class Child
 {
 	protected $birthday;
 	protected $breastfeedingMode;
+	protected $name;
 
 	public function __construct(Birthday $birthday)
 	{
@@ -24,6 +25,18 @@ class Child
 	public function getBirthday(): Birthday
 	{
 		return $this->birthday;
+	}
+
+	public function setName(?string $name): Child
+	{
+		$this->name = $name ?: null;
+
+		return $this;
+	}
+
+	public function getName(): ?string
+	{
+		return $this->name;
 	}
 
 	public function setBreastfeedingMode(?BreastfeedingMode $breastfeedingMode): Child

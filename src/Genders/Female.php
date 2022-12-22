@@ -76,8 +76,10 @@ class Female extends \Fatty\Gender
 		try {
 			$weight = $this->getPregnancy()->getWeightBeforePregnancy();
 		} catch (\Throwable $e) {
-			$weight = $calculator->getWeight();
+			// Nevermind.
 		}
+
+		$weight = ($weight ?? null) ?: $calculator->getWeight();
 
 		return new QuantityMetric(
 			"basalMetabolicRateMifflinStJeorWeight",
