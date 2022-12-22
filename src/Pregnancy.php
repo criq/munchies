@@ -11,6 +11,9 @@ use Katu\Tools\Calendar\Time;
 
 class Pregnancy
 {
+	protected $childbirthDate;
+	protected $weightBeforePregnancy;
+
 	public function __construct(Time $childbirthDate)
 	{
 		$this->setChildbirthDate($childbirthDate);
