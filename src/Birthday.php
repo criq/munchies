@@ -19,12 +19,15 @@ class Birthday
 	public static function createFromString(string $value): ?Birthday
 	{
 		try {
-			$time = Time::createFromFormat("j.*n.*Y", $value)->setTime(0, 0, 0);
-
-			return new static($time);
+			$time = Time::createFromString($value, false);
+			if ($time) {
+				return new static($time);
+			}
 		} catch (\Throwable $e) {
-			return null;
+			// Nevermind.
 		}
+
+		return null;
 	}
 
 	public static function validateBirthday(Param $birthday): Validation
