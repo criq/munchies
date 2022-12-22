@@ -36,8 +36,9 @@ class Calculator implements RestResponseInterface
 	public static function createFromRequest(ServerRequestInterface $request): Validation
 	{
 		$validations = new ValidationCollection;
-		$params = $request->getQueryParams();
 		$calculator = new static;
+
+		$params = $request->getQueryParams();
 
 		if (trim($params["gender"] ?? null)) {
 			$genderValidation = Gender::validateGender(new Param("gender", $params["gender"]));
@@ -217,6 +218,9 @@ class Calculator implements RestResponseInterface
 				$calculator->setUnits($unitsValidation->getResponse());
 			}
 		}
+
+		// if (trim($params["pregnancy_childbirthDate"] ?? null)) {
+		// }
 
 		$validation = $validations->getMerged();
 		if ($validation->hasErrors()) {
