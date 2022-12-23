@@ -6,7 +6,6 @@ use Fatty\Exceptions\MissingGenderException;
 use Fatty\Metrics\AmountMetric;
 use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
-use Fatty\Strategies\Zivot20;
 use Katu\Errors\Error;
 use Katu\Tools\Calendar\Time;
 use Katu\Tools\Rest\RestResponse;
@@ -273,7 +272,15 @@ class Calculator implements RestResponseInterface
 
 	public function getStrategy(): Strategy
 	{
-		return $this->strategy ?: new Zivot20;
+		if ($this->strategy) {
+			return $this->strategy;
+		}
+
+		if ($this->getGender() instanceof \Fatty\Genders\Female && ($this->getGender()->getIsPregnant($this) || $this->getGender()->getIsNewMother($this))) {
+			return new \Fatty\Strategies\DiaMama;
+		}
+
+		return new \Fatty\Strategies\Zivot20;
 	}
 
 	/****************************************************************************
