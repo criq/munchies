@@ -11,6 +11,7 @@ use Katu\Tools\Calendar\Time;
 use Katu\Tools\Rest\RestResponse;
 use Katu\Tools\Rest\RestResponseInterface;
 use Katu\Tools\Validation\Param;
+use Katu\Tools\Validation\Params\UserInput;
 use Katu\Tools\Validation\Validation;
 use Katu\Tools\Validation\ValidationCollection;
 use Psr\Http\Message\ServerRequestInterface;
@@ -48,7 +49,30 @@ class Calculator implements RestResponseInterface
 			}
 		}
 
-		// Děcka a těhotenství!!!
+		if ($calculator->getGender() instanceof \Fatty\Genders\Female && trim($params["pregnancy_childbirthDate"] ?? null)) {
+			$childbirtDateValidation = Birthday::validateBirthday(new UserInput("pregnancy_childbirthDate", $params["pregnancy_childbirthDate"]));
+			$validations[] = $childbirtDateValidation;
+
+			if (!$childbirtDateValidation->hasErrors()) {
+				$calculator->getGender()->setPregnancy(new Pregnancy($childbirtDateValidation->getResponse()->getTime()));
+			}
+		}
+
+		if ($calculator->getGender() instanceof \Fatty\Genders\Female && trim($params["pregnancy_weightBeforePregnancy"] ?? null)) {
+			$weightBeforePregnancyValidation = Weight::validateWeight(new UserInput("pregnancy_weightBeforePregnancy", $params["pregnancy_weightBeforePregnancy"]));
+			$validations[] = $weightBeforePregnancyValidation;
+
+			if (!$weightBeforePregnancyValidation->hasErrors()) {
+				$calculator->getGender()->getPregnancy()->setWeightBeforePregnancy($weightBeforePregnancyValidation->getResponse());
+			}
+		}
+
+		$children = new ChildCollection;
+		foreach ($params as $key => $value) {
+			if (preg_match("/^children_[0-9]+_birthday$/", $key)) {
+				// var_dump($value);die;
+			}
+		}
 
 		if (trim($params["birthday"] ?? null)) {
 			$birthdayValidation = Birthday::validateBirthday(new Param("birthday", $params["birthday"]));
