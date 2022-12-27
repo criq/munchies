@@ -48,6 +48,8 @@ class Calculator implements RestResponseInterface
 			}
 		}
 
+		// Děcka a těhotenství!!!
+
 		if (trim($params["birthday"] ?? null)) {
 			$birthdayValidation = Birthday::validateBirthday(new Param("birthday", $params["birthday"]));
 			$validations[] = $birthdayValidation;
@@ -217,9 +219,6 @@ class Calculator implements RestResponseInterface
 				$calculator->setUnits($unitsValidation->getResponse());
 			}
 		}
-
-		// if (trim($params["pregnancy_childbirthDate"] ?? null)) {
-		// }
 
 		$validation = $validations->getMerged();
 		if ($validation->hasErrors()) {
@@ -1244,34 +1243,6 @@ class Calculator implements RestResponseInterface
 			// Nevermind.
 		}
 
-		// $res["input"]["pregnancyIsPregnant"] =
-		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
-		// 	&& $this->getGender()->getIsPregnant()
-		// 		? true : false;
-
-		// $res["input"]["childbirthDate"] =
-		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
-		// 	&& $this->getGender()->getIsPregnant()
-		// 	&& $this->getGender()->getChildbirthDate() instanceof \App\Classes\Profile\Birthday
-		// 		? $this->getGender()->getChildbirthDate()->getBirthday()->format("Y-m-d") : null;
-
-		// $res["input"]["breastfeedingIsBreastfeeding"] =
-		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
-		// 	&& $this->getGender()->isBreastfeeding()
-		// 		? true : false;
-
-		// $res["input"]["breastfeeding"]["childbirthDate"] =
-		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
-		// 	&& $this->getGender()->isBreastfeeding()
-		// 	&& $this->getGender()->getBreastfeedingChildbirthDate() instanceof \App\Classes\Profile\Birthday
-		// 		? $this->getGender()->getBreastfeedingChildbirthDate()->getBirthday()->format("Y-m-d") : null;
-
-		// $res["input"]["breastfeedingMode"] =
-		// 			$this->getGender() instanceof \App\Classes\Profile\Genders\Female
-		// 	&& $this->getGender()->isBreastfeeding()
-		// 	&& $this->getGender()->getBreastfeedingMode() instanceof \App\Classes\Profile\BreastfeedingMode
-		// 		? $this->getGender()->getBreastfeedingMode()->getCode() : null;
-
 		/**************************************************************************
 		 * Output.
 		 */
@@ -1444,12 +1415,6 @@ class Calculator implements RestResponseInterface
 		} catch (\Fatty\Exceptions\FattyException $e) {
 			$exceptions->addException($e);
 		}
-
-		// try {
-		// 	$metricCollection->append($this->getGoal()->calcWeightGoalEnergyExpenditure($this));
-		// } catch (\Fatty\Exceptions\FattyException $e) {
-		// 	$exceptions->addException($e);
-		// }
 
 		try {
 			$metricCollection->append($this->getDiet()->calcDietApproach());
