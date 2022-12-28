@@ -1482,6 +1482,12 @@ class Calculator implements RestResponseInterface
 			$exceptions->addException($e);
 		}
 
+		try {
+			$metricCollection->append($this->calcBasalMetabolicRateStrategy());
+		} catch (\Fatty\Exceptions\FattyException $e) {
+			$exceptions->addException($e);
+		}
+
 		if ($exceptions->hasExceptions()) {
 			throw $exceptions;
 		}
