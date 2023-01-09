@@ -1494,6 +1494,26 @@ class Calculator implements RestResponseInterface
 			$exceptions->addException($e);
 		}
 
+		try {
+			$metricCollection->append($this->calcEstimatedFunctionalMass());
+		} catch (\Fatty\Exceptions\FattyException $e) {
+			$exceptions->addException($e);
+		}
+
+		try {
+			$index = $this->getGender()->getPregnancy()->getCurrentWeek($this->getReferenceTime())->getIndex();
+			$metricCollection->append(new AmountMetric("pregnancyWeek", new Amount($index)));
+		} catch (\Throwable $e) {
+			// Nevermind.
+		}
+
+		try {
+			$index = $this->getGender()->getPregnancy()->getCurrentTrimester($this->getReferenceTime())->getIndex();
+			$metricCollection->append(new AmountMetric("pregnancyTrimester", new Amount($index)));
+		} catch (\Throwable $e) {
+			// Nevermind.
+		}
+
 		if ($exceptions->hasExceptions()) {
 			throw $exceptions;
 		}
