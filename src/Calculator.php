@@ -1488,6 +1488,12 @@ class Calculator implements RestResponseInterface
 			$exceptions->addException($e);
 		}
 
+		try {
+			$metricCollection->append($this->calcEstimatedFunctionalMass());
+		} catch (\Fatty\Exceptions\FattyException $e) {
+			$exceptions->addException($e);
+		}
+
 		if ($exceptions->hasExceptions()) {
 			throw $exceptions;
 		}
