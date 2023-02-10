@@ -8,6 +8,7 @@ use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Katu\Errors\Error;
 use Katu\Tools\Calendar\Time;
+use Katu\Tools\Options\OptionCollection;
 use Katu\Tools\Rest\RestResponse;
 use Katu\Tools\Rest\RestResponseInterface;
 use Katu\Tools\Validation\Param;
@@ -1518,7 +1519,7 @@ class Calculator implements RestResponseInterface
 		return $res;
 	}
 
-	public function getRestResponse(?ServerRequestInterface $request = null): RestResponse
+	public function getRestResponse(?ServerRequestInterface $request = null, ?OptionCollection $options = null): RestResponse
 	{
 		return new RestResponse($this->getResponse());
 	}
