@@ -8,6 +8,7 @@ use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Katu\Errors\Error;
 use Katu\Tools\Calendar\Time;
+use Katu\Tools\Options\OptionCollection;
 use Katu\Tools\Rest\RestResponse;
 use Katu\Tools\Rest\RestResponseInterface;
 use Katu\Tools\Validation\Param;
@@ -1488,6 +1489,26 @@ class Calculator implements RestResponseInterface
 			$exceptions->addException($e);
 		}
 
+		try {
+			$metricCollection->append($this->calcEstimatedFunctionalMass());
+		} catch (\Fatty\Exceptions\FattyException $e) {
+			$exceptions->addException($e);
+		}
+
+		try {
+			$index = $this->getGender()->getPregnancy()->getCurrentWeek($this->getReferenceTime())->getIndex();
+			$metricCollection->append(new AmountMetric("pregnancyWeek", new Amount($index)));
+		} catch (\Throwable $e) {
+			// Nevermind.
+		}
+
+		try {
+			$index = $this->getGender()->getPregnancy()->getCurrentTrimester($this->getReferenceTime())->getIndex();
+			$metricCollection->append(new AmountMetric("pregnancyTrimester", new Amount($index)));
+		} catch (\Throwable $e) {
+			// Nevermind.
+		}
+
 		if ($exceptions->hasExceptions()) {
 			throw $exceptions;
 		}
@@ -1498,7 +1519,7 @@ class Calculator implements RestResponseInterface
 		return $res;
 	}
 
-	public function getRestResponse(?ServerRequestInterface $request = null): RestResponse
+	public function getRestResponse(?ServerRequestInterface $request = null, ?OptionCollection $options = null): RestResponse
 	{
 		return new RestResponse($this->getResponse());
 	}
