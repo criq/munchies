@@ -15,7 +15,6 @@ use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Nutrients\Proteins;
 use Fatty\Percentage;
-use Fatty\Pregnancy;
 use Katu\Tools\Calendar\Timeout;
 
 class Female extends \Fatty\Gender
@@ -121,60 +120,6 @@ class Female extends \Fatty\Gender
 		$energy = $this->getChildren()->calcReferenceDailyIntakeBonus($calculator)->getResult();
 
 		return new QuantityMetric("breastfeedingReferenceDailyIntakeBonus", $energy);
-	}
-
-	/*****************************************************************************
-	 * Těhotenství.
-	 */
-	public function setPregnancy(?Pregnancy $pregnancy): Female
-	{
-		$this->pregnancy = $pregnancy;
-
-		return $this;
-	}
-
-	public function getPregnancy(): ?Pregnancy
-	{
-		return $this->pregnancy;
-	}
-
-	public function getIsPregnant(Calculator $calculator): bool
-	{
-		$pregnancy = $this->getPregnancy();
-		if ($pregnancy) {
-			return $pregnancy->getIsPregnant($calculator->getReferenceTime());
-		}
-
-		return false;
-	}
-
-	/*****************************************************************************
-	 * Kojení.
-	 */
-	public function setChildren(?ChildCollection $children): Female
-	{
-		$this->children = $children;
-
-		return $this;
-	}
-
-	public function getChildren(): ChildCollection
-	{
-		if (!$this->children) {
-			$this->children = new ChildCollection;
-		}
-
-		return $this->children;
-	}
-
-	public function getIsBreastfeeding(): bool
-	{
-		return (bool)count($this->getChildren()->filterBreastfed());
-	}
-
-	public function getIsNewMother(Calculator $calculator): bool
-	{
-		return (bool)count($this->getChildren()->filterYoungerThan(new Timeout("6 months", $calculator->getReferenceTime())));
 	}
 
 	/*****************************************************************************

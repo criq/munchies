@@ -7,6 +7,8 @@ use Fatty\Metric;
 
 class StringMetric extends Metric
 {
+	public $formatted;
+
 	public function __construct(string $name, string $result, ?string $formatted = null, ?string $formula = null)
 	{
 		$this->name = $name;

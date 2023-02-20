@@ -8,6 +8,7 @@ use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\StringMetric;
 use Fatty\Nutrients\Proteins;
 use Katu\Errors\Error;
+use Katu\Tools\Calendar\Timeout;
 use Katu\Tools\Validation\Param;
 use Katu\Tools\Validation\Validation;
 
@@ -24,6 +25,9 @@ abstract class Gender
 	abstract public function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
 	abstract public function calcBodyType(Calculator $calculator): StringMetric;
 	abstract public function getSportProteinMatrix(): array;
+
+	protected $children;
+	protected $pregnancy;
 
 	public static function createFromString(string $value): ?Gender
 	{
@@ -50,16 +54,6 @@ abstract class Gender
 	public function getCode(): string
 	{
 		return lcfirst(array_slice(explode("\\", get_called_class()), -1, 1)[0]);
-	}
-
-	public function getIsPregnant(): bool
-	{
-		return false;
-	}
-
-	public function getIsNewMother(): bool
-	{
-		return false;
 	}
 
 	/*****************************************************************************
@@ -278,5 +272,59 @@ abstract class Gender
 			"goalNutrientProteinBonus",
 			new Proteins(new Amount),
 		);
+	}
+
+	/*****************************************************************************
+	 * Těhotenství.
+	 */
+	public function setPregnancy(?Pregnancy $pregnancy): Gender
+	{
+		$this->pregnancy = $pregnancy;
+
+		return $this;
+	}
+
+	public function getPregnancy(): ?Pregnancy
+	{
+		return $this->pregnancy;
+	}
+
+	public function getIsPregnant(Calculator $calculator): bool
+	{
+		$pregnancy = $this->getPregnancy();
+		if ($pregnancy) {
+			return $pregnancy->getIsPregnant($calculator->getReferenceTime());
+		}
+
+		return false;
+	}
+
+	public function getIsNewMother(Calculator $calculator): bool
+	{
+		return (bool)count($this->getChildren()->filterYoungerThan(new Timeout("6 months", $calculator->getReferenceTime())));
+	}
+
+	/*****************************************************************************
+	 * Kojení.
+	 */
+	public function setChildren(?ChildCollection $children): Gender
+	{
+		$this->children = $children;
+
+		return $this;
+	}
+
+	public function getChildren(): ChildCollection
+	{
+		if (!$this->children) {
+			$this->children = new ChildCollection;
+		}
+
+		return $this->children;
+	}
+
+	public function getIsBreastfeeding(): bool
+	{
+		return (bool)count($this->getChildren()->filterBreastfed());
 	}
 }
