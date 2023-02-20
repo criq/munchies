@@ -4,7 +4,7 @@ namespace Fatty;
 
 use Katu\Tools\Calendar\Time;
 
-class TimeWeight
+class DateTimeWeight
 {
 	protected $time;
 	protected $weight;

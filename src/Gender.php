@@ -52,12 +52,12 @@ abstract class Gender
 		return lcfirst(array_slice(explode("\\", get_called_class()), -1, 1)[0]);
 	}
 
-	public function getIsPregnant(): bool
+	public function getIsPregnant(Calculator $calculator): bool
 	{
 		return false;
 	}
 
-	public function getIsNewMother(): bool
+	public function getIsNewMother(Calculator $calculator): bool
 	{
 		return false;
 	}
