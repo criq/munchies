@@ -2,11 +2,11 @@
 
 namespace Fatty;
 
-use Fatty\Metrics\AmountMetric;
-use Fatty\Metrics\QuantityMetric;
+use Fatty\Metrics\AmountMetricResult;
+use Fatty\Metrics\QuantityMetricResult;
 
 abstract class Strategy
 {
-	abstract public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetric;
-	abstract public function calcWeightGoalQuotient(Calculator $calculator): AmountMetric;
+	abstract public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetricResult;
+	abstract public function calcWeightGoalQuotient(Calculator $calculator): AmountMetricResult;
 }

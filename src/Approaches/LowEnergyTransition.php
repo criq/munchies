@@ -7,7 +7,8 @@ use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDay;
 use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDayCollection;
 use Fatty\Calculator;
 use Fatty\Energy;
-use Fatty\Metrics\QuantityMetric;
+use Fatty\Metrics\QuantityMetricResult;
+use Fatty\Metrics\WeightGoalEnergyExpenditureMetric;
 use Fatty\Nutrients;
 use Fatty\Nutrients\Fats;
 use Fatty\Nutrients\Proteins;
@@ -107,11 +108,12 @@ class LowEnergyTransition extends \Fatty\Approach
 		return $this->calcDays($calculator)->filterByDate($calculator->getReferenceTime())[0]->getWeightGoalEnergyExpenditure();
 	}
 
-	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetric
+	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetricResult
 	{
-		$result = $this->getWeightGoalEnergyExpenditure($calculator)->getInUnit($calculator->getUnits());
+		$result = new QuantityMetricResult(new WeightGoalEnergyExpenditureMetric);
+		$result->setResult($this->getWeightGoalEnergyExpenditure($calculator)->getInUnit($calculator->getUnits()));
 
-		return new QuantityMetric("weightGoalEnergyExpenditure", $result);
+		return $result;
 	}
 
 	public function getGoalNutrients(Calculator $calculator): Nutrients

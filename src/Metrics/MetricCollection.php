@@ -1,6 +1,6 @@
 <?php
 
-namespace Fatty;
+namespace Fatty\Metrics;
 
 class MetricCollection extends \ArrayObject
 {
@@ -30,10 +30,10 @@ class MetricCollection extends \ArrayObject
 		return new static($array);
 	}
 
-	public function getResponse(?Locale $locale = null): array
-	{
-		return array_map(function ($metric) use ($locale) {
-			return $metric->getResponse($locale);
-		}, $this->getArrayCopy());
-	}
+	// public function getResponse(?Locale $locale = null): array
+	// {
+	// 	return array_map(function ($metric) use ($locale) {
+	// 		return $metric->getResponse($locale);
+	// 	}, $this->getArrayCopy());
+	// }
 }

@@ -3,7 +3,11 @@
 namespace Fatty;
 
 use Fatty\Metrics\QuantityMetric;
+use Fatty\Metrics\QuantityMetricResult;
+use Fatty\Metrics\ReferenceDailyIntakeBonusMetric;
 use Katu\Tools\Calendar\Timeout;
+
+use function PHPUnit\Framework\returnSelf;
 
 class ChildCollection extends \ArrayObject
 {
@@ -21,19 +25,23 @@ class ChildCollection extends \ArrayObject
 		})));
 	}
 
-	public function calcReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
+	public function calcReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetricResult
 	{
+		$result = new QuantityMetricResult(new ReferenceDailyIntakeBonusMetric);
+
 		$energy = new Energy(new Amount, "kJ");
 
-		foreach (array_map(function (Child $child) use ($calculator) {
-			return $child->calcReferenceDailyIntakeBonus($calculator)->getResult();
-		}, $this->getArrayCopy()) as $childEnergy) {
-			$energy->modify($childEnergy);
+		foreach ($this as $child) {
+			$referenceDailyIntakeBonusResult = $child->calcReferenceDailyIntakeBonus($calculator);
+			$result->addErrors($referenceDailyIntakeBonusResult->getErrors());
+
+			if (!$referenceDailyIntakeBonusResult->hasErrors()) {
+				$energy->modify($referenceDailyIntakeBonusResult->getResult());
+			}
 		}
 
-		return new QuantityMetric(
-			"referenceDailyIntakeBonus",
-			$energy,
-		);
+		$result->setResult($energy);
+
+		return $result;
 	}
 }

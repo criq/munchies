@@ -2,12 +2,20 @@
 
 namespace Fatty;
 
+use Fatty\Errors\MissingGoalDurationError;
+use Fatty\Errors\MissingGoalVectorError;
+use Fatty\Errors\MissingWeightError;
 use Fatty\Exceptions\MissingGoalDurationException;
 use Fatty\Exceptions\MissingGoalVectorException;
 use Fatty\Exceptions\MissingGoalWeightException;
 use Fatty\Exceptions\MissingWeightException;
+use Fatty\Metrics\GoalDurationMetric;
+use Fatty\Metrics\GoalVectorMetric;
+use Fatty\Metrics\GoalWeightMetric;
 use Fatty\Metrics\QuantityMetric;
+use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Metrics\StringMetric;
+use Fatty\Metrics\StringMetricResult;
 use Katu\Errors\Error;
 use Katu\Tools\Validation\Param;
 use Katu\Tools\Validation\Validation;
@@ -30,14 +38,18 @@ class Goal
 		return $this->duration;
 	}
 
-	public function calcGoalDuration(): QuantityMetric
+	public function calcGoalDuration(): QuantityMetricResult
 	{
+		$result = new QuantityMetricResult(new GoalDurationMetric);
+
 		$duration = $this->getDuration();
 		if (!$duration) {
-			throw new MissingGoalDurationException;
+			$result->addError(new MissingGoalDurationError);
+		} else {
+			$result->setResult($duration);
 		}
 
-		return new QuantityMetric("goalDuration", $duration);
+		return $result;
 	}
 
 	public static function validateVector(Param $vector): Validation
@@ -116,23 +128,31 @@ class Goal
 		}
 	}
 
-	public function calcGoalVector(): StringMetric
+	public function calcGoalVector(): StringMetricResult
 	{
+		$result = new StringMetricResult(new GoalVectorMetric);
+
 		$vector = $this->getVector();
 		if (!$vector) {
-			throw new MissingGoalVectorException;
+			$result->addError(new MissingGoalVectorError);
+		} else {
+			$result->setResult(new StringValue($vector->getCode()));
 		}
 
-		return new StringMetric("goalVector", $vector->getCode(), $vector->getLabelInfinitive());
+		return $result;
 	}
 
-	public function calcGoalWeight(): QuantityMetric
+	public function calcGoalWeight(): QuantityMetricResult
 	{
+		$result = new QuantityMetricResult(new GoalWeightMetric);
+
 		$weight = $this->getWeight();
 		if (!$weight) {
-			throw new MissingGoalWeightException;
+			$result->addError(new MissingWeightError);
+		} else {
+			$result->setResult($this->getWeight());
 		}
 
-		return new QuantityMetric("goalWeight", $this->getWeight());
+		return $result;
 	}
 }

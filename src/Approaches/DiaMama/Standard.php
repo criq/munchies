@@ -5,7 +5,8 @@ namespace Fatty\Approaches\DiaMama;
 use Fatty\Amount;
 use Fatty\Calculator;
 use Fatty\Energy;
-use Fatty\Metrics\QuantityMetric;
+use Fatty\Metrics\GoalNutrientsProteinsMetric;
+use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Nutrients;
 use Fatty\Nutrients\Carbs;
 use Fatty\Nutrients\Fats;
@@ -17,31 +18,37 @@ class Standard extends \Fatty\Approaches\Standard
 	const CODE = "DIAMAMA_STANDARD";
 	const LABEL_DECLINATED = "standardní dietu";
 
-	public function calcGoalNutrientProteins(Calculator $calculator): QuantityMetric
+	public function calcGoalNutrientsProteins(Calculator $calculator): QuantityMetricResult
 	{
-		$estimatedFunctionalMass = $calculator->calcEstimatedFunctionalMass()->getResult();
-		$estimatedFunctionalMassValue = $estimatedFunctionalMass->getAmount()->getValue();
+		$result = new QuantityMetricResult(new GoalNutrientsProteinsMetric);
 
-		$sportProteinCoefficient = $calculator->calcSportProteinCoefficient()->getResult();
-		$sportProteinCoefficientValue = $sportProteinCoefficient->getValue();
+		$estimatedFunctionalMassResult = $calculator->calcEstimatedFunctionalMass();
+		$result->addErrors($estimatedFunctionalMassResult->getErrors());
 
-		$goalNutrientProteinBonus = $calculator->getGender()->calcGoalNutrientProteinBonus($calculator)->getResult();
-		$goalNutrientProteinBonusValue = $goalNutrientProteinBonus->getAmount()->getValue();
+		$sportProteinCoefficientResult = $calculator->calcSportProteinCoefficient();
+		$result->addErrors($sportProteinCoefficientResult->getErrors());
 
-		$resultValue = ($estimatedFunctionalMassValue * $sportProteinCoefficientValue) + $goalNutrientProteinBonusValue;
-		$result = new Proteins(new Amount($resultValue), "g");
+		$goalNutrientProteinBonusResult = $calculator->getGender()->calcGoalNutrientProteinBonus($calculator);
+		$result->addErrors($goalNutrientProteinBonusResult->getErrors());
 
-		$formula = "
-			(estimatedFunctionalMass[$estimatedFunctionalMassValue] * sportProteinCoefficient[$sportProteinCoefficientValue]) + $goalNutrientProteinBonusValue
-			" . ($estimatedFunctionalMassValue * $sportProteinCoefficientValue) . " + $goalNutrientProteinBonusValue
-			= $resultValue
-		";
+		if (!$result->hasErrors()) {
+			$estimatedFunctionalMassValue = $estimatedFunctionalMassResult->getResult()->getNumericalValue();
+			$sportProteinCoefficientValue = $sportProteinCoefficientResult->getResult()->getNumericalValue();
+			$goalNutrientProteinBonusValue = $goalNutrientProteinBonusResult->getResult()->getNumericalValue();
 
-		return new QuantityMetric(
-			"goalNutrientsProteins",
-			$result,
-			$formula,
-		);
+			$value = ($estimatedFunctionalMassValue * $sportProteinCoefficientValue) + $goalNutrientProteinBonusValue;
+			$proteins = new Proteins(new Amount($value), "g");
+
+			$formula = "
+				(estimatedFunctionalMass[$estimatedFunctionalMassValue] * sportProteinCoefficient[$sportProteinCoefficientValue]) + $goalNutrientProteinBonusValue
+				" . ($estimatedFunctionalMassValue * $sportProteinCoefficientValue) . " + $goalNutrientProteinBonusValue
+				= $value
+			";
+
+			$result->setResult($proteins)->setFormula($formula);
+		}
+
+		return $result;
 	}
 
 	public function getGoalNutrients(Calculator $calculator): Nutrients
@@ -49,7 +56,7 @@ class Standard extends \Fatty\Approaches\Standard
 		$wgee = $calculator->calcWeightGoalEnergyExpenditure();
 
 		$nutrients = new Nutrients;
-		$nutrients->setProteins($this->calcGoalNutrientProteins($calculator)->getResult());
+		$nutrients->setProteins($this->calcGoalNutrientsProteins($calculator)->getResult());
 		$nutrients->setCarbs(new Carbs(new Amount(static::CARBS_DEFAULT), "g"));
 
 		$nutrients->setFats(

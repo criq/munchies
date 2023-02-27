@@ -3,8 +3,12 @@
 namespace Fatty;
 
 use Fatty\Exceptions\InvalidAmountException;
+use Fatty\Metrics\ResultInterface;
+use Katu\Tools\Options\OptionCollection;
+use Katu\Tools\Rest\RestResponse;
+use Psr\Http\Message\ServerRequestInterface;
 
-class Amount
+class Amount implements ResultInterface
 {
 	protected $value;
 
@@ -52,5 +56,40 @@ class Amount
 		$numberFormatter->setAttribute(\NumberFormatter::FRACTION_DIGITS, 1);
 
 		return $numberFormatter->format($this->getValue());
+	}
+
+	public function getNumericalValue(): ?float
+	{
+		return (float)$this->getValue();
+	}
+
+	public function getStringValue(): ?string
+	{
+		return (string)$this->getNumericalValue();
+	}
+
+	public function getBooleanValue(): ?bool
+	{
+		return (bool)$this->getNumericalValue();
+	}
+
+	public function getArrayValue(): ?array
+	{
+		return null;
+	}
+
+	public function getInUnit(string $unit): ?ResultInterface
+	{
+		return $this;
+	}
+
+	public function getUnit(): ?string
+	{
+		return null;
+	}
+
+	public function getRestResponse(?ServerRequestInterface $request = null, ?OptionCollection $options = null): RestResponse
+	{
+		return new RestResponse((float)$this->getValue());
 	}
 }

@@ -17,7 +17,7 @@ class Mediterranean extends Standard
 	public function getGoalNutrients(Calculator $calculator): Nutrients
 	{
 		$nutrients = new Nutrients;
-		$nutrients->setProteins($this->calcGoalNutrientProteins($calculator)->getResult());
+		$nutrients->setProteins($this->calcGoalNutrientsProteins($calculator)->getResult());
 
 		$wgee = $calculator->calcWeightGoalEnergyExpenditure();
 

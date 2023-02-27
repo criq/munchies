@@ -2,10 +2,24 @@
 
 namespace Fatty;
 
-use Fatty\Exceptions\MissingBodyFatPercentageInputException;
-use Fatty\Metrics\AmountMetric;
+use Fatty\Errors\MissingBirthdayError;
+use Fatty\Errors\MissingBodyFatPercentageInputError;
+use Fatty\Errors\MissingWeightError;
+use Fatty\Metrics\AmountMetricResult;
+use Fatty\Metrics\ArrayMetricResult;
+use Fatty\Metrics\BasalMetabolicRateMetric;
+use Fatty\Metrics\BasalMetabolicRateMifflinStJeorWeightMetric;
+use Fatty\Metrics\BasalMetabolicRateStrategyMetric;
+use Fatty\Metrics\BodyFatPercentageMetric;
+use Fatty\Metrics\EssentialFatPercentageMetric;
+use Fatty\Metrics\FitnessLevelMetric;
+use Fatty\Metrics\GoalNutrientProteinBonusMetric;
+use Fatty\Metrics\MaxOptimalWeightMetric;
 use Fatty\Metrics\QuantityMetric;
-use Fatty\Metrics\StringMetric;
+use Fatty\Metrics\QuantityMetricResult;
+use Fatty\Metrics\ReferenceDailyIntakeBonusMetric;
+use Fatty\Metrics\SportProteinSetKeyMetric;
+use Fatty\Metrics\StringMetricResult;
 use Fatty\Nutrients\Proteins;
 use Katu\Errors\Error;
 use Katu\Tools\Calendar\Timeout;
@@ -21,10 +35,10 @@ abstract class Gender
 	const ESSENTIAL_FAT_PERCENTAGE = NULL;
 	const FIT_BODY_FAT_PERCENTAGE = NULL;
 
-	abstract public function calcBasalMetabolicRateMifflinStJeorAdjustment(): QuantityMetric;
-	abstract public function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric;
-	abstract public function calcBodyType(Calculator $calculator): StringMetric;
-	abstract public function getSportProteinMatrix(): array;
+	abstract public function calcBasalMetabolicRateMifflinStJeorAdjustment(): QuantityMetricResult;
+	abstract public function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetricResult;
+	abstract public function calcBodyType(Calculator $calculator): StringMetricResult;
+	abstract public function calcSportProteinMatrix(): ArrayMetricResult;
 
 	protected $children;
 	protected $pregnancy;
@@ -100,178 +114,258 @@ abstract class Gender
 		return null;
 	}
 
-	public function calcBodyFatPercentage(Calculator $calculator): AmountMetric
+	public function calcBodyFatPercentage(Calculator $calculator): AmountMetricResult
 	{
+		$result = new AmountMetricResult(new BodyFatPercentageMetric);
+
 		$strategy = $this->getBodyFatPercentageStrategy($calculator);
 		if (!$strategy) {
-			throw new MissingBodyFatPercentageInputException;
+			$result->addError(new MissingBodyFatPercentageInputError);
+		} else {
+			switch ($strategy) {
+				case static::BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT:
+					return $this->calcBodyFatPercentageByMeasurement($calculator);
+					break;
+				case static::BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS:
+					return $this->calcBodyFatPercentageByProportions($calculator);
+					break;
+			}
 		}
 
-		switch ($strategy) {
-			case static::BODY_FAT_PERCENTAGE_STRATEGY_MEASUREMENT:
-				return $this->calcBodyFatPercentageByMeasurement($calculator);
-				break;
-			case static::BODY_FAT_PERCENTAGE_STRATEGY_PROPORTIONS:
-				return $this->calcBodyFatPercentageByProportions($calculator);
-				break;
-		}
+		return $result;
 	}
 
-	public function calcBodyFatPercentageByMeasurement(Calculator $calculator): AmountMetric
+	public function calcBodyFatPercentageByMeasurement(Calculator $calculator): AmountMetricResult
 	{
-		return new AmountMetric("bodyFatPercentage", $calculator->getBodyFatPercentage());
+		return (new AmountMetricResult(new BodyFatPercentageMetric))
+			->setResult($calculator->getBodyFatPercentage())
+			;
 	}
 
-	public function calcEssentialFatPercentage(): AmountMetric
+	public function calcEssentialFatPercentage(): AmountMetricResult
 	{
-		return new AmountMetric("essentialFatPercentage", new Percentage((float)static::ESSENTIAL_FAT_PERCENTAGE));
+		return (new AmountMetricResult(new EssentialFatPercentageMetric))
+			->setResult(new Percentage((float)static::ESSENTIAL_FAT_PERCENTAGE))
+			;
 	}
 
 	/****************************************************************************
 	 * Basal metabolic rate.
 	 */
-	public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetric
+	public function calcBasalMetabolicRate(Calculator $calculator): QuantityMetricResult
 	{
-		switch ($this->calcBasalMetabolicRateStrategy($calculator)->getResult()) {
-			case static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR:
-				return $this->calcBasalMetabolicRateMifflinStJeor($calculator);
-				break;
-			case static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE:
-				return $this->calcBasalMetabolicRateKatchMcArdle($calculator);
-				break;
+		$result = new QuantityMetricResult(new BasalMetabolicRateMetric);
+
+		$basalMetabolicRateStrategyResult = $this->calcBasalMetabolicRateStrategy($calculator);
+		$result->addErrors($basalMetabolicRateStrategyResult->getErrors());
+
+		if (!$result->hasErrors()) {
+			switch ($basalMetabolicRateStrategyResult->getResult()->getStringValue()) {
+				case static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR:
+					return $this->calcBasalMetabolicRateMifflinStJeor($calculator);
+					break;
+				case static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE:
+					return $this->calcBasalMetabolicRateKatchMcArdle($calculator);
+					break;
+			}
 		}
+
+		return $result;
 	}
 
-	public function calcBasalMetabolicRateStrategy(Calculator $calculator): StringMetric
+	public function calcBasalMetabolicRateStrategy(Calculator $calculator): StringMetricResult
 	{
-		return new StringMetric(
-			"basalMetabolicRateStrategy",
-			static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE,
-		);
+		return (new StringMetricResult(new BasalMetabolicRateStrategyMetric))
+			->setResult(new StringValue(static::BASAL_METABOLIC_RATE_STRATEGY_KATCH_MCARDLE))
+			;
 	}
 
-	public function calcBasalMetabolicRateKatchMcArdle(Calculator $calculator): QuantityMetric
+	public function calcBasalMetabolicRateKatchMcArdle(Calculator $calculator): QuantityMetricResult
 	{
-		$fatFreeMass = $calculator->calcFatFreeMass();
-		$fatFreeMassValue = $fatFreeMass->getResult()->getAmount()->getValue();
+		$result = new QuantityMetricResult(new BasalMetabolicRateMetric);
 
-		$resultValue = 370 + (21.6 * $fatFreeMassValue);
-		$result = (new Energy(
-			new Amount($resultValue),
-			"kcal",
-		))->getInUnit($calculator->getUnits());
+		$fatFreeMassResult = $calculator->calcFatFreeMass();
+		$result->addErrors($fatFreeMassResult->getErrors());
 
-		$formula = "
-			370 + (21.6 * fatFreeMass[{$fatFreeMassValue}])
-			= 370 + " . (21.6 * $fatFreeMassValue) . "
-			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
-			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
-		";
+		if (!$result->hasErrors()) {
+			$fatFreeMassValue = $fatFreeMassResult->getResult()->getNumericalValue();
 
-		return new QuantityMetric("basalMetabolicRate", $result, $formula);
+			$energyValue = 370 + (21.6 * $fatFreeMassValue);
+
+			$energy = (new Energy(
+				new Amount($energyValue),
+				"kcal",
+			))->getInUnit($calculator->getUnits());
+
+			$formula = "
+				370 + (21.6 * fatFreeMass[{$fatFreeMassValue}])
+				= 370 + " . (21.6 * $fatFreeMassValue) . "
+				= {$energy->getInUnit("kcal")->getAmount()->getValue()} kcal
+				= {$energy->getInUnit("kJ")->getAmount()->getValue()} kJ
+			";
+
+			$result->setResult($energy)->setFormula($formula);
+		}
+
+		return $result;
 	}
 
-	public function calcBasalMetabolicRateMifflinStJeor(Calculator $calculator): QuantityMetric
+	public function calcBasalMetabolicRateMifflinStJeor(Calculator $calculator): QuantityMetricResult
 	{
-		$weight = $this->calcBasalMetabolicRateMifflinStJeorWeight($calculator)->getResult();
-		$weightValue = $weight->getInUnit("kg")->getAmount()->getValue();
-		$heightValue = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
-		$ageValue = $calculator->getBirthday()->getAge($calculator->getReferenceTime());
+		$result = new QuantityMetricResult(new BasalMetabolicRateMetric);
 
-		$basalMetabolicRateMifflinStJeorAdjustment = $this->calcBasalMetabolicRateMifflinStJeorAdjustment()->getResult();
-		$basalMetabolicRateMifflinStJeorAdjustmentValue = $basalMetabolicRateMifflinStJeorAdjustment->getAmount()->getValue();
+		$weightResult = $this->calcBasalMetabolicRateMifflinStJeorWeight($calculator);
+		$result->addErrors($weightResult->getErrors());
 
-		$result = (new Energy(
-			new Amount(
-				(10 * $weightValue)
-				+ (6.25 * $heightValue)
-				- (5 * $ageValue)
-				+ $basalMetabolicRateMifflinStJeorAdjustmentValue
-			),
-			"kcal",
-		))->getInUnit($calculator->getUnits());
+		$heightResult = $calculator->calcHeight();
+		$result->addErrors($heightResult->getErrors());
 
-		$formula = "
-			(10 * weight[$weightValue]) + (6.25 * height[$heightValue]) - (5 * age[$ageValue]) + basalMetabolicRateMifflinStJeorAdjustment[$basalMetabolicRateMifflinStJeorAdjustmentValue]
-			= " . (10 * $weightValue) . " + " . (6.25 * $heightValue) . " - " . (5 * $ageValue) . " + ($basalMetabolicRateMifflinStJeorAdjustmentValue)
-			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
-			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
-		";
+		$birthday = $calculator->getBirthday();
+		if (!$birthday) {
+			$result->addError(new MissingBirthdayError);
+		}
 
-		return new QuantityMetric(
-			"basalMetabolicRate",
-			$result,
-			$formula
-		);
+		$basalMetabolicRateMifflinStJeorAdjustmentResult = $this->calcBasalMetabolicRateMifflinStJeorAdjustment();
+		$result->addErrors($basalMetabolicRateMifflinStJeorAdjustmentResult->getErrors());
+
+		if (!$result->hasErrors()) {
+			$weightValue = $weightResult->getResult()->getInUnit("kg")->getNumericalValue();
+			$heightValue = $heightResult->getResult()->getInUnit("cm")->getNumericalValue();
+			$ageValue = $birthday->getAge($calculator->getReferenceTime());
+			$basalMetabolicRateMifflinStJeorAdjustmentValue = $basalMetabolicRateMifflinStJeorAdjustmentResult->getResult()->getNumericalValue();
+
+			$energy = (new Energy(
+				new Amount(
+					(10 * $weightValue)
+					+ (6.25 * $heightValue)
+					- (5 * $ageValue)
+					+ $basalMetabolicRateMifflinStJeorAdjustmentValue
+				),
+				"kcal",
+			))->getInUnit($calculator->getUnits());
+
+			$formula = "
+				(10 * weight[$weightValue]) + (6.25 * height[$heightValue]) - (5 * age[$ageValue]) + basalMetabolicRateMifflinStJeorAdjustment[$basalMetabolicRateMifflinStJeorAdjustmentValue]
+				= " . (10 * $weightValue) . " + " . (6.25 * $heightValue) . " - " . (5 * $ageValue) . " + ($basalMetabolicRateMifflinStJeorAdjustmentValue)
+				= {$energy->getInUnit("kcal")->getAmount()->getValue()} kcal
+				= {$energy->getInUnit("kJ")->getAmount()->getValue()} kJ
+			";
+
+			$result->setResult($energy)->setFormula($formula);
+		}
+
+		return $result;
 	}
 
-	public function calcBasalMetabolicRateMifflinStJeorWeight(Calculator $calculator): QuantityMetric
+	public function calcBasalMetabolicRateMifflinStJeorWeight(Calculator $calculator): QuantityMetricResult
 	{
-		return new QuantityMetric(
-			"basalMetabolicRateMifflinStJeorWeight",
-			$calculator->getWeight(),
-		);
+		$result = new QuantityMetricResult(new BasalMetabolicRateMifflinStJeorWeightMetric);
+
+		$weight = $calculator->getWeight();
+		if (!$weight) {
+			$result->addError(new MissingWeightError);
+		} else {
+			$result->setResult($weight);
+		}
+
+		return $result;
 	}
 
 	/*****************************************************************************
 	 * Doporučený denní příjem - bonusy.
 	 */
-	public function calcReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
+	public function calcReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetricResult
 	{
-		return new QuantityMetric("referenceDailyIntakeBonus", new Energy);
+		return (new QuantityMetricResult(new ReferenceDailyIntakeBonusMetric))
+			->setResult(new Energy)
+			;
 	}
 
 	/****************************************************************************
 	 * Fitness level.
 	 */
-	public function calcFitnessLevel(Calculator $calculator): StringMetric
+	public function calcFitnessLevel(Calculator $calculator): StringMetricResult
 	{
-		$bodyFatPercentage = $calculator->calcBodyFatPercentage();
-		$bodyFatPercentageValue = $bodyFatPercentage->getResult()->getValue();
+		$result = new StringMetricResult(new FitnessLevelMetric);
 
-		$fitBodyFatPercentage = static::FIT_BODY_FAT_PERCENTAGE;
+		$bodyFatPercentageResult = $calculator->calcBodyFatPercentage();
+		$result->addErrors($bodyFatPercentageResult->getErrors());
 
-		$string = $calculator->calcBodyFatPercentage()->getResult()->getValue() > $fitBodyFatPercentage ? "UNFIT" : "FIT";
-		$formula = "bodyFatPercentage[{$bodyFatPercentageValue}] > {$fitBodyFatPercentage} ? UNFIT : FIT";
-
-		return new StringMetric("fitnessLevel", $string, $string, $formula);
-	}
-
-	public function calcMaxOptimalWeight(Calculator $calculator): QuantityMetric
-	{
-		if ($calculator->calcFitnessLevel()->getResult() == "UNFIT") {
-			$fatFreeMass = $calculator->calcFatFreeMass();
-			$fatFreeMassValue = $fatFreeMass->getResult()->getInUnit("kg")->getAmount()->getValue();
-
+		if (!$result->hasErrors()) {
+			$bodyFatPercentageValue = $bodyFatPercentageResult->getResult()->getNumericalValue();
 			$fitBodyFatPercentage = static::FIT_BODY_FAT_PERCENTAGE;
 
-			$value = $fatFreeMassValue * (1 + $fitBodyFatPercentage);
+			$string = $bodyFatPercentageResult->getResult()->getNumericalValue() > $fitBodyFatPercentage ? "UNFIT" : "FIT";
+			$formula = "bodyFatPercentage[{$bodyFatPercentageValue}] > {$fitBodyFatPercentage} ? UNFIT : FIT";
 
-			$weight = new Weight(new Amount($value), "kg");
-			$formula = "
-				fatFreeMass[{$fatFreeMassValue}] * (1 + fitBodyFatPercentage[{$fitBodyFatPercentage}])
-				= {$fatFreeMassValue} * " . (1 + $fitBodyFatPercentage) . "
-				= {$value} kg
-			";
-		} else {
-			$weight = $calculator->getWeight();
-			$formula = "weight[$weight]";
+			$result->setResult(new StringValue($string))->setFormula($formula);
 		}
 
-		return new QuantityMetric("maxOptimalWeight", $weight, $formula);
+		return $result;
 	}
 
-	public function calcSportProteinSetKey(Calculator $calculator): StringMetric
+	public function calcMaxOptimalWeight(Calculator $calculator): QuantityMetricResult
 	{
-		return new StringMetric("sportProteinSetKey", (string)$calculator->calcFitnessLevel()->getResult());
+		$result = new QuantityMetricResult(new MaxOptimalWeightMetric);
+
+		$fitnessLevelResult = $calculator->calcFitnessLevel();
+		$result->addErrors($fitnessLevelResult->getErrors());
+
+		if (!$result->hasErrors()) {
+			if ($fitnessLevelResult->getResult()->getStringValue() == "UNFIT") {
+				$fatFreeMassResult = $calculator->calcFatFreeMass();
+				$result->addErrors($fatFreeMassResult->getErrors());
+
+				if (!$result->hasErrors()) {
+					$fatFreeMassValue = $fatFreeMassResult->getResult()->getInUnit("kg")->getNumericalValue();
+					$fitBodyFatPercentage = static::FIT_BODY_FAT_PERCENTAGE;
+
+					$value = $fatFreeMassValue * (1 + $fitBodyFatPercentage);
+
+					$weight = new Weight(new Amount($value), "kg");
+
+					$formula = "
+						fatFreeMass[{$fatFreeMassValue}] * (1 + fitBodyFatPercentage[{$fitBodyFatPercentage}])
+						= {$fatFreeMassValue} * " . (1 + $fitBodyFatPercentage) . "
+						= {$value} kg
+					";
+
+					$result->setResult($weight)->setFormula($formula);
+				}
+			} else {
+				$weight = $calculator->getWeight();
+				if (!$weight) {
+					$result->addError(new MissingWeightError);
+				} else {
+					$formula = "weight[$weight]";
+
+					$result->setResult($weight)->setFormula($formula);
+				}
+			}
+		}
+
+		return $result;
 	}
 
-	public function calcGoalNutrientProteinBonus(Calculator $calculator): QuantityMetric
+	public function calcSportProteinSetKey(Calculator $calculator): StringMetricResult
 	{
-		return new QuantityMetric(
-			"goalNutrientProteinBonus",
-			new Proteins(new Amount),
-		);
+		$result = new StringMetricResult(new SportProteinSetKeyMetric);
+
+		$fitnessLevelResult = $calculator->calcFitnessLevel();
+		$result->addErrors($fitnessLevelResult->getErrors());
+
+		if (!$result->hasErrors()) {
+			$result->setResult($fitnessLevelResult->getResult());
+		}
+
+		return $result;
+	}
+
+	public function calcGoalNutrientProteinBonus(Calculator $calculator): QuantityMetricResult
+	{
+		return (new QuantityMetricResult(new GoalNutrientProteinBonusMetric))
+			->setResult(new Proteins(new Amount))
+			;
 	}
 
 	/*****************************************************************************

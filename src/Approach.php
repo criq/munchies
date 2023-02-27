@@ -2,7 +2,13 @@
 
 namespace Fatty;
 
-use Fatty\Metrics\QuantityMetric;
+use Fatty\Errors\MissingGoalVectorError;
+use Fatty\Metrics\GoalNutrientsCarbsMetric;
+use Fatty\Metrics\GoalNutrientsFatsMetric;
+use Fatty\Metrics\GoalNutrientsProteinsMetric;
+use Fatty\Metrics\MetricResultCollection;
+use Fatty\Metrics\QuantityMetricResult;
+use Fatty\Metrics\WeightGoalEnergyExpenditureMetric;
 use Fatty\Nutrients\Carbs;
 use Fatty\Nutrients\Fats;
 use Fatty\Nutrients\Proteins;
@@ -86,57 +92,80 @@ abstract class Approach
 		return static::PROTEINS_DEFAULT ? new Proteins(new Amount((float)static::PROTEINS_DEFAULT), "g") : null;
 	}
 
-	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetric
+	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetricResult
 	{
+		$result = new QuantityMetricResult(new WeightGoalEnergyExpenditureMetric);
+
 		if (!$calculator->getGoal()->getVector()) {
-			throw new \Fatty\Exceptions\MissingGoalVectorException;
+			$result->addError(new MissingGoalVectorError);
 		}
 
-		$totalDailyEnergyExpenditure = $calculator->calcTotalDailyEnergyExpenditure()->getResult();
-		$totalDailyEnergyExpenditureValue = $totalDailyEnergyExpenditure->getAmount()->getValue();
+		$totalDailyEnergyExpenditureResult = $calculator->calcTotalDailyEnergyExpenditure();
+		$result->addErrors($totalDailyEnergyExpenditureResult->getErrors());
 
-		$weightGoalQuotient = $calculator->getGoal()->getVector()->calcWeightGoalQuotient($calculator)->getResult();
-		$weightGoalQuotientValue = $weightGoalQuotient->getValue();
+		$weightGoalQuotientResult = $calculator->getGoal()->getVector()->calcWeightGoalQuotient($calculator);
+		$result->addErrors($weightGoalQuotientResult->getErrors());
 
-		$result = (new Energy(
-			new Amount($totalDailyEnergyExpenditureValue * $weightGoalQuotientValue),
-			$totalDailyEnergyExpenditure->getUnit(),
-		))->getInUnit($calculator->getUnits());
+		if (!$result->hasErrors()) {
+			$totalDailyEnergyExpenditureValue = $totalDailyEnergyExpenditureResult->getResult()->getNumericalValue();
+			$weightGoalQuotientValue = $weightGoalQuotientResult->getResult()->getNumericalValue();
 
-		$formula = "
-			totalDailyEnergyExpenditure[{$totalDailyEnergyExpenditure}] * weightGoalQuotient[{$weightGoalQuotientValue}]
-			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
-			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
-		";
+			$energy = (new Energy(
+				new Amount($totalDailyEnergyExpenditureValue * $weightGoalQuotientValue),
+				$totalDailyEnergyExpenditureResult->getResult()->getUnit(),
+			))->getInUnit($calculator->getUnits());
 
-		return new QuantityMetric("weightGoalEnergyExpenditure", $result, $formula);
-	}
+			$formula = "
+				totalDailyEnergyExpenditure[{$totalDailyEnergyExpenditureValue}] * weightGoalQuotient[{$weightGoalQuotientValue}]
+				= {$energy->getInUnit("kcal")->getAmount()->getValue()} kcal
+				= {$energy->getInUnit("kJ")->getAmount()->getValue()} kJ
+			";
 
-	public function calcGoalNutrientProteins(Calculator $calculator): QuantityMetric
-	{
-		$maxOptimalWeight = $calculator->calcMaxOptimalWeight();
-		$calcSportProteinCoefficient = $calculator->calcSportProteinCoefficient();
-
-		$resultValue = $maxOptimalWeight->getResult()->getAmount()->getValue() * $calcSportProteinCoefficient->getResult()->getValue();
-
-		$proteins = new Nutrients\Proteins(new Amount($resultValue), "g");
-
-		return new \Fatty\Metrics\QuantityMetric("goalNutrientsProteins", $proteins);
-	}
-
-	public function calcGoalNutrients(Calculator $calculator): MetricCollection
-	{
-		$dietApproach = $calculator->getDiet()->getApproach();
-		if (!$dietApproach) {
-			throw new \Fatty\Exceptions\MissingDietApproachException;
+			$result->setResult($energy)->setFormula($formula);
 		}
+
+		return $result;
+	}
+
+	public function calcGoalNutrientsProteins(Calculator $calculator): QuantityMetricResult
+	{
+		$result = new QuantityMetricResult(new GoalNutrientsProteinsMetric);
+
+		$maxOptimalWeightResult = $calculator->calcMaxOptimalWeight();
+		$result->addErrors($maxOptimalWeightResult->getErrors());
+
+		$calcSportProteinCoefficientResult = $calculator->calcSportProteinCoefficient();
+		$result->addErrors($calcSportProteinCoefficientResult->getErrors());
+
+		if (!$result->hasErrors()) {
+			$maxOptimalWeightValue = $maxOptimalWeightResult->getResult()->getNumericalValue();
+			$calcSportProteinCoefficient = $calcSportProteinCoefficientResult->getResult()->getNumericalValue();
+
+			$amount = $maxOptimalWeightValue * $calcSportProteinCoefficient;
+			$proteins = new Nutrients\Proteins(new Amount($amount), "g");
+
+			$result->setResult($proteins);
+		}
+
+		return $result;
+	}
+
+	public function calcGoalNutrients(Calculator $calculator): MetricResultCollection
+	{
+		$carbs = new QuantityMetricResult(new GoalNutrientsCarbsMetric);
+		$fats = new QuantityMetricResult(new GoalNutrientsFatsMetric);
+		$proteins = new QuantityMetricResult(new GoalNutrientsProteinsMetric);
 
 		$nutrients = $this->getGoalNutrients($calculator);
 
-		return new MetricCollection([
-			new QuantityMetric("goalNutrientsCarbs", $nutrients->getCarbs()),
-			new QuantityMetric("goalNutrientsFats", $nutrients->getFats()),
-			new QuantityMetric("goalNutrientsProteins", $nutrients->getProteins()),
+		$carbs->setResult($nutrients->getCarbs());
+		$fats->setResult($nutrients->getFats());
+		$proteins->setResult($nutrients->getProteins());
+
+		return new MetricResultCollection([
+			$carbs,
+			$fats,
+			$proteins,
 		]);
 	}
 }

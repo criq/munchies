@@ -2,7 +2,12 @@
 
 namespace Fatty;
 
-abstract class Quantity implements \Effekt\QuantityInterface
+use Fatty\Metrics\ResultInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Katu\Tools\Options\OptionCollection;
+use Katu\Tools\Rest\RestResponse;
+
+abstract class Quantity implements \Effekt\QuantityInterface, ResultInterface
 {
 	const BASE_UNIT = null;
 
@@ -104,5 +109,33 @@ abstract class Quantity implements \Effekt\QuantityInterface
 	public function getModified(Quantity $modifier): Quantity
 	{
 		return (clone $this)->modify($modifier);
+	}
+
+	public function getNumericalValue(): ?float
+	{
+		return $this->getAmount()->getNumericalValue();
+	}
+
+	public function getStringValue(): ?string
+	{
+		return (string)$this->getNumericalValue();
+	}
+
+	public function getBooleanValue(): ?bool
+	{
+		return (bool)$this->getNumericalValue();
+	}
+
+	public function getArrayValue(): ?array
+	{
+		return null;
+	}
+
+	public function getRestResponse(?ServerRequestInterface $request = null, ?OptionCollection $options = null): RestResponse
+	{
+		return new RestResponse([
+			"amount" => $this->getAmount()->getRestResponse($request, $options),
+			"unit" => (string)$this->getUnit(),
+		]);
 	}
 }

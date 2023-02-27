@@ -5,51 +5,72 @@ namespace Fatty\Strategies;
 use Fatty\Amount;
 use Fatty\Calculator;
 use Fatty\Energy;
-use Fatty\Metrics\AmountMetric;
-use Fatty\Metrics\QuantityMetric;
+use Fatty\Metrics\AmountMetricResult;
+use Fatty\Metrics\QuantityMetricResult;
+use Fatty\Metrics\WeightGoalEnergyExpenditureMetric;
+use Fatty\Metrics\WeightGoalQuotientMetric;
 use Fatty\Strategy;
 
 class DiaMama extends Strategy
 {
-	public function calcWeightGoalQuotient(Calculator $calculator): AmountMetric
+	public function calcWeightGoalQuotient(Calculator $calculator): AmountMetricResult
 	{
-		$bodyMassIndex = $calculator->calcBodyMassIndex()->getResult()->getValue();
-		if ($bodyMassIndex <= 19) {
-			// BMI pod 19 včetně => cíl vlastně přibírání, WGEE = TDEE * 1,1
-			$weightGoalQuotient = 1.1;
-		} elseif ($bodyMassIndex > 19 && $bodyMassIndex < 25) {
-			// BMI 19,1 až 24,9 => cíl udržování WGEE = TDEE * 1
-			$weightGoalQuotient = 1;
-		} elseif ($bodyMassIndex >= 25 && $bodyMassIndex < 30) {
-			// BMI 25 až 29,9 => cíl “lehké hubnutí” WGEE = TDEE * 0,93
-			$weightGoalQuotient = .93;
-		} else {
-			// BMI více než 30 => cíl vlastně hubnutí WGEE = TDEE * 0,9
-			$weightGoalQuotient = .9;
+		$result = new AmountMetricResult(new WeightGoalQuotientMetric);
+
+		$bodyMassIndexResult = $calculator->calcBodyMassIndex();
+		$result->addErrors($bodyMassIndexResult->getErrors());
+
+		if (!$result->hasErrors()) {
+			$bodyMassIndexValue = $bodyMassIndexResult->getResult()->getNumericalValue();
+
+			if ($bodyMassIndexValue <= 19) {
+				// BMI pod 19 včetně => cíl vlastně přibírání, WGEE = TDEE * 1,1
+				$weightGoalQuotient = 1.1;
+			} elseif ($bodyMassIndexValue > 19 && $bodyMassIndexValue < 25) {
+				// BMI 19,1 až 24,9 => cíl udržování WGEE = TDEE * 1
+				$weightGoalQuotient = 1;
+			} elseif ($bodyMassIndexValue >= 25 && $bodyMassIndexValue < 30) {
+				// BMI 25 až 29,9 => cíl “lehké hubnutí” WGEE = TDEE * 0,93
+				$weightGoalQuotient = .93;
+			} else {
+				// BMI více než 30 => cíl vlastně hubnutí WGEE = TDEE * 0,9
+				$weightGoalQuotient = .9;
+			}
+
+			$result->setResult(new Amount($weightGoalQuotient));
 		}
 
-		return new AmountMetric("weightGoalQuotient", new Amount($weightGoalQuotient));
+		return $result;
 	}
 
-	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetric
+	public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetricResult
 	{
-		$totalDailyEnergyExpenditure = $calculator->calcTotalDailyEnergyExpenditure()->getResult();
-		$totalDailyEnergyExpenditureValue = $totalDailyEnergyExpenditure->getAmount()->getValue();
+		$result = new QuantityMetricResult(new WeightGoalEnergyExpenditureMetric);
 
-		$weightGoalQuotient = $this->calcWeightGoalQuotient($calculator)->getResult();
-		$weightGoalQuotientValue = $weightGoalQuotient->getValue();
+		$totalDailyEnergyExpenditureResult = $calculator->calcTotalDailyEnergyExpenditure();
+		$result->addErrors($totalDailyEnergyExpenditureResult->getErrors());
 
-		$result = (new Energy(
-			new Amount($totalDailyEnergyExpenditureValue * $weightGoalQuotientValue),
-			$totalDailyEnergyExpenditure->getUnit(),
-		))->getInUnit($calculator->getUnits());
+		$weightGoalQuotientResult = $this->calcWeightGoalQuotient($calculator);
+		$result->addErrors($weightGoalQuotientResult->getErrors());
 
-		$formula = "
-			totalDailyEnergyExpenditure[{$totalDailyEnergyExpenditure}] * weightGoalQuotient[{$weightGoalQuotientValue}]
-			= {$result->getInUnit("kcal")->getAmount()->getValue()} kcal
-			= {$result->getInUnit("kJ")->getAmount()->getValue()} kJ
-		";
+		if (!$result->hasErrors()) {
+			$totalDailyEnergyExpenditureValue = $totalDailyEnergyExpenditureResult->getResult()->getNumericalValue();
+			$weightGoalQuotientValue = $weightGoalQuotientResult->getResult()->getNumericalValue();
 
-		return new QuantityMetric("weightGoalEnergyExpenditure", $result, $formula);
+			$energy = (new Energy(
+				new Amount($totalDailyEnergyExpenditureValue * $weightGoalQuotientValue),
+				$totalDailyEnergyExpenditureResult->getResult()->getUnit(),
+			))->getInUnit($calculator->getUnits());
+
+			$formula = "
+				totalDailyEnergyExpenditure[{$totalDailyEnergyExpenditureValue}] * weightGoalQuotient[{$weightGoalQuotientValue}]
+				= {$energy->getInUnit("kcal")->getAmount()->getValue()} kcal
+				= {$energy->getInUnit("kJ")->getAmount()->getValue()} kJ
+			";
+
+			$result->setResult($energy)->setFormula($formula);
+		}
+
+		return $result;
 	}
 }

@@ -2,9 +2,12 @@
 
 namespace Fatty;
 
+use Fatty\Errors\MissingDietApproachError;
 use Fatty\Exceptions\InvalidDietCarbsException;
 use Fatty\Exceptions\MissingDietApproachException;
+use Fatty\Metrics\DietApproachMetric;
 use Fatty\Metrics\StringMetric;
+use Fatty\Metrics\StringMetricResult;
 use Fatty\Nutrients\Carbs;
 use Katu\Errors\Error;
 use Katu\Tools\Calendar\Time;
@@ -79,14 +82,18 @@ class Diet
 		return $this->getApproach()->getDefaultCarbs();
 	}
 
-	public function calcDietApproach(): StringMetric
+	public function calcDietApproach(): StringMetricResult
 	{
+		$result = new StringMetricResult(new DietApproachMetric);
+
 		$approach = $this->getApproach();
 		if (!$approach) {
-			throw new MissingDietApproachException;
+			$result->addError(new MissingDietApproachError);
+		} else {
+			$result->setResult(new StringValue($approach->getCode()));
 		}
 
-		return new StringMetric("dietApproach", $approach->getCode(), $approach->getDeclinatedLabel());
+		return $result;
 	}
 
 	public function setTimeStart(?Time $timeStart): Diet

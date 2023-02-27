@@ -3,6 +3,8 @@
 namespace Fatty;
 
 use Fatty\Metrics\AmountMetric;
+use Fatty\Metrics\AmountMetricResult;
+use Fatty\Metrics\SportActivityMetric;
 use Fatty\SportDurations\Aerobic;
 use Fatty\SportDurations\Anaerobic;
 use Fatty\SportDurations\LowFrequency;
@@ -84,8 +86,10 @@ class SportDurations
 		return $this->anaerobic;
 	}
 
-	public function calcSportActivity(): AmountMetric
+	public function calcSportActivity(): AmountMetricResult
 	{
+		$result = new AmountMetricResult(new SportActivityMetric);
+
 		$amount = 0;
 
 		if ($this->lowFrequency || $this->aerobic || $this->anaerobic) {
@@ -104,7 +108,9 @@ class SportDurations
 			$amount = static::DEFAULT_PAL;
 		}
 
-		return new AmountMetric("sportActivity", new Activity($amount));
+		$result->setResult(new Activity($amount));
+
+		return $result;
 	}
 
 	public function getTotalDuration(): Duration

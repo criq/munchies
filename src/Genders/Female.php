@@ -3,19 +3,33 @@
 namespace Fatty\Genders;
 
 use Fatty\Amount;
+use Fatty\ArrayValue;
 use Fatty\BodyTypes\Apple;
 use Fatty\BodyTypes\AppleWithHigherRisk;
 use Fatty\BodyTypes\Balanced;
 use Fatty\BodyTypes\PearOrHourglass;
 use Fatty\Calculator;
-use Fatty\ChildCollection;
 use Fatty\Energy;
-use Fatty\Metrics\AmountMetric;
+use Fatty\Metrics\AmountMetricResult;
+use Fatty\Metrics\ArrayMetricResult;
+use Fatty\Metrics\BasalMetabolicRateMifflinStJeorAdjustmentMetric;
+use Fatty\Metrics\BasalMetabolicRateMifflinStJeorWeightMetric;
+use Fatty\Metrics\BasalMetabolicRateStrategyMetric;
+use Fatty\Metrics\BodyFatPercentageMetric;
+use Fatty\Metrics\BodyTypeMetric;
+use Fatty\Metrics\BreastfeedingReferenceDailyIntakeBonusMetric;
+use Fatty\Metrics\GoalNutrientProteinBonusMetric;
+use Fatty\Metrics\PregnancyReferenceDailyIntakeBonusMetric;
 use Fatty\Metrics\QuantityMetric;
+use Fatty\Metrics\QuantityMetricResult;
+use Fatty\Metrics\ReferenceDailyIntakeBonusMetric;
+use Fatty\Metrics\SportProteinCoefficientMetric;
+use Fatty\Metrics\SportProteinMatrixMetric;
 use Fatty\Metrics\StringMetric;
+use Fatty\Metrics\StringMetricResult;
 use Fatty\Nutrients\Proteins;
 use Fatty\Percentage;
-use Katu\Tools\Calendar\Timeout;
+use Fatty\StringValue;
 
 class Female extends \Fatty\Gender
 {
@@ -29,48 +43,48 @@ class Female extends \Fatty\Gender
 	/*****************************************************************************
 	 * Procento tělesného tuku - BFP.
 	 */
-	public function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetric
+	public function calcBodyFatPercentageByProportions(Calculator $calculator): AmountMetricResult
 	{
+		$result = new AmountMetricResult(new BodyFatPercentageMetric);
+
 		$waistValue = $calculator->getProportions()->getWaist()->getInUnit("cm")->getAmount()->getValue();
 		$neckValue = $calculator->getProportions()->getNeck()->getInUnit("cm")->getAmount()->getValue();
 		$heightValue = $calculator->getProportions()->getHeight()->getInUnit("cm")->getAmount()->getValue();
 		$hipsValue = $calculator->getProportions()->getHips()->getInUnit("cm")->getAmount()->getValue();
 
 		$resultValue = ((495 / (1.29579 - (0.35004 * log10($waistValue + $hipsValue - $neckValue)) + (0.22100 * log10($heightValue)))) - 450) * 0.01;
-		$result = new Percentage($resultValue);
+		$percentage = new Percentage($resultValue);
 		$formula = "
 			((495 / (1.29579 - (0.35004 * log10(waist[{$waistValue}] + hips[{$hipsValue}] - neck[{$neckValue}])) + (0.22100 * log10(height[{$heightValue}])))) - 450) * 0.01
 			= {$resultValue}
 			";
 
-		return new AmountMetric("bodyFatPercentage", $result, $formula);
+		return $result->setResult($percentage)->setFormula($formula);
 	}
 
 	/****************************************************************************
 	 * Basal metabolic rate.
 	 */
-	public function calcBasalMetabolicRateStrategy(Calculator $calculator): StringMetric
+	public function calcBasalMetabolicRateStrategy(Calculator $calculator): StringMetricResult
 	{
 		// Při těhotenství je zapotřebí použít Mifflin-StJeor kvůli rostoucímu břichu.
 		if ($this->getIsPregnant($calculator)) {
-			return new StringMetric(
-				"basalMetabolicRateStrategy",
-				static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR,
-			);
+			return (new StringMetricResult(new BasalMetabolicRateStrategyMetric))
+				->setResult(new StringValue(static::BASAL_METABOLIC_RATE_STRATEGY_MIFFLIN_STJEOR))
+				;
 		}
 
 		return parent::calcBasalMetabolicRateStrategy($calculator);
 	}
 
-	public function calcBasalMetabolicRateMifflinStJeorAdjustment(): QuantityMetric
+	public function calcBasalMetabolicRateMifflinStJeorAdjustment(): QuantityMetricResult
 	{
-		return new QuantityMetric(
-			"basalMetabolicRateMifflinStJeorAdjustment",
-			new Energy(new Amount(-161), "kcal"),
-		);
+		return (new QuantityMetricResult(new BasalMetabolicRateMifflinStJeorAdjustmentMetric))
+			->setResult(new Energy(new Amount(-161), "kcal"))
+			;
 	}
 
-	public function calcBasalMetabolicRateMifflinStJeorWeight(Calculator $calculator): QuantityMetric
+	public function calcBasalMetabolicRateMifflinStJeorWeight(Calculator $calculator): QuantityMetricResult
 	{
 		try {
 			$weight = $this->getPregnancy()->getWeightBeforePregnancy();
@@ -80,27 +94,40 @@ class Female extends \Fatty\Gender
 
 		$weight = ($weight ?? null) ?: $calculator->getWeight();
 
-		return new QuantityMetric(
-			"basalMetabolicRateMifflinStJeorWeight",
-			$weight,
-		);
+		return (new QuantityMetricResult(new BasalMetabolicRateMifflinStJeorWeightMetric))
+			->setResult($weight)
+			;
 	}
 
 	/*****************************************************************************
 	 * Doporučený denní příjem - bonusy.
 	 */
-	public function calcReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
+	public function calcReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetricResult
 	{
-		$energy = (new Energy)
-			->modify($this->calcBreastfeedingReferenceDailyIntakeBonus($calculator)->getResult())
-			->modify($this->calcPregnancyReferenceDailyIntakeBonus($calculator)->getResult())
-			;
+		$result = new QuantityMetricResult(new ReferenceDailyIntakeBonusMetric);
 
-		return new QuantityMetric("referenceDailyIntakeBonus", $energy);
+		$breastfeedingReferenceDailyIntakeBonusResult = $this->calcBreastfeedingReferenceDailyIntakeBonus($calculator);
+		$result->addErrors($breastfeedingReferenceDailyIntakeBonusResult->getErrors());
+
+		$pregnancyReferenceDailyIntakeBonusResult = $this->calcPregnancyReferenceDailyIntakeBonus($calculator);
+		$result->addErrors($pregnancyReferenceDailyIntakeBonusResult->getErrors());
+
+		if (!$result->hasErrors()) {
+			$energy = (new Energy)
+				->modify($breastfeedingReferenceDailyIntakeBonusResult->getResult())
+				->modify($pregnancyReferenceDailyIntakeBonusResult->getResult())
+				;
+
+			$result->setResult($energy);
+		}
+
+		return $result;
 	}
 
-	public function calcPregnancyReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
+	public function calcPregnancyReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetricResult
 	{
+		$result = new QuantityMetricResult(new PregnancyReferenceDailyIntakeBonusMetric);
+
 		$energy = new Energy;
 		$referenceTime = $calculator->getReferenceTime();
 
@@ -112,97 +139,117 @@ class Female extends \Fatty\Gender
 			}
 		}
 
-		return new QuantityMetric("pregnancyReferenceDailyIntakeBonus", $energy);
+		$result->setResult($energy);
+
+		return $result;
 	}
 
-	public function calcBreastfeedingReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetric
+	public function calcBreastfeedingReferenceDailyIntakeBonus(Calculator $calculator): QuantityMetricResult
 	{
-		$energy = $this->getChildren()->calcReferenceDailyIntakeBonus($calculator)->getResult();
+		$result = new QuantityMetricResult(new BreastfeedingReferenceDailyIntakeBonusMetric);
 
-		return new QuantityMetric("breastfeedingReferenceDailyIntakeBonus", $energy);
+		$referenceDailyIntakeBonusResult = $this->getChildren()->calcReferenceDailyIntakeBonus($calculator);
+		$result->addErrors($referenceDailyIntakeBonusResult->getErrors());
+
+		if (!$result->hasErrors()) {
+			$result->setResult($referenceDailyIntakeBonusResult->getResult());
+		}
+
+		return $result;
 	}
 
 	/*****************************************************************************
 	 * Typ postavy.
 	 */
 
-	public function calcBodyType(Calculator $calculator): StringMetric
+	public function calcBodyType(Calculator $calculator): StringMetricResult
 	{
-		$waistHipRatioValue = $calculator->calcWaistHipRatio()->getResult()->getValue();
+		$result = new StringMetricResult(new BodyTypeMetric);
 
-		if ($waistHipRatioValue < .75) {
-			$result = new PearOrHourglass;
-		} elseif ($waistHipRatioValue >= .75 && $waistHipRatioValue < .8) {
-			$result = new Balanced;
-		} elseif ($waistHipRatioValue >= .8 && $waistHipRatioValue < .85) {
-			$result = new Apple;
-		} else {
-			$result = new AppleWithHigherRisk;
+		$waistHipRatioResult = $calculator->calcWaistHipRatio();
+		$result->addErrors($waistHipRatioResult->getErrors());
+
+		if (!$result->hasErrors()) {
+			$waistHipRatioValue = $waistHipRatioResult->getResult()->getNumericalValue();
+
+			if ($waistHipRatioValue < .75) {
+				$bodyType = new PearOrHourglass;
+			} elseif ($waistHipRatioValue >= .75 && $waistHipRatioValue < .8) {
+				$bodyType = new Balanced;
+			} elseif ($waistHipRatioValue >= .8 && $waistHipRatioValue < .85) {
+				$bodyType = new Apple;
+			} else {
+				$bodyType = new AppleWithHigherRisk;
+			}
+
+			$result->setResult(new StringValue($bodyType->getCode()));
 		}
 
-		return new StringMetric("bodyType", $result->getCode(), $result->getLabel());
+		return $result;
 	}
 
 	/****************************************************************************
 	 * Sport durations.
 	 */
-	public function calcSportProteinSetKey(Calculator $calculator): StringMetric
+	public function calcSportProteinSetKey(Calculator $calculator): StringMetricResult
 	{
+		$result = new StringMetricResult(new SportProteinCoefficientMetric);
+
 		if ($this->getIsPregnant($calculator)) {
-			return new StringMetric(
-				"sportProteinSetKey",
-				"PREGNANT",
-			);
+			$result->setResult(new StringValue("PREGNANT"));
 		} elseif ($this->getIsNewMother($calculator)) {
-			return new StringMetric(
-				"sportProteinSetKey",
-				"NEW_MOTHER",
-			);
+			$result->setResult(new StringValue("NEW_MOTHER"));
+		} else {
+			return parent::calcSportProteinSetKey($calculator);
 		}
 
-		return parent::calcSportProteinSetKey($calculator);
+		return $result;
 	}
 
-	public function getSportProteinMatrix(): array
+	public function calcSportProteinMatrix(): ArrayMetricResult
 	{
-		return [
-			"FIT" => [
-				"NO_ACTIVITY" => 1.4,
-				"LOW_FREQUENCY" => 1.4,
-				"AEROBIC" => 1.6,
-				"ANAEROBIC" => 1.8,
-				"ANAEROBIC_SHORT" => 1.6,
-				"ANAEROBIC_LONG" => 1.8,
-			],
-			"UNFIT" => [
-				"NO_ACTIVITY" => 1.4,
-				"LOW_FREQUENCY" => 1.5,
-				"AEROBIC" => 1.8,
-				"ANAEROBIC" => 1.8,
-				"ANAEROBIC_SHORT" => 1.8,
-				"ANAEROBIC_LONG" => 1.8,
-			],
-			"PREGNANT" => [
-				"NO_ACTIVITY" => 1.8,
-				"LOW_FREQUENCY" => 1.9,
-				"AEROBIC" => 1.9,
-				"ANAEROBIC" => 2.2,
-				"ANAEROBIC_SHORT" => 2.2,
-				"ANAEROBIC_LONG" => 2.2,
-			],
-			"NEW_MOTHER" => [
-				"NO_ACTIVITY" => 1.8,
-				"LOW_FREQUENCY" => 1.9,
-				"AEROBIC" => 1.9,
-				"ANAEROBIC" => 2.2,
-				"ANAEROBIC_SHORT" => 2.2,
-				"ANAEROBIC_LONG" => 2.2,
-			],
-		];
+		return (new ArrayMetricResult(new SportProteinMatrixMetric))
+			->setResult(new ArrayValue([
+				"FIT" => [
+					"NO_ACTIVITY" => 1.4,
+					"LOW_FREQUENCY" => 1.4,
+					"AEROBIC" => 1.6,
+					"ANAEROBIC" => 1.8,
+					"ANAEROBIC_SHORT" => 1.6,
+					"ANAEROBIC_LONG" => 1.8,
+				],
+				"UNFIT" => [
+					"NO_ACTIVITY" => 1.4,
+					"LOW_FREQUENCY" => 1.5,
+					"AEROBIC" => 1.8,
+					"ANAEROBIC" => 1.8,
+					"ANAEROBIC_SHORT" => 1.8,
+					"ANAEROBIC_LONG" => 1.8,
+				],
+				"PREGNANT" => [
+					"NO_ACTIVITY" => 1.8,
+					"LOW_FREQUENCY" => 1.9,
+					"AEROBIC" => 1.9,
+					"ANAEROBIC" => 2.2,
+					"ANAEROBIC_SHORT" => 2.2,
+					"ANAEROBIC_LONG" => 2.2,
+				],
+				"NEW_MOTHER" => [
+					"NO_ACTIVITY" => 1.8,
+					"LOW_FREQUENCY" => 1.9,
+					"AEROBIC" => 1.9,
+					"ANAEROBIC" => 2.2,
+					"ANAEROBIC_SHORT" => 2.2,
+					"ANAEROBIC_LONG" => 2.2,
+				],
+			]))
+			;
 	}
 
-	public function calcGoalNutrientProteinBonus(Calculator $calculator): QuantityMetric
+	public function calcGoalNutrientProteinBonus(Calculator $calculator): QuantityMetricResult
 	{
+		$result = new QuantityMetricResult(new GoalNutrientProteinBonusMetric);
+
 		$proteins = new Proteins(new Amount);
 
 		if ($this->getIsBreastfeeding()) {
@@ -211,9 +258,8 @@ class Female extends \Fatty\Gender
 			}
 		}
 
-		return new QuantityMetric(
-			"goalNutrientProteinBonus",
-			$proteins,
-		);
+		$result->setResult($proteins);
+
+		return $result;
 	}
 }

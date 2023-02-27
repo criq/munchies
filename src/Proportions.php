@@ -2,8 +2,11 @@
 
 namespace Fatty;
 
+use Fatty\Errors\MissingHeightError;
 use Fatty\Exceptions\MissingHeightException;
+use Fatty\Metrics\HeightMetric;
 use Fatty\Metrics\QuantityMetric;
+use Fatty\Metrics\QuantityMetricResult;
 use Katu\Errors\Error;
 use Katu\Tools\Validation\Param;
 use Katu\Tools\Validation\Validation;
@@ -40,18 +43,21 @@ class Proportions
 		return $this->height;
 	}
 
-	public function calcHeight(): QuantityMetric
+	public function calcHeight(): QuantityMetricResult
 	{
+		$result = new QuantityMetricResult(new HeightMetric);
+
 		$height = $this->getHeight();
 		if (!$height) {
-			throw new MissingHeightException;
+			$result->addError(new MissingHeightError);
+		} else {
+			$heightValue = $height->getAmount()->getValue();
+			$formula = "height[{$heightValue}] = {$heightValue}";
+
+			$result->setResult($height)->setFormula($formula);
 		}
 
-		$heightValue = $height->getAmount()->getValue();
-
-		$formula = "height[{$heightValue}] = {$heightValue}";
-
-		return new QuantityMetric('height', $height, $formula);
+		return $result;
 	}
 
 	/*****************************************************************************

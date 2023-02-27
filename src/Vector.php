@@ -2,7 +2,8 @@
 
 namespace Fatty;
 
-use Fatty\Metrics\AmountMetric;
+use Fatty\Metrics\AmountMetricResult;
+use Fatty\Metrics\WeightGoalQuotientMetric;
 
 abstract class Vector
 {
@@ -37,9 +38,11 @@ abstract class Vector
 		return static::CODE;
 	}
 
-	public function calcWeightGoalQuotient(Calculator $calculator): AmountMetric
+	public function calcWeightGoalQuotient(Calculator $calculator): AmountMetricResult
 	{
-		return new AmountMetric("weightGoalQuotient", new Amount((float)static::WEIGHT_GOAL_QUOTIENT));
+		return (new AmountMetricResult(new WeightGoalQuotientMetric))
+			->setResult(new Amount((float)static::WEIGHT_GOAL_QUOTIENT))
+			;
 	}
 
 	public function getChangePerWeek()
