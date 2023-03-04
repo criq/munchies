@@ -2,12 +2,9 @@
 
 namespace Fatty;
 
-use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Metrics\ReferenceDailyIntakeBonusMetric;
 use Katu\Tools\Calendar\Timeout;
-
-use function PHPUnit\Framework\returnSelf;
 
 class ChildCollection extends \ArrayObject
 {

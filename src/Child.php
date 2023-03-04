@@ -2,7 +2,6 @@
 
 namespace Fatty;
 
-use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Metrics\ReferenceDailyIntakeBonusMetric;
 

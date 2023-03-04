@@ -126,9 +126,26 @@ class Calculator implements RestResponseInterface
 		}
 
 		$children = new ChildCollection;
-		foreach ($params as $key => $value) {
-			if (preg_match("/^children_[0-9]+_birthday$/", $key)) {
-				// var_dump($value);die;
+		foreach ($params as $birthdayKey => $value) {
+			if (preg_match("/^children_(?<index>[0-9]+)_birthday$/", $birthdayKey, $match)) {
+				$breastfeedingModeKey = "children_{$match["index"]}_breastfeedingMode";
+
+				$childBirthdayInput = trim($value);
+				$childBreastfeedingModeInput = trim($params[$breastfeedingModeKey] ?? null);
+
+				if (mb_strlen($childBirthdayInput)) {
+					$childBirthdayValidation = Birthday::validateBirthday(new UserInput($birthdayKey, $childBirthdayInput));
+					$validations[] = $childBirthdayValidation;
+
+					$childBreastfeedingModeValidation = BreastfeedingMode::validate(new UserInput($breastfeedingModeKey, $childBreastfeedingModeInput));
+					$validations[] = $childBreastfeedingModeValidation;
+
+					if (!$childBirthdayValidation->hasErrors() && !$childBreastfeedingModeValidation->hasErrors()) {
+						$children[] = (new Child($childBirthdayValidation->getResponse()))
+							->setBreastfeedingMode($childBreastfeedingModeValidation->getResponse())
+							;
+					}
+				}
 			}
 		}
 
@@ -1077,10 +1094,10 @@ class Calculator implements RestResponseInterface
 
 	public function getOptimalWeight(): Interval
 	{
-		$activeBodyMassWeightValue = $this->calcActiveBodyMassWeight()->getResult()->getInUnit("kg")->getAmount()->getValue();
+		$activeBodyMassWeightValue = $this->calcActiveBodyMassWeight()->getResult()->getInUnit("kg")->getNumericalValue();
 		$optimalFatWeight = $this->calcOptimalFatWeight();
-		$optimalFatWeightMinValue = $optimalFatWeight->filterByName("optimalFatWeightMin")[0]->getResult()->getInUnit("kg")->getAmount()->getValue();
-		$optimalFatWeightMaxValue = $optimalFatWeight->filterByName("optimalFatWeightMax")[0]->getResult()->getInUnit("kg")->getAmount()->getValue();
+		$optimalFatWeightMinValue = $optimalFatWeight->filterByCode("optimalFatWeightMin")->getFirst()->getResult()->getInUnit("kg")->getNumericalValue();
+		$optimalFatWeightMaxValue = $optimalFatWeight->filterByCode("optimalFatWeightMax")->getFirst()->getResult()->getInUnit("kg")->getNumericalValue();
 
 		return new Interval(
 			new Weight(
@@ -1146,10 +1163,10 @@ class Calculator implements RestResponseInterface
 		$maxResult->addErrors($bodyFatWeightResult->getErrors());
 
 		if (!$minResult->hasErrors() && !$maxResult->hasErrors()) {
-			$value = $optimalFatWeightResults->filterByMetric(new OptimalFatWeightMinMetric)->getFirst()->getResult()->getNumericalValue() / $bodyFatWeightResult->getResult()->getInUnit("kg")->getAmount()->getValue();
+			$value = $optimalFatWeightResults->filterByMetric(new OptimalFatWeightMinMetric)->getFirst()->getResult()->getNumericalValue() / $bodyFatWeightResult->getResult()->getInUnit("kg")->getNumericalValue();
 			$minResult->setResult(new Percentage($value <= 1 ? $value : 1));
 
-			$value = $optimalFatWeightResults->filterByMetric(new OptimalFatWeightMaxMetric)->getFirst()->getResult()->getNumericalValue() / $bodyFatWeightResult->getResult()->getInUnit("kg")->getAmount()->getValue();
+			$value = $optimalFatWeightResults->filterByMetric(new OptimalFatWeightMaxMetric)->getFirst()->getResult()->getNumericalValue() / $bodyFatWeightResult->getResult()->getInUnit("kg")->getNumericalValue();
 			$maxResult->setResult(new Percentage($value <= 1 ? $value : 1));
 		}
 

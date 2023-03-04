@@ -2,6 +2,9 @@
 
 namespace Fatty;
 
+use Katu\Tools\Validation\Params\UserInput;
+use Katu\Tools\Validation\Validation;
+
 class BreastfeedingMode
 {
 	const CODE = "";
@@ -18,5 +21,24 @@ class BreastfeedingMode
 			BreastfeedingModes\Partial::CODE => new BreastfeedingModes\Partial,
 			BreastfeedingModes\Full::CODE => new BreastfeedingModes\Full,
 		];
+	}
+
+	public static function validate(UserInput $param): Validation
+	{
+		$validation = new Validation;
+
+		$output = trim($param);
+		if (!mb_strlen($output)) {
+			$validation->addError((new Error("Chybějící způsob kojení."))->addParam($param));
+		} else {
+			$output = static::getAvailable()[$output] ?? null;
+			if (!$output) {
+				$validation->addError((new Error("Neplatný způsob kojení."))->addParam($param));
+			} else {
+				$validation->setResponse($output)->addParam($param->setOutput($output));
+			}
+		}
+
+		return $validation;
 	}
 }
