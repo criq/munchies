@@ -6,6 +6,7 @@ use Fatty\Amount;
 use Fatty\Calculator;
 use Fatty\Energy;
 use Fatty\Errors\MissingGoalVectorError;
+use Fatty\Metrics\MetricResultCollection;
 use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Metrics\WeightGoalEnergyExpenditureMetric;
 use Fatty\Nutrients;
@@ -41,7 +42,7 @@ class LowEnergy extends \Fatty\Approach
 		return $result;
 	}
 
-	public function getGoalNutrients(Calculator $calculator): Nutrients
+	public function calcGoalNutrients(Calculator $calculator): MetricResultCollection
 	{
 		$nutrients = new Nutrients;
 		$nutrients->setCarbs((new static)->getDefaultCarbs());

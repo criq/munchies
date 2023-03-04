@@ -25,8 +25,6 @@ abstract class Approach
 	const LABEL_DECLINATED = null;
 	const PROTEINS_DEFAULT = null;
 
-	abstract public function getGoalNutrients(Calculator $calculator): Nutrients;
-
 	public function __toString(): string
 	{
 		return $this->getDeclinatedLabel();
@@ -156,7 +154,7 @@ abstract class Approach
 		$fats = new QuantityMetricResult(new GoalNutrientsFatsMetric);
 		$proteins = new QuantityMetricResult(new GoalNutrientsProteinsMetric);
 
-		$nutrients = $this->getGoalNutrients($calculator);
+		$nutrients = $this->calcGoalNutrients($calculator);
 
 		$carbs->setResult($nutrients->getCarbs());
 		$fats->setResult($nutrients->getFats());

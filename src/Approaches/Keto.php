@@ -5,6 +5,7 @@ namespace Fatty\Approaches;
 use Fatty\Amount;
 use Fatty\Calculator;
 use Fatty\Energy;
+use Fatty\Metrics\MetricResultCollection;
 use Fatty\Nutrients;
 use Fatty\Nutrients\Fats;
 
@@ -16,7 +17,7 @@ class Keto extends \Fatty\Approach
 	const CODE = "KETO";
 	const LABEL_DECLINATED = "keto dietu";
 
-	public function getGoalNutrients(Calculator $calculator): Nutrients
+	public function calcGoalNutrients(Calculator $calculator): MetricResultCollection
 	{
 		$nutrients = new Nutrients;
 		$nutrients->setProteins($this->calcGoalNutrientsProteins($calculator)->getResult());

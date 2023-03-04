@@ -5,7 +5,10 @@ namespace Fatty\Approaches\DiaMama;
 use Fatty\Amount;
 use Fatty\Calculator;
 use Fatty\Energy;
+use Fatty\Metrics\GoalNutrientsCarbsMetric;
+use Fatty\Metrics\GoalNutrientsFatsMetric;
 use Fatty\Metrics\GoalNutrientsProteinsMetric;
+use Fatty\Metrics\MetricResultCollection;
 use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Nutrients;
 use Fatty\Nutrients\Carbs;
@@ -51,25 +54,39 @@ class Standard extends \Fatty\Approaches\Standard
 		return $result;
 	}
 
-	public function getGoalNutrients(Calculator $calculator): Nutrients
+	public function calcGoalNutrients(Calculator $calculator): MetricResultCollection
 	{
-		$wgee = $calculator->calcWeightGoalEnergyExpenditure();
+		$carbsResult = new QuantityMetricResult(new GoalNutrientsCarbsMetric);
+		$fatsResult = new QuantityMetricResult(new GoalNutrientsFatsMetric);
+		$proteinsResult = $this->calcGoalNutrientsProteins($calculator);
 
-		$nutrients = new Nutrients;
-		$nutrients->setProteins($this->calcGoalNutrientsProteins($calculator)->getResult());
-		$nutrients->setCarbs(new Carbs(new Amount(static::CARBS_DEFAULT), "g"));
+		$wgeeResult = $calculator->calcWeightGoalEnergyExpenditure();
+		$fatsResult->addErrors($wgeeResult->getErrors());
 
-		$nutrients->setFats(
-			Fats::createFromEnergy(
-				new Energy(
-					new Amount(
-						$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
+			$nutrients = new Nutrients;
+			$nutrients->setProteins($proteinsResult->getResult());
+			$nutrients->setCarbs(new Carbs(new Amount(static::CARBS_DEFAULT), "g"));
+			$nutrients->setFats(
+				Fats::createFromEnergy(
+					new Energy(
+						new Amount(
+							$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInUnit(Energy::getBaseUnit())->getAmount()->getValue()
+						),
+						Energy::getBaseUnit(),
 					),
-					Energy::getBaseUnit(),
 				),
-			),
-		);
+			);
 
-		return $nutrients;
+			$carbsResult->setResult($nutrients->getCarbs());
+			$fatsResult->setResult($nutrients->getFats());
+			$proteinsResult->setResult($nutrients->getProteins());
+		}
+
+		return new MetricResultCollection([
+			$carbsResult,
+			$fatsResult,
+			$proteinsResult,
+		]);
 	}
 }

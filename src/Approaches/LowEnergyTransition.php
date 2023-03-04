@@ -7,6 +7,7 @@ use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDay;
 use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDayCollection;
 use Fatty\Calculator;
 use Fatty\Energy;
+use Fatty\Metrics\MetricResultCollection;
 use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Metrics\WeightGoalEnergyExpenditureMetric;
 use Fatty\Nutrients;
@@ -116,7 +117,7 @@ class LowEnergyTransition extends \Fatty\Approach
 		return $result;
 	}
 
-	public function getGoalNutrients(Calculator $calculator): Nutrients
+	public function calcGoalNutrients(Calculator $calculator): MetricResultCollection
 	{
 		$nutrients = new Nutrients;
 
