@@ -45,7 +45,7 @@ class MetricResultCollection extends \ArrayObject implements MetricResultCollect
 	{
 		$res = [];
 		foreach ($this as $metricResult) {
-			$res[$metricResult->getMetric()->getCode()] = $metricResult;
+			$res[$metricResult->getMetric()->getCode()->getCamelCaseFormat()] = $metricResult;
 		}
 
 		ksort($res);
