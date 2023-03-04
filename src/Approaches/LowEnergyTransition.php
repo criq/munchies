@@ -7,6 +7,9 @@ use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDay;
 use Fatty\Approaches\LowEnergyTransition\LowEnergyTransitionDayCollection;
 use Fatty\Calculator;
 use Fatty\Energy;
+use Fatty\Metrics\GoalNutrientsCarbsMetric;
+use Fatty\Metrics\GoalNutrientsFatsMetric;
+use Fatty\Metrics\GoalNutrientsProteinsMetric;
 use Fatty\Metrics\MetricResultCollection;
 use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Metrics\WeightGoalEnergyExpenditureMetric;
@@ -92,7 +95,7 @@ class LowEnergyTransition extends \Fatty\Approach
 			$ketoCalculator->setDiet(new \Fatty\Diet(new \Fatty\Approaches\Keto));
 			$ketoWeightGoalEnergyExpenditure = $ketoCalculator->calcWeightGoalEnergyExpenditure()->getResult();
 
-			if ($day->getWeightGoalEnergyExpenditure()->getInUnit(static::ENERGY_UNIT)->getAmount()->getValue() > $ketoWeightGoalEnergyExpenditure->getInUnit(static::ENERGY_UNIT)->getAmount()->getValue()) {
+			if ($day->getWeightGoalEnergyExpenditure()->getInUnit(static::ENERGY_UNIT)->getAmount()->getValue() > $ketoWeightGoalEnergyExpenditure->getInUnit(static::ENERGY_UNIT)->getNumericalValue()) {
 				$day->setWeightGoalEnergyExpenditure($ketoWeightGoalEnergyExpenditure);
 			}
 
@@ -119,40 +122,58 @@ class LowEnergyTransition extends \Fatty\Approach
 
 	public function calcGoalNutrients(Calculator $calculator): MetricResultCollection
 	{
-		$nutrients = new Nutrients;
+		print_r($this->calcDays($calculator));
+		die;
 
-		$wgee = $calculator->calcWeightGoalEnergyExpenditure();
 
-		// Bílkoviny.
+		$carbsResult = new QuantityMetricResult(new GoalNutrientsCarbsMetric);
+		$fatsResult = new QuantityMetricResult(new GoalNutrientsFatsMetric);
+		$proteinsResult = new QuantityMetricResult(new GoalNutrientsProteinsMetric);
+
+		$wgeeResult = $calculator->calcWeightGoalEnergyExpenditure();
+		$proteinsResult->addErrors($wgeeResult->getErrors());
+		$fatsResult->addErrors($wgeeResult->getErrors());
+
 		$ketoCalculator = clone $calculator;
 		$ketoCalculator->setDiet(new \Fatty\Diet(new \Fatty\Approaches\Keto));
-		$ketoWgee = $ketoCalculator->calcWeightGoalEnergyExpenditure();
+		$ketoWgeeResult = $ketoCalculator->calcWeightGoalEnergyExpenditure();
+		$proteinsResult->addErrors($ketoWgeeResult->getErrors());
 
-		$startEnergyValue = $this->getDefaultEnergy()->getInUnit("J")->getAmount()->getValue();
-		$goalEnergyValue = $ketoWgee->getResult()->getInUnit("J")->getAmount()->getValue();
-		$currentEnergyValue = $wgee->getResult()->getInUnit("J")->getAmount()->getValue();
-		$progress = ($currentEnergyValue - $startEnergyValue) / ($goalEnergyValue - $startEnergyValue);
+		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
+			$nutrients = new Nutrients;
 
-		$startProteinsValue = $this->getDefaultProteins()->getInUnit("g")->getAmount()->getValue();
-		$goalProteinsValue = $ketoCalculator->calcGoalNutrients()->filterByName("goalNutrientsProteins")[0]->getResult()->getInUnit("g")->getAmount()->getValue();
-		$addProteins = ($goalProteinsValue - $startProteinsValue) * $progress;
-		$proteins = new Proteins(new Amount($startProteinsValue + $addProteins), "g");
-		$nutrients->setProteins($proteins);
+			// Bílkoviny.
+			$startEnergyValue = $this->getDefaultEnergy()->getInUnit(Energy::getBaseUnit())->getAmount()->getValue();
+			$goalEnergyValue = $ketoWgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue();
+			$currentEnergyValue = $wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue();
+			$progress = ($currentEnergyValue - $startEnergyValue) / ($goalEnergyValue - $startEnergyValue);
 
-		// Tuky a sacharidy.
-		$dietCarbs = $calculator->getDiet()->getCarbs();
-		$nutrients->setCarbs($dietCarbs);
-		$nutrients->setFats(
-			Fats::createFromEnergy(
+			$startProteinsValue = $this->getDefaultProteins()->getInUnit("g")->getAmount()->getValue();
+			$goalProteinsValue = $ketoCalculator->calcGoalNutrients()->filterByCode("goalNutrientsProteins")->getFirst()->getResult()->getInUnit("g")->getNumericalValue();
+			$addProteins = ($goalProteinsValue - $startProteinsValue) * $progress;
+			$proteins = new Proteins(new Amount($startProteinsValue + $addProteins), "g");
+			$nutrients->setProteins($proteins);
+
+			// Sacharidy.
+			$carbs = $calculator->getDiet()->getCarbs();
+			$nutrients->setCarbs($carbs);
+
+			// Tuky.
+			$fats = Fats::createFromEnergy(
 				new Energy(
 					new Amount(
-						$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+						$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 					),
 					Energy::getBaseUnit(),
 				),
-			),
-		);
+			);
+			$nutrients->setFats($fats);
+		}
 
-		return $nutrients;
+		return new MetricResultCollection([
+			$carbsResult,
+			$fatsResult,
+			$proteinsResult,
+		]);
 	}
 }
