@@ -3,8 +3,6 @@
 namespace Fatty;
 
 use Fatty\Errors\MissingGoalVectorError;
-use Fatty\Metrics\GoalNutrientsCarbsMetric;
-use Fatty\Metrics\GoalNutrientsFatsMetric;
 use Fatty\Metrics\GoalNutrientsProteinsMetric;
 use Fatty\Metrics\MetricResultCollection;
 use Fatty\Metrics\QuantityMetricResult;
@@ -24,6 +22,8 @@ abstract class Approach
 	const FATS_DEFAULT = null;
 	const LABEL_DECLINATED = null;
 	const PROTEINS_DEFAULT = null;
+
+	abstract public function calcGoalNutrients(Calculator $calculator): MetricResultCollection;
 
 	public function __toString(): string
 	{
@@ -146,24 +146,5 @@ abstract class Approach
 		}
 
 		return $result;
-	}
-
-	public function calcGoalNutrients(Calculator $calculator): MetricResultCollection
-	{
-		$carbs = new QuantityMetricResult(new GoalNutrientsCarbsMetric);
-		$fats = new QuantityMetricResult(new GoalNutrientsFatsMetric);
-		$proteins = new QuantityMetricResult(new GoalNutrientsProteinsMetric);
-
-		$nutrients = $this->calcGoalNutrients($calculator);
-
-		$carbs->setResult($nutrients->getCarbs());
-		$fats->setResult($nutrients->getFats());
-		$proteins->setResult($nutrients->getProteins());
-
-		return new MetricResultCollection([
-			$carbs,
-			$fats,
-			$proteins,
-		]);
 	}
 }

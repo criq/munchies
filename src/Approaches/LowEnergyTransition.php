@@ -168,6 +168,10 @@ class LowEnergyTransition extends \Fatty\Approach
 				),
 			);
 			$nutrients->setFats($fats);
+
+			$carbsResult->setResult($nutrients->getCarbs());
+			$fatsResult->setResult($nutrients->getFats());
+			$proteinsResult->setResult($nutrients->getProteins());
 		}
 
 		return new MetricResultCollection([

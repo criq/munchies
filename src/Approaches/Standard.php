@@ -5,7 +5,10 @@ namespace Fatty\Approaches;
 use Fatty\Amount;
 use Fatty\Calculator;
 use Fatty\Energy;
+use Fatty\Metrics\GoalNutrientsCarbsMetric;
+use Fatty\Metrics\GoalNutrientsFatsMetric;
 use Fatty\Metrics\MetricResultCollection;
+use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Nutrients;
 use Fatty\Nutrients\Carbs;
 use Fatty\Nutrients\Fats;
@@ -19,50 +22,63 @@ class Standard extends \Fatty\Approach
 
 	public function calcGoalNutrients(Calculator $calculator): MetricResultCollection
 	{
-		$nutrients = new Nutrients;
-		$nutrients->setProteins($this->calcGoalNutrientsProteins($calculator)->getResult());
+		$carbsResult = new QuantityMetricResult(new GoalNutrientsCarbsMetric);
+		$fatsResult = new QuantityMetricResult(new GoalNutrientsFatsMetric);
+		$proteinsResult = $this->calcGoalNutrientsProteins($calculator);
 
-		$wgee = $calculator->calcWeightGoalEnergyExpenditure();
+		$wgeeResult = $calculator->calcWeightGoalEnergyExpenditure();
+		$carbsResult->addErrors($wgeeResult->getErrors());
+		$fatsResult->addErrors($wgeeResult->getErrors());
 
-		if ($calculator->getSportDurations()->getAnaerobic() instanceof SportDuration && $calculator->getSportDurations()->getAnaerobic()->getAmount()->getValue() >= 100) {
-			$nutrients->setCarbs(
-				Carbs::createFromEnergy(
-					new Energy(new Amount($wgee->getResult()->getInUnit("kJ")->getAmount()->getValue() * .58), "kJ"),
-				)
-			);
+		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
+			$nutrients = new Nutrients;
 
-			$nutrients->setFats(Fats::createFromEnergy(
-				new Energy(
-					new Amount(
-						$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue(),
-					),
-					Energy::getBaseUnit(),
-				),
-			));
-		} else {
-			$nutrients->setCarbs(
-				Carbs::createFromEnergy(
+			if ($calculator->getSportDurations()->getAnaerobic() instanceof SportDuration && $calculator->getSportDurations()->getAnaerobic()->getAmount()->getValue() >= 100) {
+				$carbs = Carbs::createFromEnergy(
+					new Energy(new Amount($wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() * .58), Energy::getBaseUnit()),
+				);
+				$nutrients->setCarbs($carbs);
+
+				$fats = Fats::createFromEnergy(
 					new Energy(
 						new Amount(
-							$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() * .55
+							$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue(),
 						),
 						Energy::getBaseUnit(),
 					),
-				),
-			);
-
-			$nutrients->setFats(
-				Fats::createFromEnergy(
+				);
+				$nutrients->setFats($fats);
+			} else {
+				$carbs = Carbs::createFromEnergy(
 					new Energy(
 						new Amount(
-							$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+							$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() * .55
 						),
 						Energy::getBaseUnit(),
 					),
-				),
-			);
+				);
+				$nutrients->setCarbs($carbs);
+
+				$fats = Fats::createFromEnergy(
+					new Energy(
+						new Amount(
+							$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+						),
+						Energy::getBaseUnit(),
+					),
+				);
+				$nutrients->setFats($fats);
+			}
+
+			$carbsResult->setResult($nutrients->getCarbs());
+			$fatsResult->setResult($nutrients->getFats());
+			$proteinsResult->setResult($proteinsResult->getResult());
 		}
 
-		return $nutrients;
+		return new MetricResultCollection([
+			$carbsResult,
+			$fatsResult,
+			$proteinsResult,
+		]);
 	}
 }
