@@ -65,18 +65,20 @@ class Standard extends \Fatty\Approaches\Standard
 
 		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
 			$nutrients = new Nutrients;
-			$nutrients->setProteins($proteinsResult->getResult());
+
 			$nutrients->setCarbs(new Carbs(new Amount(static::CARBS_DEFAULT), "g"));
-			$nutrients->setFats(
-				Fats::createFromEnergy(
-					new Energy(
-						new Amount(
-							$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInUnit(Energy::getBaseUnit())->getAmount()->getValue()
-						),
-						Energy::getBaseUnit(),
+
+			$nutrients->setProteins($proteinsResult->getResult());
+
+			$fats = Fats::createFromEnergy(
+				new Energy(
+					new Amount(
+						$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 					),
+					Energy::getBaseUnit(),
 				),
 			);
+			$nutrients->setFats($fats);
 
 			$carbsResult->setResult($nutrients->getCarbs());
 			$fatsResult->setResult($nutrients->getFats());

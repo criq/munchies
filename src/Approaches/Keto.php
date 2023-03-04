@@ -5,7 +5,10 @@ namespace Fatty\Approaches;
 use Fatty\Amount;
 use Fatty\Calculator;
 use Fatty\Energy;
+use Fatty\Metrics\GoalNutrientsCarbsMetric;
+use Fatty\Metrics\GoalNutrientsFatsMetric;
 use Fatty\Metrics\MetricResultCollection;
+use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Nutrients;
 use Fatty\Nutrients\Fats;
 
@@ -19,24 +22,40 @@ class Keto extends \Fatty\Approach
 
 	public function calcGoalNutrients(Calculator $calculator): MetricResultCollection
 	{
-		$nutrients = new Nutrients;
-		$nutrients->setProteins($this->calcGoalNutrientsProteins($calculator)->getResult());
+		$carbsResult = new QuantityMetricResult(new GoalNutrientsCarbsMetric);
+		$fatsResult = new QuantityMetricResult(new GoalNutrientsFatsMetric);
+		$proteinsResult = $this->calcGoalNutrientsProteins($calculator);
 
-		$wgee = $calculator->calcWeightGoalEnergyExpenditure();
+		$wgeeResult = $calculator->calcWeightGoalEnergyExpenditure();
+		$fatsResult->addErrors($wgeeResult->getErrors());
 
-		$dietCarbs = $calculator->getDiet()->getCarbs();
-		$nutrients->setCarbs($dietCarbs);
-		$nutrients->setFats(
-			Fats::createFromEnergy(
+		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
+			$nutrients = new Nutrients;
+
+			$carbs = $calculator->getDiet()->getCarbs();
+			$nutrients->setCarbs($carbs);
+
+			$nutrients->setProteins($proteinsResult->getResult());
+
+			$fats = Fats::createFromEnergy(
 				new Energy(
 					new Amount(
-						$wgee->getResult()->getInBaseUnit()->getAmount()->getValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+						$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 					),
 					Energy::getBaseUnit(),
 				),
-			),
-		);
+			);
+			$nutrients->setFats($fats);
 
-		return $nutrients;
+			$carbsResult->setResult($nutrients->getCarbs());
+			$fatsResult->setResult($nutrients->getFats());
+			$proteinsResult->setResult($nutrients->getProteins());
+		}
+
+		return new MetricResultCollection([
+			$carbsResult,
+			$fatsResult,
+			$proteinsResult,
+		]);
 	}
 }
