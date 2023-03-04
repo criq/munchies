@@ -5,6 +5,7 @@ namespace Fatty;
 use Fatty\Metrics\ResultInterface;
 use Katu\Tools\Options\OptionCollection;
 use Katu\Tools\Rest\RestResponse;
+use Katu\Types\TJSON;
 use Psr\Http\Message\ServerRequestInterface;
 
 class ArrayValue implements ResultInterface
@@ -61,6 +62,11 @@ class ArrayValue implements ResultInterface
 	public function getUnit(): ?string
 	{
 		return null;
+	}
+
+	public function getFormatted(): ?string
+	{
+		return TJSON::createFromContents($this->getArrayValue());
 	}
 
 	public function getRestResponse(?ServerRequestInterface $request = null, ?OptionCollection $options = null): RestResponse

@@ -63,6 +63,11 @@ class BooleanValue implements ResultInterface
 		return null;
 	}
 
+	public function getFormatted(): ?string
+	{
+		return $this->getValue() ? "Ano" : "Ne";
+	}
+
 	public function getRestResponse(?ServerRequestInterface $request = null, ?OptionCollection $options = null): RestResponse
 	{
 		return new RestResponse($this->getValue());

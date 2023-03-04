@@ -63,6 +63,11 @@ class StringValue implements ResultInterface
 		return null;
 	}
 
+	public function getFormatted(): ?string
+	{
+		return $this->getStringValue();
+	}
+
 	public function getRestResponse(?ServerRequestInterface $request = null, ?OptionCollection $options = null): RestResponse
 	{
 		return new RestResponse((string)$this->getValue());

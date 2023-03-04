@@ -12,6 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 abstract class MetricResult implements MetricResultCollectionAddable, RestResponseInterface
 {
 	protected $errors;
+	protected $formatted;
 	protected $formula;
 	protected $metric;
 	protected $result;
@@ -88,8 +89,10 @@ abstract class MetricResult implements MetricResultCollectionAddable, RestRespon
 	public function getRestResponse(?ServerRequestInterface $request = null, ?OptionCollection $options = null): RestResponse
 	{
 		return new RestResponse([
-			"metric" => $this->getMetric()->getRestResponse($request, $options),
 			"errors" => $this->getErrors()->getRestResponse($request, $options),
+			"formatted" => $this->getResult() ? $this->getResult()->getFormatted() : null,
+			"formula" => $this->getFormula(),
+			"metric" => $this->getMetric()->getRestResponse($request, $options),
 			"result" => $this->getResult() ? $this->getResult()->getRestResponse($request, $options) : null,
 		]);
 	}
