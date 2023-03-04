@@ -985,6 +985,7 @@ class Calculator implements RestResponseInterface
 			$activeBodyMassPercentageValue = $this->calcActiveBodyMassPercentage()->getResult()->getNumericalValue();
 			$resultValue = $weightValue * $activeBodyMassPercentageValue;
 			$formula = "weight[$weightValue] * activeBodyMassPercentage[$activeBodyMassPercentageValue]";
+
 			$result->setResult(new Weight(new Amount($resultValue), "kg"))->setFormula($formula);
 		}
 
