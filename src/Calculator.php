@@ -981,12 +981,11 @@ class Calculator implements RestResponseInterface
 		if (!$weight) {
 			$result->addError(new MissingWeightError);
 		} else {
-			$result->setResult(new Weight(
-				new Amount(
-					$weight->getInUnit("kg")->getNumericalValue() * $this->calcActiveBodyMassPercentage()->getResult()->getNumericalValue()
-				),
-				"kg",
-			));
+			$weightValue = $weight->getInUnit("kg")->getNumericalValue();
+			$activeBodyMassPercentageValue = $this->calcActiveBodyMassPercentage()->getResult()->getNumericalValue();
+			$resultValue = $weightValue * $activeBodyMassPercentageValue;
+			$formula = "weight[$weightValue] * activeBodyMassPercentage[$activeBodyMassPercentageValue]";
+			$result->setResult(new Weight(new Amount($resultValue), "kg"))->setFormula($formula);
 		}
 
 		return $result;
