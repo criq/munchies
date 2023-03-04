@@ -963,10 +963,8 @@ class Calculator implements RestResponseInterface
 
 		if (!$result->hasErrors()) {
 			$bodyFatPercentageValue = $bodyFatPercentageResult->getResult()->getNumericalValue();
-
 			$percentage = new Percentage(1 - $bodyFatPercentageValue);
 			$formula = "1 - bodyFatPercentage[$bodyFatPercentageValue] = {$percentage->getValue()}";
-
 			$result->setResult($percentage)->setFormula($formula);
 		}
 
@@ -985,7 +983,6 @@ class Calculator implements RestResponseInterface
 			$activeBodyMassPercentageValue = $this->calcActiveBodyMassPercentage()->getResult()->getNumericalValue();
 			$resultValue = $weightValue * $activeBodyMassPercentageValue;
 			$formula = "weight[$weightValue] * activeBodyMassPercentage[$activeBodyMassPercentageValue]";
-
 			$result->setResult(new Weight(new Amount($resultValue), "kg"))->setFormula($formula);
 		}
 
