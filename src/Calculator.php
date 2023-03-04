@@ -148,6 +148,7 @@ class Calculator implements RestResponseInterface
 				}
 			}
 		}
+		$calculator->getGender()->setChildren($children);
 
 		if (trim($params["birthday"] ?? null)) {
 			$birthdayValidation = Birthday::validateBirthday(new UserInput("birthday", $params["birthday"]));
