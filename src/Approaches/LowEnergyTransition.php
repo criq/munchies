@@ -44,7 +44,7 @@ class LowEnergyTransition extends \Fatty\Approach
 
 		while ($time->format("Ymd") <= $timeEnd->format("Ymd")) {
 			$day = new LowEnergyTransitionDay($time);
-			$day->setWeight($calculator->getWeightHistory()->getForDate($time)->getWeight());
+			$day->setWeight($calculator->getWeights()->getForDate($time)->getWeight());
 
 			if ($timeStart->format("Ymd") == $time->format("Ymd")) {
 				// First day.

@@ -89,7 +89,7 @@ class Calculator implements RestResponseInterface
 	protected $strategy;
 	protected $units = "kcal";
 	protected $weight;
-	protected $weightHistory;
+	protected $weights;
 
 	public static function createFromRequest(ServerRequestInterface $request): Validation
 	{
@@ -484,16 +484,16 @@ class Calculator implements RestResponseInterface
 		return $result;
 	}
 
-	public function setWeightHistory(?WeightHistory $value): Calculator
+	public function setWeights(?WeightCollection $value): Calculator
 	{
-		$this->weightHistory = $value;
+		$this->weights = $value;
 
 		return $this;
 	}
 
-	public function getWeightHistory(): WeightHistory
+	public function getWeights(): WeightCollection
 	{
-		return $this->weightHistory ?: new WeightHistory;
+		return $this->weights ?: new WeightCollection;
 	}
 
 	/*****************************************************************************
