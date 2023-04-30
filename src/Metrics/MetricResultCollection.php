@@ -25,6 +25,7 @@ class MetricResultCollection extends \ArrayObject implements MetricResultCollect
 	public function filterByCode(string $code): MetricResultCollection
 	{
 		return new static(array_values(array_filter($this->getArrayCopy(), function (MetricResult $metricResult) use ($code) {
+			// var_dump($metricResult->getMetric()->getCode());
 			return $metricResult->getMetric()->getCode() == $code;
 		})));
 	}
