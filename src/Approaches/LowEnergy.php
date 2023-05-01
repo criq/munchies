@@ -48,7 +48,7 @@ class LowEnergy extends \Fatty\Approach
 	{
 		return new MetricResultCollection([
 			(new QuantityMetricResult(new GoalNutrientsCarbsMetric))->setResult((new static)->getDefaultCarbs()),
-			(new QuantityMetricResult(new GoalNutrientsFatsMetric))->setResult((new static)->getDefaultFats())
+			(new QuantityMetricResult(new GoalNutrientsFatsMetric))->setResult((new static)->getDefaultFats()),
 			(new QuantityMetricResult(new GoalNutrientsProteinsMetric))->setResult((new static)->getDefaultProteins()),
 		]);
 	}
