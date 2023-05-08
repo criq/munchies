@@ -37,7 +37,7 @@ class WeightCollection extends \ArrayObject
 
 	public function getFirst(): ?TimeWeight
 	{
-		return $this[0] ?? null;
+		return array_values($this->getArrayCopy())[0] ?? null;
 	}
 
 	public function getLast(): ?TimeWeight
