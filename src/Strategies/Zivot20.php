@@ -6,10 +6,16 @@ use Fatty\Calculator;
 use Fatty\Metrics\AmountMetricResult;
 use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Strategy;
+use Fatty\Weight;
 
 class Zivot20 extends Strategy
 {
 	const WEIGHT_GOAL_QUOTIENT = null;
+
+	public function getBodyMassIndexWeight(Calculator $calculator): ?Weight
+	{
+		return $calculator->getWeight();
+	}
 
 	public function calcWeightGoalQuotient(Calculator $calculator): AmountMetricResult
 	{

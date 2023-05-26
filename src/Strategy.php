@@ -9,4 +9,5 @@ abstract class Strategy
 {
 	abstract public function calcWeightGoalEnergyExpenditure(Calculator $calculator): QuantityMetricResult;
 	abstract public function calcWeightGoalQuotient(Calculator $calculator): AmountMetricResult;
+	abstract public function getBodyMassIndexWeight(Calculator $calculator): ?Weight;
 }

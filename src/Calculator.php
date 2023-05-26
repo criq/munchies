@@ -763,11 +763,16 @@ class Calculator implements RestResponseInterface
 		return $result;
 	}
 
+	public function getBodyMassIndexWeight(): ?Weight
+	{
+		return $this->getStrategy()->getBodyMassIndexWeight($this);
+	}
+
 	public function calcBodyMassIndex(): AmountMetricResult
 	{
 		$result = new AmountMetricResult(new BodyMassIndexMetric);
 
-		if (!($this->getWeight() instanceof Weight)) {
+		if (!($this->getBodyMassIndexWeight() instanceof Weight)) {
 			$result->addError(new MissingWeightError);
 		}
 		if (!($this->getProportions()->getHeight() instanceof Length)) {
@@ -775,7 +780,7 @@ class Calculator implements RestResponseInterface
 		}
 
 		if (!$result->hasErrors()) {
-			$weightValue = $this->getWeight()->getInUnit("kg")->getAmount()->getValue();
+			$weightValue = $this->getBodyMassIndexWeight()->getInUnit("kg")->getAmount()->getValue();
 			$heightValue = $this->getProportions()->getHeight()->getInUnit("m")->getAmount()->getValue();
 
 			$resultValue = $weightValue / pow($heightValue, 2);

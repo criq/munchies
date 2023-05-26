@@ -10,13 +10,20 @@ use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Metrics\WeightGoalEnergyExpenditureMetric;
 use Fatty\Metrics\WeightGoalQuotientMetric;
 use Fatty\Strategy;
+use Fatty\Weight;
 
 class DiaMama extends Strategy
 {
+	public function getBodyMassIndexWeight(Calculator $calculator): ?Weight
+	{
+		return $calculator->getGender()->getPregnancy()->getWeightBeforePregnancy();
+	}
+
 	public function calcWeightGoalQuotient(Calculator $calculator): AmountMetricResult
 	{
 		$result = new AmountMetricResult(new WeightGoalQuotientMetric);
 
+		// Body Mass Index se musí počítat z hmotnosti před otěhotněním.
 		$bodyMassIndexResult = $calculator->calcBodyMassIndex();
 		$result->addErrors($bodyMassIndexResult->getErrors());
 
