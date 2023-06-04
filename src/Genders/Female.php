@@ -137,6 +137,10 @@ class Female extends \Fatty\Gender
 			if ($trimester && in_array($trimester->getIndex(), [2, 3])) {
 				$energy->modify(new Energy(new Amount(300), "kcal"));
 			}
+			if ($trimester && in_array($trimester->getIndex(), [3]) && $pregnancy->getNumberOfChildren() > 1) {
+				$basalMetabolicRate = $calculator->calcBasalMetabolicRate()->getResult();
+				$energy->modify(new Energy(new Amount($basalMetabolicRate->getNumericalValue() * .1), $basalMetabolicRate->getUnit()));
+			}
 		}
 
 		$result->setResult($energy);
