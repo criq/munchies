@@ -12,6 +12,7 @@ use Katu\Tools\Calendar\Time;
 class Pregnancy
 {
 	protected $childbirthDate;
+	protected $numberOfChildren = 1;
 	protected $weightBeforePregnancy;
 
 	public function __construct(Time $childbirthDate)
