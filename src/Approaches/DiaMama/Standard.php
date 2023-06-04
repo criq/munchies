@@ -40,11 +40,12 @@ class Standard extends \Fatty\Approaches\Standard
 			$goalNutrientProteinBonusValue = $goalNutrientProteinBonusResult->getResult()->getNumericalValue();
 
 			$value = ($estimatedFunctionalMassValue * $sportProteinCoefficientValue) + $goalNutrientProteinBonusValue;
+			$value = min(150, $value);
 			$proteins = new Proteins(new Amount($value), "g");
 
 			$formula = "
-				(estimatedFunctionalMass[$estimatedFunctionalMassValue] * sportProteinCoefficient[$sportProteinCoefficientValue]) + $goalNutrientProteinBonusValue
-				" . ($estimatedFunctionalMassValue * $sportProteinCoefficientValue) . " + $goalNutrientProteinBonusValue
+				MIN(150, (estimatedFunctionalMass[$estimatedFunctionalMassValue] * sportProteinCoefficient[$sportProteinCoefficientValue]) + $goalNutrientProteinBonusValue)
+				MIN(150, " . ($estimatedFunctionalMassValue * $sportProteinCoefficientValue) . " + $goalNutrientProteinBonusValue)
 				= $value
 			";
 
