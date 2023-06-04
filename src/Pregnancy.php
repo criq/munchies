@@ -54,6 +54,18 @@ class Pregnancy
 		return $this->weightBeforePregnancy;
 	}
 
+	public function setNumberOfChildren(int $numberOfChildren): Pregnancy
+	{
+		$this->numberOfChildren = $numberOfChildren;
+
+		return $this;
+	}
+
+	public function getNumberOfChildren(): int
+	{
+		return $this->numberOfChildren;
+	}
+
 	public function getIsPregnant(Time $referenceTime): bool
 	{
 		return $this->getInterval()->fitsTime($referenceTime);
