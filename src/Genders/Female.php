@@ -20,12 +20,10 @@ use Fatty\Metrics\BodyTypeMetric;
 use Fatty\Metrics\BreastfeedingReferenceDailyIntakeBonusMetric;
 use Fatty\Metrics\GoalNutrientProteinBonusMetric;
 use Fatty\Metrics\PregnancyReferenceDailyIntakeBonusMetric;
-use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Metrics\ReferenceDailyIntakeBonusMetric;
 use Fatty\Metrics\SportProteinCoefficientMetric;
 use Fatty\Metrics\SportProteinMatrixMetric;
-use Fatty\Metrics\StringMetric;
 use Fatty\Metrics\StringMetricResult;
 use Fatty\Nutrients\Proteins;
 use Fatty\Percentage;
@@ -255,6 +253,10 @@ class Female extends \Fatty\Gender
 		$result = new QuantityMetricResult(new GoalNutrientProteinBonusMetric);
 
 		$proteins = new Proteins(new Amount);
+
+		if ($this->getIsPregnant($calculator) && $this->getPregnancy()->getNumberOfChildren() > 1) {
+			$proteins->modify(new Proteins(new Amount(25), "g"));
+		}
 
 		if ($this->getIsBreastfeeding()) {
 			if ($this->getIsPregnant($calculator) || $this->getIsNewMother($calculator)) {
