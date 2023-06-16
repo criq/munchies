@@ -49,4 +49,22 @@ class WeightCollection extends \ArrayObject
 	{
 		return $this->filterForDate($time)->sort()->getLast();
 	}
+
+	public function getTrend()
+	{
+		try {
+			$weights = $this->sort()->getReversed();
+
+			if ($weights[0] ?? null && $weights[0] ?? null) {
+				$last = $weights[0]->getWeight()->getAmount();
+				$prev = $weights[1]->getWeight()->getAmount();
+
+				return ($last == $prev) ? 0 : ($last > $prev ? 1 : -1);
+			}
+		} catch (\Throwable $e) {
+			// Nevermind.
+		}
+
+		return null;
+	}
 }
