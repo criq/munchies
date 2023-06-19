@@ -55,7 +55,7 @@ class WeightCollection extends \ArrayObject
 		try {
 			$weights = $this->sort()->getReversed();
 
-			if ($weights[0] ?? null && $weights[0] ?? null) {
+			if (($weights[0] ?? null) && ($weights[1] ?? null)) {
 				$last = $weights[0]->getWeight()->getAmount();
 				$prev = $weights[1]->getWeight()->getAmount();
 
