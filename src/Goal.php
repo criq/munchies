@@ -16,6 +16,7 @@ use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Metrics\StringMetric;
 use Fatty\Metrics\StringMetricResult;
+use Fatty\Vectors\Maintain;
 use Katu\Errors\Error;
 use Katu\Tools\Validation\Param;
 use Katu\Tools\Validation\Validation;
@@ -69,9 +70,9 @@ class Goal
 		return $this;
 	}
 
-	public function getVector(): ?Vector
+	public function getVector(): Vector
 	{
-		return $this->vector;
+		return $this->vector ?: new Maintain;
 	}
 
 	public static function validateWeight(Param $weight): Validation
