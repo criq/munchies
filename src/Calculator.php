@@ -1462,8 +1462,10 @@ class Calculator implements RestResponseInterface
 			$result->addError(new MissingGenderError);
 		}
 
-		$referenceDailyIntakeBonusResult = $gender->calcReferenceDailyIntakeBonus($this);
-		$result->addErrors($referenceDailyIntakeBonusResult->getErrors());
+		if (!$result->hasErrors()) {
+			$referenceDailyIntakeBonusResult = $gender->calcReferenceDailyIntakeBonus($this);
+			$result->addErrors($referenceDailyIntakeBonusResult->getErrors());
+		}
 
 		if (!$result->hasErrors()) {
 			$weightGoalEnergyExpenditureValue = $weightGoalEnergyExpenditureResult->getResult()->getInUnit("kcal")->getNumericalValue();
