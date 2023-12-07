@@ -27,9 +27,9 @@ class LowCarb extends \Fatty\Approach
 		$fatsResult = new QuantityMetricResult(new GoalNutrientsFatsMetric);
 		$proteinsResult = $this->calcGoalNutrientsProteins($calculator);
 
-		$wgeeResult = $calculator->calcWeightGoalEnergyExpenditure();
-		$carbsResult->addErrors($wgeeResult->getErrors());
-		$fatsResult->addErrors($wgeeResult->getErrors());
+		$rdiResult = $calculator->calcReferenceDailyIntake();
+		$carbsResult->addErrors($rdiResult->getErrors());
+		$fatsResult->addErrors($rdiResult->getErrors());
 
 		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
 			$nutrients = new Nutrients;
@@ -40,7 +40,7 @@ class LowCarb extends \Fatty\Approach
 			$carbs = Carbs::createFromEnergy(
 				new Energy(
 					new Amount(
-						$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() * .2,
+						$rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() * .2,
 					),
 					Energy::getBaseUnit(),
 				),
@@ -56,7 +56,7 @@ class LowCarb extends \Fatty\Approach
 			$fats = Fats::createFromEnergy(
 				new Energy(
 					new Amount(
-						$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+						$rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 					),
 					Energy::getBaseUnit(),
 				),

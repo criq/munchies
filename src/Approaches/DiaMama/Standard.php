@@ -61,20 +61,20 @@ class Standard extends \Fatty\Approaches\Standard
 		$fatsResult = new QuantityMetricResult(new GoalNutrientsFatsMetric);
 		$proteinsResult = $this->calcGoalNutrientsProteins($calculator);
 
-		$wgeeResult = $calculator->calcWeightGoalEnergyExpenditure();
-		$fatsResult->addErrors($wgeeResult->getErrors());
+		$rdiResult = $calculator->calcReferenceDailyIntake();
+
+		$fatsResult->addErrors($rdiResult->getErrors());
 
 		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
 			$nutrients = new Nutrients;
 
 			$nutrients->setCarbs(new Carbs(new Amount(static::CARBS_DEFAULT), "g"));
-
 			$nutrients->setProteins($proteinsResult->getResult());
 
 			$fats = Fats::createFromEnergy(
 				new Energy(
 					new Amount(
-						$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+						$rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 					),
 					Energy::getBaseUnit(),
 				),

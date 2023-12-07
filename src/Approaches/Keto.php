@@ -26,8 +26,8 @@ class Keto extends \Fatty\Approach
 		$fatsResult = new QuantityMetricResult(new GoalNutrientsFatsMetric);
 		$proteinsResult = $this->calcGoalNutrientsProteins($calculator);
 
-		$wgeeResult = $calculator->calcWeightGoalEnergyExpenditure();
-		$fatsResult->addErrors($wgeeResult->getErrors());
+		$rdiResult = $calculator->calcReferenceDailyIntake();
+		$fatsResult->addErrors($rdiResult->getErrors());
 
 		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
 			$nutrients = new Nutrients;
@@ -40,7 +40,7 @@ class Keto extends \Fatty\Approach
 			$fats = Fats::createFromEnergy(
 				new Energy(
 					new Amount(
-						$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+						$rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 					),
 					Energy::getBaseUnit(),
 				),

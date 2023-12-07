@@ -26,23 +26,23 @@ class Standard extends \Fatty\Approach
 		$fatsResult = new QuantityMetricResult(new GoalNutrientsFatsMetric);
 		$proteinsResult = $this->calcGoalNutrientsProteins($calculator);
 
-		$wgeeResult = $calculator->calcWeightGoalEnergyExpenditure();
-		$carbsResult->addErrors($wgeeResult->getErrors());
-		$fatsResult->addErrors($wgeeResult->getErrors());
+		$rdiResult = $calculator->calcReferenceDailyIntake();
+		$carbsResult->addErrors($rdiResult->getErrors());
+		$fatsResult->addErrors($rdiResult->getErrors());
 
 		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
 			$nutrients = new Nutrients;
 
 			if ($calculator->getSportDurations()->getAnaerobic() instanceof SportDuration && $calculator->getSportDurations()->getAnaerobic()->getAmount()->getValue() >= 100) {
 				$carbs = Carbs::createFromEnergy(
-					new Energy(new Amount($wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() * .58), Energy::getBaseUnit()),
+					new Energy(new Amount($rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() * .58), Energy::getBaseUnit()),
 				);
 				$nutrients->setCarbs($carbs);
 
 				$fats = Fats::createFromEnergy(
 					new Energy(
 						new Amount(
-							$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue(),
+							$rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue(),
 						),
 						Energy::getBaseUnit(),
 					),
@@ -52,7 +52,7 @@ class Standard extends \Fatty\Approach
 				$carbs = Carbs::createFromEnergy(
 					new Energy(
 						new Amount(
-							$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() * .55
+							$rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() * .55
 						),
 						Energy::getBaseUnit(),
 					),
@@ -62,7 +62,7 @@ class Standard extends \Fatty\Approach
 				$fats = Fats::createFromEnergy(
 					new Energy(
 						new Amount(
-							$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+							$rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 						),
 						Energy::getBaseUnit(),
 					),

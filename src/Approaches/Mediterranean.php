@@ -24,9 +24,9 @@ class Mediterranean extends Standard
 		$fatsResult = new QuantityMetricResult(new GoalNutrientsFatsMetric);
 		$proteinsResult = $this->calcGoalNutrientsProteins($calculator);
 
-		$wgeeResult = $calculator->calcWeightGoalEnergyExpenditure();
-		$carbsResult->addErrors($wgeeResult->getErrors());
-		$fatsResult->addErrors($wgeeResult->getErrors());
+		$rdiResult = $calculator->calcReferenceDailyIntake();
+		$carbsResult->addErrors($rdiResult->getErrors());
+		$fatsResult->addErrors($rdiResult->getErrors());
 
 		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
 			$nutrients = new Nutrients;
@@ -34,7 +34,7 @@ class Mediterranean extends Standard
 			$fats = Fats::createFromEnergy(
 				new Energy(
 					new Amount(
-						$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() * .4
+						$rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() * .4
 					),
 					Energy::getBaseUnit(),
 				),
@@ -44,7 +44,7 @@ class Mediterranean extends Standard
 			$carbs = Carbs::createFromEnergy(
 				new Energy(
 					new Amount(
-						$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+						$rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 					),
 					Energy::getBaseUnit(),
 				),

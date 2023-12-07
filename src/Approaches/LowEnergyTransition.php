@@ -126,15 +126,15 @@ class LowEnergyTransition extends \Fatty\Approach
 		$fatsResult = new QuantityMetricResult(new GoalNutrientsFatsMetric);
 		$proteinsResult = new QuantityMetricResult(new GoalNutrientsProteinsMetric);
 
-		$wgeeResult = $calculator->calcWeightGoalEnergyExpenditure();
-		$proteinsResult->addErrors($wgeeResult->getErrors());
-		$fatsResult->addErrors($wgeeResult->getErrors());
+		$rdiResult = $calculator->calcReferenceDailyIntake();
+		$proteinsResult->addErrors($rdiResult->getErrors());
+		$fatsResult->addErrors($rdiResult->getErrors());
 
 		$ketoCalculator = clone $calculator;
 		$ketoCalculator->setDiet(new \Fatty\Diet(new \Fatty\Approaches\Keto));
 		// var_dump($ketoCalculator);
-		$ketoWgeeResult = $ketoCalculator->calcWeightGoalEnergyExpenditure();
-		$proteinsResult->addErrors($ketoWgeeResult->getErrors());
+		$ketoRdiResult = $ketoCalculator->calcReferenceDailyIntake();
+		$proteinsResult->addErrors($ketoRdiResult->getErrors());
 
 		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
 			$nutrients = new Nutrients;
@@ -142,9 +142,9 @@ class LowEnergyTransition extends \Fatty\Approach
 			// Bílkoviny.
 			$startEnergyValue = $this->getDefaultEnergy()->getInUnit(Energy::getBaseUnit())->getNumericalValue();
 			// var_dump($startEnergyValue);
-			$goalEnergyValue = $ketoWgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue();
+			$goalEnergyValue = $ketoRdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue();
 			// var_dump($goalEnergyValue);
-			$currentEnergyValue = $wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue();
+			$currentEnergyValue = $rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue();
 			// var_dump($currentEnergyValue);
 			$progress = ($currentEnergyValue - $startEnergyValue) / ($goalEnergyValue - $startEnergyValue);
 			// var_dump($progress);
@@ -169,7 +169,7 @@ class LowEnergyTransition extends \Fatty\Approach
 			$fats = Fats::createFromEnergy(
 				new Energy(
 					new Amount(
-						$wgeeResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+						$rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
 					),
 					Energy::getBaseUnit(),
 				),
