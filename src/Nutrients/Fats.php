@@ -4,5 +4,5 @@ namespace Fatty\Nutrients;
 
 class Fats extends \Fatty\Nutrient
 {
-	const KJ_IN_G = 37;
+	const KJ_IN_G = 38;
 }
