@@ -30,21 +30,23 @@ class Standard extends \Fatty\Approach
 		$carbsResult->addErrors($rdiResult->getErrors());
 		$fatsResult->addErrors($rdiResult->getErrors());
 
+		$energyBaseUnit = Energy::getBaseUnit();
+
 		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
 			$nutrients = new Nutrients;
+			$nutrients->setProteins($proteinsResult->getResult());
 
 			if ($calculator->getSportDurations()->getAnaerobic() instanceof SportDuration && $calculator->getSportDurations()->getAnaerobic()->getAmount()->getValue() >= 100) {
-				$carbs = Carbs::createFromEnergy(
-					new Energy(new Amount($rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() * .58), Energy::getBaseUnit()),
-				);
+				$carbsEnergy = new Energy(new Amount($rdiResult->getResult()->getInUnit($energyBaseUnit)->getNumericalValue() * .58), $energyBaseUnit);
+				$carbs = Carbs::createFromEnergy($carbsEnergy);
 				$nutrients->setCarbs($carbs);
 
 				$fats = Fats::createFromEnergy(
 					new Energy(
 						new Amount(
-							$rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue(),
+							$rdiResult->getResult()->getInUnit($energyBaseUnit)->getNumericalValue() - $nutrients->getEnergy()->getInUnit($energyBaseUnit)->getAmount()->getValue(),
 						),
-						Energy::getBaseUnit(),
+						$energyBaseUnit,
 					),
 				);
 				$nutrients->setFats($fats);
@@ -52,9 +54,9 @@ class Standard extends \Fatty\Approach
 				$carbs = Carbs::createFromEnergy(
 					new Energy(
 						new Amount(
-							$rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() * .55
+							$rdiResult->getResult()->getInUnit($energyBaseUnit)->getNumericalValue() * .55
 						),
-						Energy::getBaseUnit(),
+						$energyBaseUnit,
 					),
 				);
 				$nutrients->setCarbs($carbs);
@@ -62,9 +64,9 @@ class Standard extends \Fatty\Approach
 				$fats = Fats::createFromEnergy(
 					new Energy(
 						new Amount(
-							$rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue() - $nutrients->getEnergy()->getInBaseUnit()->getAmount()->getValue()
+							$rdiResult->getResult()->getInUnit($energyBaseUnit)->getNumericalValue() - $nutrients->getEnergy()->getInUnit($energyBaseUnit)->getAmount()->getValue()
 						),
-						Energy::getBaseUnit(),
+						$energyBaseUnit,
 					),
 				);
 				$nutrients->setFats($fats);
