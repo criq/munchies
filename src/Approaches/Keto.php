@@ -31,11 +31,10 @@ class Keto extends \Fatty\Approach
 
 		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
 			$nutrients = new Nutrients;
+			$nutrients->setProteins($proteinsResult->getResult());
 
 			$carbs = $calculator->getDiet()->getCarbs();
 			$nutrients->setCarbs($carbs);
-
-			$nutrients->setProteins($proteinsResult->getResult());
 
 			$fats = Fats::createFromEnergy(
 				new Energy(

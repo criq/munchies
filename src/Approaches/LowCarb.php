@@ -33,7 +33,6 @@ class LowCarb extends \Fatty\Approach
 
 		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
 			$nutrients = new Nutrients;
-
 			$nutrients->setProteins($proteinsResult->getResult());
 
 			// Sacharidy, maximum je 90 g.

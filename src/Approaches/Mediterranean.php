@@ -30,6 +30,7 @@ class Mediterranean extends Standard
 
 		if (!$carbsResult->hasErrors() && !$fatsResult->hasErrors() && !$proteinsResult->hasErrors()) {
 			$nutrients = new Nutrients;
+			$nutrients->setProteins($proteinsResult->getResult());
 
 			$fats = Fats::createFromEnergy(
 				new Energy(
