@@ -95,20 +95,18 @@ class Male extends \Fatty\Gender
 		return (new ArrayMetricResult(new SportProteinMatrixMetric))
 			->setResult(new ArrayValue([
 				"FIT" => [
-					"AEROBIC"         => 1.8,
-					"ANAEROBIC_LONG"  => 2.2,
+					"AEROBIC"         => 1.95,
 					"ANAEROBIC_SHORT" => 1.8,
 					"ANAEROBIC"       => 2.2,
-					"LOW_FREQUENCY"   => 1.5,
-					"NO_ACTIVITY"     => 1.5,
+					"LOW_FREQUENCY"   => 1.75,
+					"NO_ACTIVITY"     => 1.7,
 				],
 				"UNFIT" => [
-					"AEROBIC"         => 1.7,
-					"ANAEROBIC_LONG"  => 2,
-					"ANAEROBIC_SHORT" => 1.7,
+					"AEROBIC"         => 1.95,
+					"ANAEROBIC_SHORT" => 1.8,
 					"ANAEROBIC"       => 2,
-					"LOW_FREQUENCY"   => 1.5,
-					"NO_ACTIVITY"     => 1.5,
+					"LOW_FREQUENCY"   => 1.75,
+					"NO_ACTIVITY"     => 1.7,
 				],
 			]))
 			;
