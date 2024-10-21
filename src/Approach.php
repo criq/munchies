@@ -30,24 +30,9 @@ abstract class Approach
 		return $this->getDeclinatedLabel();
 	}
 
-	public static function createFromCode(string $value): ?Approach
+	public static function createFromCode(string $code): ?Approach
 	{
-		return static::getAvailableClasses()[$value] ?? null;
-	}
-
-	public static function getAvailableClasses(): array
-	{
-		return [
-			\Fatty\Approaches\DiaMama\HighCarb::CODE => new \Fatty\Approaches\DiaMama\HighCarb,
-			\Fatty\Approaches\DiaMama\LowCarb::CODE => new \Fatty\Approaches\DiaMama\LowCarb,
-			\Fatty\Approaches\DiaMama\Standard::CODE => new \Fatty\Approaches\DiaMama\Standard,
-			\Fatty\Approaches\Keto::CODE => new \Fatty\Approaches\Keto,
-			\Fatty\Approaches\LowCarb::CODE => new \Fatty\Approaches\LowCarb,
-			\Fatty\Approaches\LowEnergy::CODE => new \Fatty\Approaches\LowEnergy,
-			\Fatty\Approaches\LowEnergyTransition::CODE => new \Fatty\Approaches\LowEnergyTransition,
-			\Fatty\Approaches\Mediterranean::CODE => new \Fatty\Approaches\Mediterranean,
-			\Fatty\Approaches\Standard::CODE => new \Fatty\Approaches\Standard,
-		];
+		return ApproachCollection::createDefault()->getAssoc()[$code] ?? null;
 	}
 
 	public function getCode(): string
