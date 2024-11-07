@@ -40,7 +40,7 @@ class LowEnergyTransition extends \Fatty\Approach
 		$timeEnd = $calculator->getReferenceTime();
 		$time = clone $timeStart;
 
-		$collection = new LowEnergyTransitionDayCollection;
+		$days = new LowEnergyTransitionDayCollection;
 
 		while ($time->format("Ymd") <= $timeEnd->format("Ymd")) {
 			$day = new LowEnergyTransitionDay($time);
@@ -52,8 +52,8 @@ class LowEnergyTransition extends \Fatty\Approach
 				$day->setDaysToIncrease(7);
 			} else {
 				// Other days.
-				$previousDay = $collection->filterByDate((clone $time)->modify("- 1 day"))[0];
-				$previousWeightDay = $collection->getPreviousWeightDay($time, $day->getWeight());
+				$previousDay = $days->filterByDate((clone $time)->modify("- 1 day"))[0];
+				$previousWeightDay = $days->getPreviousWeightDay($time, $day->getWeight());
 
 				$day->setDaysToIncrease($previousDay->getDaysToIncrease() - 1);
 
@@ -97,14 +97,15 @@ class LowEnergyTransition extends \Fatty\Approach
 
 			if ($day->getWeightGoalEnergyExpenditure()->getInUnit(static::ENERGY_UNIT)->getAmount()->getValue() > $ketoWeightGoalEnergyExpenditure->getInUnit(static::ENERGY_UNIT)->getNumericalValue()) {
 				$day->setWeightGoalEnergyExpenditure($ketoWeightGoalEnergyExpenditure);
+				$day->setIsTransitionFinished(true);
 			}
 
-			$collection[] = $day;
+			$days[] = $day;
 
 			$time = (clone $time)->modify("+ 1 day");
 		}
 
-		return $collection->sortByOldest();
+		return $days;
 	}
 
 	public function getWeightGoalEnergyExpenditure(Calculator $calculator): Energy

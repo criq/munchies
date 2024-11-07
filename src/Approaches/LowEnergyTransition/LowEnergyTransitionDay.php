@@ -9,6 +9,7 @@ use Katu\Tools\Calendar\Time;
 class LowEnergyTransitionDay
 {
 	protected $daysToIncrease;
+	protected $isTransitionFinished = false;
 	protected $time;
 	protected $weight;
 	protected $weightGoalEnergyExpenditure;
@@ -57,5 +58,17 @@ class LowEnergyTransitionDay
 	public function getDaysToIncrease(): ?int
 	{
 		return $this->daysToIncrease;
+	}
+
+	public function setIsTransitionFinished(bool $value): LowEnergyTransitionDay
+	{
+		$this->isTransitionFinished = $value;
+
+		return $this;
+	}
+
+	public function getIsTransitionFinished(): bool
+	{
+		return $this->isTransitionFinished;
 	}
 }

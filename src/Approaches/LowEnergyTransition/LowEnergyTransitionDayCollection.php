@@ -33,6 +33,16 @@ class LowEnergyTransitionDayCollection extends \ArrayObject
 		return $this->filterBeforeDate($time)->filterDifferentWeight($weight)->sortByNewest()[0] ?? null;
 	}
 
+	public function getAssoc(): LowEnergyTransitionDayCollection
+	{
+		return new static(array_combine(
+			array_map(function (LowEnergyTransitionDay $day) {
+				return $day->getTime()->format("Y-m-d");
+			}, $this->getArrayCopy()),
+			array_values($this->getArrayCopy()),
+		));
+	}
+
 	public function sortByOldest(): LowEnergyTransitionDayCollection
 	{
 		$array = $this->getArrayCopy();
@@ -46,5 +56,10 @@ class LowEnergyTransitionDayCollection extends \ArrayObject
 	public function sortByNewest(): LowEnergyTransitionDayCollection
 	{
 		return new static(array_reverse($this->sortByOldest()->getArrayCopy()));
+	}
+
+	public function getFirst(): ?LowEnergyTransitionDay
+	{
+		return array_values($this->getArrayCopy())[0] ?? null;
 	}
 }
