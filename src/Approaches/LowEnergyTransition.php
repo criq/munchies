@@ -29,7 +29,7 @@ class LowEnergyTransition extends \Fatty\Approach
 	const ENERGY_MIN = 800;
 	const PROTEINS_DEFAULT = 82;
 
-	public function calcDays(Calculator $calculator)
+	public function calcDays(Calculator $calculator): LowEnergyTransitionDayCollection
 	{
 		$energyDecrement = new Energy(new Amount(static::ENERGY_DECREMENT), static::ENERGY_UNIT);
 		$energyIncrement = new Energy(new Amount(static::ENERGY_INCREMENT), static::ENERGY_UNIT);
@@ -132,7 +132,6 @@ class LowEnergyTransition extends \Fatty\Approach
 
 		$ketoCalculator = clone $calculator;
 		$ketoCalculator->setDiet(new \Fatty\Diet(new \Fatty\Approaches\Keto));
-		// var_dump($ketoCalculator);
 		$ketoRdiResult = $ketoCalculator->calcReferenceDailyIntake();
 		$proteinsResult->addErrors($ketoRdiResult->getErrors());
 
@@ -141,23 +140,12 @@ class LowEnergyTransition extends \Fatty\Approach
 
 			// Bílkoviny.
 			$startEnergyValue = $this->getDefaultEnergy()->getInUnit(Energy::getBaseUnit())->getNumericalValue();
-			// var_dump($startEnergyValue);
 			$goalEnergyValue = $ketoRdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue();
-			// var_dump($goalEnergyValue);
 			$currentEnergyValue = $rdiResult->getResult()->getInUnit(Energy::getBaseUnit())->getNumericalValue();
-			// var_dump($currentEnergyValue);
 			$progress = ($currentEnergyValue - $startEnergyValue) / ($goalEnergyValue - $startEnergyValue);
-			// var_dump($progress);
 
 			$startProteinsValue = $this->getDefaultProteins()->getInUnit("g")->getNumericalValue();
-			// var_dump($startProteinsValue);die;
-			// var_dump($ketoCalculator);
-			// var_dump($ketoCalculator->calcGoalNutrients());
-			// var_dump($ketoCalculator->calcGoalNutrients()->filterByCode("GOAL_NUTRIENTS_PROTEINS"));
-			$goalProteinsValue = $ketoCalculator->calcGoalNutrients()->filterByCode("GOAL_NUTRIENTS_PROTEINS")->getFirst()->getResult()->getInUnit("g")->getNumericalValue();
-			// var_dump($ketoCalculator);
-			// var_dump($goalProteinsValue);
-			$addProteins = ($goalProteinsValue - $startProteinsValue) * $progress;
+			$goalProteinsValue = $ketoCalculator->calcGoalNutrients()->filterByCode("GOAL_NUTRIENTS_PROTEINS")->getFirst()->getResult()->getInUnit("g")->getNumericalValue();$addProteins = ($goalProteinsValue - $startProteinsValue) * $progress;
 			$proteins = new Proteins(new Amount($startProteinsValue + $addProteins), "g");
 			$nutrients->setProteins($proteins);
 
