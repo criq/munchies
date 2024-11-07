@@ -15,7 +15,6 @@ use Fatty\Metrics\EssentialFatPercentageMetric;
 use Fatty\Metrics\FitnessLevelMetric;
 use Fatty\Metrics\GoalNutrientProteinBonusMetric;
 use Fatty\Metrics\MaxOptimalWeightMetric;
-use Fatty\Metrics\QuantityMetric;
 use Fatty\Metrics\QuantityMetricResult;
 use Fatty\Metrics\ReferenceDailyIntakeBonusMetric;
 use Fatty\Metrics\SportProteinSetKeyMetric;
